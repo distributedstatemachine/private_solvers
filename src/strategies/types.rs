@@ -10,6 +10,5 @@ pub enum Event {
 /// Core Action enum.
 #[derive(Debug, Clone)]
 pub enum Action {
-    // Simplest action.
-    LogSwapIntent(SwapIntent),
+    SettleIntent(SwapIntent),
 }

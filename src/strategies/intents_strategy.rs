@@ -39,6 +39,6 @@ impl Strategy<Event, Action> for IntentsStrategy {
 impl IntentsStrategy {
     // Process new orders as they come in.
     async fn process_new_swap_intent(&mut self, event: NewSwapIntent) -> Option<Action> {
-        Some(Action::LogSwapIntent(event.0))
+        Some(Action::SettleIntent(event.0))
     }
 }

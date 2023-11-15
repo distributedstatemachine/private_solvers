@@ -1,16 +1,16 @@
-use std::str::FromStr;
 use std::sync::Arc;
 
-use crate::types::swap_intent::SwapIntent;
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
 use bindings_khalani::intents_mempool::{IntentCreatedFilter, IntentsMempool};
-use ethers::abi::Address;
 use ethers::contract::Event;
 use ethers::middleware::Middleware;
 use ethers::providers::PubsubClient;
 use futures::StreamExt;
+
+use crate::config::config::Config;
+use crate::types::swap_intent::SwapIntent;
 
 /// A new intent event, containing the intent parameters.
 #[derive(Debug, Clone)]
@@ -23,12 +23,8 @@ pub struct IntentsCollector<M> {
 }
 
 impl<M: Middleware> IntentsCollector<M> {
-    pub fn new(provider: Arc<M>) -> Self {
-        let intents_mempool = IntentsMempool::new(
-            // TODO: extract to configs.
-            Address::from_str("0xec60021da4f7d482f020bbf0aa8b3d6ea73345a2").unwrap(),
-            provider.clone(),
-        );
+    pub fn new(provider: Arc<M>, config: Config) -> Self {
+        let intents_mempool = IntentsMempool::new(config.intents_mempool_address, provider.clone());
         Self {
             intent_created_filter: intents_mempool.intent_created_filter(),
         }

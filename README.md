@@ -3,11 +3,12 @@ Khalani solver off-chain bot built with [Artemis](https://github.com/paradigmxyz
 
 ### Startup
 ```shell
-cargo run -- --wss <websocket RPC url> --private-key <private key>
+cargo run -- --rpc <provider RPC url> --wss <websocket RPC url> --private-key <private key>
 ```
 
-- `<websocket RPC url>` is the RPC provider's WebSocket URL. The Infura provides those.
-- `<private key>` is the solver's wallet containing funds
+- `<provider RPC url>` — RPC provider's URL 
+- `<websocket RPC url>` — RPC provider's WebSocket URL
+- `<private key>` — the solver's wallet
 
 ### End-to-end test of the Intents Mempool
 - Start the solver to listen to Sepolia.
