@@ -9,7 +9,7 @@ edition = "2021"
 bindings-khalani = { path = "./crates/bindings-khalani" }
 
 artemis-core = { git = "https://github.com/paradigmxyz/artemis" }
-tokio = { version = "1.34.0", features = ["full"] }
+tokio = { version = "1.34.0", features = ["full", "test-util"] }
 clap = { version = "4.4.7", features = ["derive"] }
 ethers = { version = "2.0.10" }
 async-trait = "0.1.74"
