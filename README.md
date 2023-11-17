@@ -3,12 +3,13 @@ Khalani solver off-chain bot built with [Artemis](https://github.com/paradigmxyz
 
 ### Startup
 ```shell
-cargo run -- --rpc <provider RPC url> --wss <websocket RPC url> --private-key <private key>
+cargo run -- --rpc <provider RPC url> --wss <websocket RPC url> --private-key <private key> --config-file <config file>
 ```
 
 - `<provider RPC url>` — RPC provider's URL 
 - `<websocket RPC url>` — RPC provider's WebSocket URL
 - `<private key>` — the solver's wallet
+- `<config file>` — path to `./config/token_config.json`
 
 ### End-to-end test of the Intents Mempool
 - Start the solver to listen to Sepolia.

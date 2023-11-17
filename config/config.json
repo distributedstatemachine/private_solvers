@@ -1,0 +1,18 @@
+{
+  "addresses": {
+    "intents_mempool_address": "0xec60021da4f7d482f020bbf0aa8b3d6ea73345a2"
+  },
+  "chains": [
+    {
+      "name": "sepolia",
+      "chain_id": 11155111
+    }
+  ],
+  "tokens": {
+    "sepolia": [
+      {
+        "address": "0x24bcc5d1f6538f4a84cd9009ebd4fa614904fa59"
+      }
+    ]
+  }
+}

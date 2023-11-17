@@ -2239,6 +2239,8 @@ dependencies = [
  "clap",
  "ethers",
  "futures",
+ "serde",
+ "serde_json",
  "tokio",
  "tracing",
  "tracing-subscriber",

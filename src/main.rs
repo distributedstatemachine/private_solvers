@@ -1,10 +1,5 @@
-use std::str::FromStr;
 use std::sync::Arc;
 
-use crate::collectors::intents_collector::IntentsCollector;
-use crate::config::config::Config;
-use crate::executors::intents_executor::IntentsExecutor;
-use crate::strategies::intents_strategy::IntentsStrategy;
 use anyhow::Result;
 use artemis_core::engine::Engine;
 use artemis_core::types::CollectorMap;
@@ -13,12 +8,17 @@ use ethers::middleware::Middleware;
 use ethers::prelude::MiddlewareBuilder;
 use ethers::providers::{Http, Provider, Ws};
 use ethers::signers::{LocalWallet, Signer};
-use ethers::types::Address;
-use strategies::types::{Action, Event};
 use tracing::{info, Level};
 use tracing_subscriber::filter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
+
+use strategies::types::{Action, Event};
+
+use crate::collectors::intents_collector::IntentsCollector;
+use crate::config::config::read_config;
+use crate::executors::intents_executor::IntentsExecutor;
+use crate::strategies::intents_strategy::IntentsStrategy;
 
 pub mod collectors;
 pub mod config;
@@ -40,6 +40,9 @@ pub struct Args {
     /// Private key for sending txs.
     #[arg(long)]
     pub private_key: String,
+
+    #[arg(long)]
+    pub config_file: String,
 }
 
 #[tokio::main]
@@ -54,6 +57,9 @@ async fn main() -> Result<()> {
         .init();
 
     let args = Args::parse();
+
+    let config = read_config(args.config_file.as_str()).unwrap();
+    info!("Config: {:?}", config);
 
     let sender_provider =
         Provider::<Http>::try_from(args.rpc).expect("Failed to instantiate HTTP Provider");
@@ -82,13 +88,11 @@ async fn main() -> Result<()> {
 
     let sender_provider = Arc::new(sender_provider.nonce_manager(address).with_signer(wallet));
 
-    let config = Config {
-        intents_mempool_address: Address::from_str("0xec60021da4f7d482f020bbf0aa8b3d6ea73345a2")
-            .unwrap(),
-    };
-
     // Set up intents collector.
-    let intents_collector = Box::new(IntentsCollector::new(ws_provider.clone(), config.clone()));
+    let intents_collector = Box::new(IntentsCollector::new(
+        ws_provider.clone(),
+        config.addresses.intents_mempool_address,
+    ));
     let intents_collector = CollectorMap::new(intents_collector, Event::NewSwapIntent);
     engine.add_collector(Box::new(intents_collector));
 
@@ -99,7 +103,7 @@ async fn main() -> Result<()> {
     // Set up intents executor.
     engine.add_executor(Box::new(IntentsExecutor::new(
         sender_provider,
-        config.clone(),
+        config.addresses.intents_mempool_address,
     )));
 
     // Start engine.

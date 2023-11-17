@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::types::swap_intent::SwapIntent;
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
@@ -7,10 +8,8 @@ use bindings_khalani::intents_mempool::{IntentCreatedFilter, IntentsMempool};
 use ethers::contract::Event;
 use ethers::middleware::Middleware;
 use ethers::providers::PubsubClient;
+use ethers::types::Address;
 use futures::StreamExt;
-
-use crate::config::config::Config;
-use crate::types::swap_intent::SwapIntent;
 
 /// A new intent event, containing the intent parameters.
 #[derive(Debug, Clone)]
@@ -23,8 +22,8 @@ pub struct IntentsCollector<M> {
 }
 
 impl<M: Middleware> IntentsCollector<M> {
-    pub fn new(provider: Arc<M>, config: Config) -> Self {
-        let intents_mempool = IntentsMempool::new(config.intents_mempool_address, provider.clone());
+    pub fn new(provider: Arc<M>, intents_mempool_address: Address) -> Self {
+        let intents_mempool = IntentsMempool::new(intents_mempool_address, provider.clone());
         Self {
             intent_created_filter: intents_mempool.intent_created_filter(),
         }
