@@ -1,6 +1,7 @@
-use ethers::types::Address;
-
 use crate::config::chain::ChainId;
+use crate::inventory::amount::Amount;
+use anyhow::Context;
+use ethers::types::{Address, U256};
 
 #[derive(Debug)]
 pub struct Token {
@@ -9,4 +10,18 @@ pub struct Token {
     pub name: String,
     pub symbol: String,
     pub decimals: u8,
+}
+
+impl Amount {
+    pub fn from_token(user_units: U256, token: &Token) -> Amount {
+        let multiplier = U256::exp10(token.decimals as usize);
+        let base_units = user_units
+            .checked_mul(multiplier)
+            .context(format!("Token {}", token.address))
+            .unwrap();
+        Amount {
+            decimals: token.decimals,
+            base_units,
+        }
+    }
 }

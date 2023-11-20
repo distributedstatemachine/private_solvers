@@ -1,12 +1,13 @@
 use crate::config::config::Config;
 use crate::config::token::TokenConfig;
 use crate::connectors::connector::Connector;
+use crate::inventory::amount::Amount;
 use crate::inventory::token::Token;
 use crate::inventory::token_balance_query::TokenBalanceQuery;
 use anyhow::Result;
 use async_trait::async_trait;
 use bindings_khalani::erc20_mintable_burnable::ERC20MintableBurnable;
-use ethers::types::{Address, U256};
+use ethers::types::Address;
 use std::default::Default;
 use std::sync::Arc;
 
@@ -58,10 +59,11 @@ impl Inventory {
 
 #[async_trait]
 impl TokenBalanceQuery for Inventory {
-    async fn get_balance(&self, token: &Token, owner: Address) -> Result<U256> {
+    async fn get_balance(&self, token: &Token, owner: Address) -> Result<Amount> {
         let rpc_client = self.connector.get_rpc_client(token.chain_id).unwrap();
         let erc20 = ERC20MintableBurnable::new(token.address, rpc_client);
-        let balance = erc20.balance_of(owner).await;
-        Ok(balance?)
+        let balance = erc20.balance_of(owner).await?;
+        let amount = Amount::from_token(balance, token);
+        Ok(amount)
     }
 }
