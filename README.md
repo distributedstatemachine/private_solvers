@@ -3,11 +3,13 @@ Khalani solver off-chain bot built with [Artemis](https://github.com/paradigmxyz
 
 ### Startup
 ```shell
-cargo run -- --rpc <provider RPC url> --wss <websocket RPC url> --private-key <private key> --config-file <config file>
+export SEPOLIA_RPC_URL=<sepolia RPC URL>
+export SEPOLIA_WS_URL=<sepolia WS URL>
+cargo run -- --config-file <config file> --private-key <private key>
 ```
 
-- `<provider RPC url>` — RPC provider's URL 
-- `<websocket RPC url>` — RPC provider's WebSocket URL
+- `<sepolia RPC URL>` — JSON RPC provider URL 
+- `<sepolia WS URL>` — WebSocket provider URL
 - `<private key>` — the solver's wallet
 - `<config file>` — path to `./config/token_config.json`
 

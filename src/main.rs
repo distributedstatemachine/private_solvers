@@ -1,12 +1,7 @@
-use std::sync::Arc;
-
 use anyhow::Result;
 use artemis_core::engine::Engine;
 use artemis_core::types::CollectorMap;
 use clap::Parser;
-use ethers::middleware::Middleware;
-use ethers::prelude::MiddlewareBuilder;
-use ethers::providers::{Http, Provider, Ws};
 use ethers::signers::{LocalWallet, Signer};
 use tracing::{info, Level};
 use tracing_subscriber::filter;
@@ -16,12 +11,15 @@ use tracing_subscriber::util::SubscriberInitExt;
 use strategies::types::{Action, Event};
 
 use crate::collectors::intents_collector::IntentsCollector;
-use crate::config::config::read_config;
+use crate::config::chain::SEPOLIA_CHAIN_ID;
+use crate::config::config::Config;
+use crate::connectors::connector::Connector;
 use crate::executors::intents_executor::IntentsExecutor;
 use crate::strategies::intents_strategy::IntentsStrategy;
 
 pub mod collectors;
 pub mod config;
+pub mod connectors;
 pub mod executors;
 pub mod inventory;
 pub mod strategies;
@@ -29,14 +27,6 @@ pub mod types;
 
 #[derive(Parser, Debug)]
 pub struct Args {
-    /// Ethereum node HTTPS endpoint.
-    #[arg(long)]
-    pub rpc: String,
-
-    /// Ethereum node WS endpoint.
-    #[arg(long)]
-    pub wss: String,
-
     /// Private key for sending txs.
     #[arg(long)]
     pub private_key: String,
@@ -58,40 +48,25 @@ async fn main() -> Result<()> {
 
     let args = Args::parse();
 
-    let config = read_config(args.config_file.as_str()).unwrap();
-    info!("Config: {:?}", config);
+    let config = Config::read_config(args.config_file.as_str()).unwrap();
+    info!("Config: {:?}", &config);
 
-    let sender_provider =
-        Provider::<Http>::try_from(args.rpc).expect("Failed to instantiate HTTP Provider");
-    let chain_id = sender_provider.get_chainid().await?.as_u64();
-
-    let wallet: LocalWallet = args
-        .private_key
-        .parse::<LocalWallet>()
-        .unwrap()
-        .with_chain_id(chain_id);
-
+    let wallet: LocalWallet = args.private_key.parse::<LocalWallet>().unwrap();
     let address = wallet.address();
     info!("Solver address: {}", address);
+
+    let connector = Connector::new(config.clone(), wallet.clone()).await?;
 
     // Set up engine.
     let mut engine = Engine::<Event, Action>::default();
 
-    // Set up ethers provider.
-    let ws_client = Ws::connect(args.wss).await?;
-    let ws_provider = Provider::new(ws_client);
-    let ws_provider = Arc::new(
-        ws_provider
-            .nonce_manager(address)
-            .with_signer(wallet.clone()),
-    );
-
-    let sender_provider = Arc::new(sender_provider.nonce_manager(address).with_signer(wallet));
+    let rpc_client = connector.get_rpc_client(SEPOLIA_CHAIN_ID).unwrap();
+    let ws_client = connector.get_ws_client(SEPOLIA_CHAIN_ID).unwrap();
 
     // Set up intents collector.
     let intents_collector = Box::new(IntentsCollector::new(
-        ws_provider.clone(),
-        config.addresses.intents_mempool_address,
+        ws_client,
+        config.addresses.intents_mempool_address.clone(),
     ));
     let intents_collector = CollectorMap::new(intents_collector, Event::NewSwapIntent);
     engine.add_collector(Box::new(intents_collector));
@@ -102,8 +77,8 @@ async fn main() -> Result<()> {
 
     // Set up intents executor.
     engine.add_executor(Box::new(IntentsExecutor::new(
-        sender_provider,
-        config.addresses.intents_mempool_address,
+        rpc_client,
+        config.addresses.intents_mempool_address.clone(),
     )));
 
     // Start engine.

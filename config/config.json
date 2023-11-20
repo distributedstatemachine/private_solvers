@@ -5,7 +5,9 @@
   "chains": [
     {
       "name": "sepolia",
-      "chain_id": 11155111
+      "chain_id": 11155111,
+      "rpc_url": "$SEPOLIA_RPC_URL",
+      "ws_url": "$SEPOLIA_WS_URL"
     }
   ],
   "tokens": {
