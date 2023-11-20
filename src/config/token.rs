@@ -1,4 +1,4 @@
-use crate::config::chain::ChainConfig;
+use crate::config::chain::ChainId;
 use ethers::types::Address;
 use serde::{Deserialize, Serialize};
 
@@ -9,6 +9,6 @@ pub struct TokenConfigRaw {
 
 #[derive(Debug, Clone)]
 pub struct TokenConfig {
-    pub chain: ChainConfig,
+    pub chain_id: ChainId,
     pub address: Address,
 }

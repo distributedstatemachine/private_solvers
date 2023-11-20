@@ -49,7 +49,7 @@ impl Config {
                     .find(|chain| chain.name.eq(chain_name))
                     .unwrap();
                 tokens.iter().map(|token| TokenConfig {
-                    chain: chain_config.clone(),
+                    chain_id: chain_config.chain_id,
                     address: token.address.parse::<Address>().unwrap(),
                 })
             })
