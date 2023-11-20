@@ -1,1 +1,1 @@
-pub mod token_test;
+pub mod inventory_test;

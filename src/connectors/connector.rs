@@ -5,6 +5,7 @@ use anyhow::{anyhow, Context, Result};
 use ethers::middleware::{MiddlewareBuilder, NonceManagerMiddleware, SignerMiddleware};
 use ethers::providers::{Http, Middleware, Provider, Ws};
 use ethers::signers::{LocalWallet, Signer};
+use ethers::types::Address;
 
 use crate::config::chain::{ChainConfig, ChainId};
 use crate::config::config::Config;
@@ -13,11 +14,16 @@ pub type RpcClient = SignerMiddleware<NonceManagerMiddleware<Provider<Http>>, Lo
 pub type WsClient = Provider<Ws>;
 
 pub struct Connector {
+    address: Address,
     rpc_clients: HashMap<ChainId, Arc<RpcClient>>,
     ws_clients: HashMap<ChainId, Arc<WsClient>>,
 }
 
 impl Connector {
+    pub fn get_address(&self) -> Address {
+        self.address
+    }
+
     pub fn get_rpc_client(&self, chain_id: ChainId) -> Option<Arc<RpcClient>> {
         self.rpc_clients.get(&chain_id).cloned()
     }
@@ -47,6 +53,7 @@ impl Connector {
             ws_clients.insert(chain_config.chain_id, ws_client);
         }
         Ok(Connector {
+            address: wallet.address(),
             rpc_clients,
             ws_clients,
         })
