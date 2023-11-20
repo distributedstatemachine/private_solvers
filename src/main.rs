@@ -27,6 +27,7 @@ pub mod types;
 
 #[derive(Parser, Debug)]
 pub struct Args {
+    // TODO: move to the config file too.
     /// Private key for sending txs.
     #[arg(long)]
     pub private_key: String,
@@ -37,14 +38,7 @@ pub struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let filter = filter::Targets::new()
-        .with_target("artemis_core", Level::INFO)
-        .with_target("khalani_solver", Level::INFO);
-
-    tracing_subscriber::registry()
-        .with(tracing_subscriber::fmt::layer())
-        .with(filter)
-        .init();
+    configure_logs();
 
     let args = Args::parse();
 
@@ -58,6 +52,25 @@ async fn main() -> Result<()> {
     let connector = Connector::new(config.clone(), wallet.clone()).await?;
 
     // Set up engine.
+    let engine = configure_engine(&config, &connector);
+
+    // Start engine.
+    run_engine(engine).await;
+    Ok(())
+}
+
+fn configure_logs() {
+    let filter = filter::Targets::new()
+        .with_target("artemis_core", Level::INFO)
+        .with_target("khalani_solver", Level::INFO);
+
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::fmt::layer())
+        .with(filter)
+        .init();
+}
+
+fn configure_engine(config: &Config, connector: &Connector) -> Engine<Event, Action> {
     let mut engine = Engine::<Event, Action>::default();
 
     let rpc_client = connector.get_rpc_client(SEPOLIA_CHAIN_ID).unwrap();
@@ -81,11 +94,13 @@ async fn main() -> Result<()> {
         config.addresses.intents_mempool_address.clone(),
     )));
 
-    // Start engine.
+    engine
+}
+
+async fn run_engine(engine: Engine<Event, Action>) {
     if let Ok(mut set) = engine.run().await {
         while let Some(res) = set.join_next().await {
             info!("Result: {:?}", res);
         }
     }
-    Ok(())
 }
