@@ -1,4 +1,4 @@
-pub use swap_intents_library::*;
+pub use ecdsa::*;
 /// This module was auto-generated with ethers-rs Abigen.
 /// More information at: <https://github.com/gakonst/ethers-rs>
 #[allow(
@@ -9,7 +9,7 @@ pub use swap_intents_library::*;
     dead_code,
     non_camel_case_types,
 )]
-pub mod swap_intents_library {
+pub mod ecdsa {
     #[allow(deprecated)]
     fn __abi() -> ::ethers::core::abi::Abi {
         ::ethers::core::abi::ethabi::Contract {
@@ -22,46 +22,44 @@ pub mod swap_intents_library {
         }
     }
     ///The parsed JSON ABI of the contract.
-    pub static SWAPINTENTSLIBRARY_ABI: ::ethers::contract::Lazy<
-        ::ethers::core::abi::Abi,
-    > = ::ethers::contract::Lazy::new(__abi);
+    pub static ECDSA_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(
+        __abi,
+    );
     #[rustfmt::skip]
-    const __BYTECODE: &[u8] = b"`V`7`\x0B\x82\x82\x829\x80Q`\0\x1A`s\x14`*WcNH{q`\xE0\x1B`\0R`\0`\x04R`$`\0\xFD[0`\0R`s\x81S\x82\x81\xF3\xFEs\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 _\xB71\xF6\x03\xA0C\x96\x08o\x9B\xAE\xFA\xECp\xD4's\xE8\xF7][\x1D\x17\xA1Vw\xA3Uzx\xA2dsolcC\0\x08\x13\x003";
+    const __BYTECODE: &[u8] = b"`V`7`\x0B\x82\x82\x829\x80Q`\0\x1A`s\x14`*WcNH{q`\xE0\x1B`\0R`\0`\x04R`$`\0\xFD[0`\0R`s\x81S\x82\x81\xF3\xFEs\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 \xED\xBB7\xEDu]\xD0\xC2\xB0\x7F\x19\xBB2\0L\x0C\x97#C\xAF\xAFoR\x8D_L\x14[\x82eH\ndsolcC\0\x08\x13\x003";
     /// The bytecode of the contract.
-    pub static SWAPINTENTSLIBRARY_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
+    pub static ECDSA_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __BYTECODE,
     );
     #[rustfmt::skip]
-    const __DEPLOYED_BYTECODE: &[u8] = b"s\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 _\xB71\xF6\x03\xA0C\x96\x08o\x9B\xAE\xFA\xECp\xD4's\xE8\xF7][\x1D\x17\xA1Vw\xA3Uzx\xA2dsolcC\0\x08\x13\x003";
+    const __DEPLOYED_BYTECODE: &[u8] = b"s\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 \xED\xBB7\xEDu]\xD0\xC2\xB0\x7F\x19\xBB2\0L\x0C\x97#C\xAF\xAFoR\x8D_L\x14[\x82eH\ndsolcC\0\x08\x13\x003";
     /// The deployed bytecode of the contract.
-    pub static SWAPINTENTSLIBRARY_DEPLOYED_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
+    pub static ECDSA_DEPLOYED_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __DEPLOYED_BYTECODE,
     );
-    pub struct SwapIntentsLibrary<M>(::ethers::contract::Contract<M>);
-    impl<M> ::core::clone::Clone for SwapIntentsLibrary<M> {
+    pub struct ECDSA<M>(::ethers::contract::Contract<M>);
+    impl<M> ::core::clone::Clone for ECDSA<M> {
         fn clone(&self) -> Self {
             Self(::core::clone::Clone::clone(&self.0))
         }
     }
-    impl<M> ::core::ops::Deref for SwapIntentsLibrary<M> {
+    impl<M> ::core::ops::Deref for ECDSA<M> {
         type Target = ::ethers::contract::Contract<M>;
         fn deref(&self) -> &Self::Target {
             &self.0
         }
     }
-    impl<M> ::core::ops::DerefMut for SwapIntentsLibrary<M> {
+    impl<M> ::core::ops::DerefMut for ECDSA<M> {
         fn deref_mut(&mut self) -> &mut Self::Target {
             &mut self.0
         }
     }
-    impl<M> ::core::fmt::Debug for SwapIntentsLibrary<M> {
+    impl<M> ::core::fmt::Debug for ECDSA<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(::core::stringify!(SwapIntentsLibrary))
-                .field(&self.address())
-                .finish()
+            f.debug_tuple(::core::stringify!(ECDSA)).field(&self.address()).finish()
         }
     }
-    impl<M: ::ethers::providers::Middleware> SwapIntentsLibrary<M> {
+    impl<M: ::ethers::providers::Middleware> ECDSA<M> {
         /// Creates a new contract instance with the specified `ethers` client at
         /// `address`. The contract derefs to a `ethers::Contract` object.
         pub fn new<T: Into<::ethers::core::types::Address>>(
@@ -71,7 +69,7 @@ pub mod swap_intents_library {
             Self(
                 ::ethers::contract::Contract::new(
                     address.into(),
-                    SWAPINTENTSLIBRARY_ABI.clone(),
+                    ECDSA_ABI.clone(),
                     client,
                 ),
             )
@@ -107,8 +105,8 @@ pub mod swap_intents_library {
             ::ethers::contract::ContractError<M>,
         > {
             let factory = ::ethers::contract::ContractFactory::new(
-                SWAPINTENTSLIBRARY_ABI.clone(),
-                SWAPINTENTSLIBRARY_BYTECODE.clone().into(),
+                ECDSA_ABI.clone(),
+                ECDSA_BYTECODE.clone().into(),
                 client,
             );
             let deployer = factory.deploy(constructor_args)?;
@@ -117,7 +115,7 @@ pub mod swap_intents_library {
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for SwapIntentsLibrary<M> {
+    for ECDSA<M> {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
