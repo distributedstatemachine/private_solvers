@@ -10,5 +10,6 @@ pub enum Event {
 /// Core Action enum.
 #[derive(Debug, Clone)]
 pub enum Action {
+    LockTokens(SwapIntent),
     SettleIntent(SwapIntent),
 }

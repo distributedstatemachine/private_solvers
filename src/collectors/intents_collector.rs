@@ -45,14 +45,7 @@ where
             match event {
                 Ok(event) => Some(NewSwapIntent(SwapIntent {
                     intent_id: event.intent_id.into(),
-                    author: event.intent.author,
-                    signature: event.intent.signature,
-                    source_chain_id: event.intent.source_chain_id,
-                    destination_chain_id: event.intent.destination_chain_id,
-                    source_token: event.intent.source_token,
-                    destination_token: event.intent.destination_token,
-                    source_amount: event.intent.source_amount,
-                    source_permit_2: event.intent.source_permit_2,
+                    ..SwapIntent::from(event.intent)
                 })),
                 Err(_) => None, // TODO: consider better error handling.
             }

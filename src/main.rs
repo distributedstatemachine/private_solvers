@@ -106,7 +106,7 @@ fn configure_engine(
     // Set up intents executor.
     engine.add_executor(Box::new(IntentsExecutor::new(
         rpc_client,
-        config.addresses.intents_mempool_address.clone(),
+        config.addresses.clone(),
     )));
 
     engine

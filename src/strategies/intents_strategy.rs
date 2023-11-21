@@ -43,14 +43,11 @@ impl IntentsStrategy {
 
 #[async_trait]
 impl Strategy<Event, Action> for IntentsStrategy {
-    // In order to sync this strategy, we need to get the current bid for all Sudo pools.
     async fn sync_state(&mut self) -> Result<()> {
-        info!("syncing state");
-
+        info!("Syncing state");
         Ok(())
     }
 
-    // Process incoming events, seeing if we can arb new orders, and updating the internal state on new blocks.
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
         let option = match event {
             Event::NewSwapIntent(new_swap_intent) => {
