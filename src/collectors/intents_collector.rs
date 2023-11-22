@@ -12,12 +12,7 @@ use ethers::contract::Event as ContractEvent;
 use ethers::types::Address;
 use futures::StreamExt;
 
-/// A new intent event, containing the intent parameters.
-#[derive(Debug, Clone)]
-pub struct NewSwapIntent(pub SwapIntent);
-
-/// A collector that listens for new intents, and generates a stream of
-/// [events](NewSwapIntent) which contain the intent parameters.
+/// A collector that listens for new intents in the mempool.
 pub struct IntentsCollector {
     intent_created_filter: ContractEvent<Arc<WsClient>, WsClient, IntentCreatedFilter>,
 }
