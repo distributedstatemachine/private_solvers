@@ -40,7 +40,7 @@ impl Config {
                 .intents_mempool_address
                 .parse::<Address>()
                 .unwrap(),
-            escrow: config.addresses.escrow.parse::<Address>().unwrap(),
+            escrow_address: config.addresses.escrow_address.parse::<Address>().unwrap(),
         };
         let chains: Vec<ChainConfig> = config
             .chains

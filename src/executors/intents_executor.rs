@@ -5,36 +5,31 @@ use artemis_core::types::Executor;
 use async_trait::async_trait;
 use bindings_khalani::escrow::Escrow;
 use bindings_khalani::intents_mempool::IntentsMempool;
-use ethers::middleware::Middleware;
-use ethers::prelude::H256;
-use ethers::types::transaction::eip2718::TypedTransaction;
-use ethers::types::U64;
+use ethers::contract::ContractCall;
 use tracing::info;
 
 use crate::config::addresses::AddressesConfig;
+use crate::connectors::connector::{Connector, RpcClient};
+use crate::ethereum::transaction::submit_transaction;
 use crate::strategies::types::Action;
 use crate::types::swap_intent::SwapIntent;
 
-pub struct IntentsExecutor<M: Middleware> {
-    sender_provider: Arc<M>,
+pub struct IntentsExecutor {
+    connector: Arc<Connector>,
     addresses_config: AddressesConfig,
 }
 
-impl<M: Middleware> IntentsExecutor<M> {
-    pub fn new(sender_provider: Arc<M>, addresses_config: AddressesConfig) -> Self {
+impl IntentsExecutor {
+    pub fn new(addresses_config: AddressesConfig, connector: Arc<Connector>) -> Self {
         Self {
-            sender_provider,
             addresses_config,
+            connector,
         }
     }
 }
 
 #[async_trait]
-impl<M> Executor<Action> for IntentsExecutor<M>
-where
-    M: Middleware,
-    M::Error: 'static,
-{
+impl Executor<Action> for IntentsExecutor {
     async fn execute(&self, action: Action) -> Result<()> {
         match action {
             Action::SettleIntent(swap_intent) => self.process_settle_intent(swap_intent).await,
@@ -43,17 +38,14 @@ where
     }
 }
 
-impl<M> IntentsExecutor<M>
-where
-    M: Middleware,
-    M::Error: 'static,
-{
+impl IntentsExecutor {
     async fn lock_tokens(&self, swap_intent: SwapIntent) -> Result<()> {
-        info!(%swap_intent, "Locking source tokens of the intent");
-        let transaction = self.build_settle_intent_tx(&swap_intent).await?;
-        let tx_hash = self.submit_tx(transaction).await?;
+        info!(?swap_intent, "Locking source tokens of the intent");
+        let transaction = self.build_lock_tokens_tx(&swap_intent);
+        let receipt = submit_transaction(transaction).await?;
+        let tx_hash = receipt.transaction_hash;
         info!(
-            %swap_intent,
+            ?swap_intent,
             %tx_hash,
             "Source tokens have been locked"
         );
@@ -61,41 +53,34 @@ where
     }
 
     async fn process_settle_intent(&self, swap_intent: SwapIntent) -> Result<()> {
-        info!(%swap_intent, "Settling intent");
-        let transaction = self.build_settle_intent_tx(&swap_intent).await?;
-        let tx_hash = self.submit_tx(transaction).await?;
+        info!(?swap_intent, "Settling intent");
+        let transaction = self.build_settle_intent_tx(&swap_intent);
+        let receipt = submit_transaction(transaction).await?;
+        let tx_hash = receipt.transaction_hash;
         info!(
-            %swap_intent,
+            ?swap_intent,
             %tx_hash,
             "Intent has been settled"
         );
         Ok(())
     }
 
-    async fn build_lock_tokens_tx(&self, swap_intent: &SwapIntent) -> Result<TypedTransaction> {
-        let chain_id: U64 = self.sender_provider.get_chainid().await?.as_u64().into();
-        let escrow = Escrow::new(self.addresses_config.escrow, self.sender_provider.clone());
-        let mut call = escrow.lock_tokens(swap_intent.into());
-        Ok(call.tx.set_chain_id(chain_id).clone())
+    fn build_lock_tokens_tx(&self, swap_intent: &SwapIntent) -> ContractCall<RpcClient, ()> {
+        let chain_id = swap_intent.source_chain_id.into();
+        let rpc_client = self.connector.get_rpc_client(chain_id).unwrap();
+        let escrow = Escrow::new(self.addresses_config.escrow_address, rpc_client);
+        let mut call = escrow.lock_tokens(swap_intent.clone().into());
+        call.tx.set_chain_id(chain_id);
+        call
     }
 
-    async fn build_settle_intent_tx(&self, swap_intent: &SwapIntent) -> Result<TypedTransaction> {
-        let chain_id: U64 = self.sender_provider.get_chainid().await?.as_u64().into();
-        let intents_mempool = IntentsMempool::new(
-            self.addresses_config.intents_mempool_address,
-            self.sender_provider.clone(),
-        );
+    fn build_settle_intent_tx(&self, swap_intent: &SwapIntent) -> ContractCall<RpcClient, ()> {
+        let chain_id = swap_intent.source_chain_id.into();
+        let rpc_client = self.connector.get_rpc_client(chain_id).unwrap();
+        let intents_mempool =
+            IntentsMempool::new(self.addresses_config.intents_mempool_address, rpc_client);
         let mut call = intents_mempool.settle_intent(swap_intent.intent_id.0);
-        Ok(call.tx.set_chain_id(chain_id).clone())
-    }
-
-    async fn submit_tx(&self, transaction: TypedTransaction) -> Result<H256> {
-        // TODO: handle failing and forever pending transactions.
-        let result = self
-            .sender_provider
-            .send_transaction(transaction, None)
-            .await?;
-        let tx_hash = result.tx_hash();
-        Ok(tx_hash)
+        call.tx.set_chain_id(chain_id);
+        call
     }
 }

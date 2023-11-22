@@ -6,6 +6,7 @@ pub struct SwapIntent {
 
     pub author: Address,
     pub signature: Bytes,
+    // TODO: use ChainId type.
     pub source_chain_id: u32,
     pub destination_chain_id: u32,
     pub source_token: Address,

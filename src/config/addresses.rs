@@ -5,12 +5,12 @@ use serde::{Deserialize, Serialize};
 pub struct AddressesConfigRaw {
     pub intents_mempool_address: String,
     pub vault_address: String,
-    pub escrow: String,
+    pub escrow_address: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct AddressesConfig {
     pub intents_mempool_address: Address,
     pub vault_address: Address,
-    pub escrow: Address,
+    pub escrow_address: Address,
 }

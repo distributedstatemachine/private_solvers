@@ -14,7 +14,6 @@ use tracing_subscriber::util::SubscriberInitExt;
 use strategies::types::{Action, Event};
 
 use crate::collectors::intents_collector::IntentsCollector;
-use crate::config::chain::SEPOLIA_CHAIN_ID;
 use crate::config::config::Config;
 use crate::connectors::connector::Connector;
 use crate::executors::intents_executor::IntentsExecutor;
@@ -23,6 +22,7 @@ use crate::strategies::intents_strategy::IntentsStrategy;
 pub mod collectors;
 pub mod config;
 pub mod connectors;
+pub mod ethereum;
 pub mod executors;
 pub mod inventory;
 pub mod strategies;
@@ -83,12 +83,9 @@ fn configure_engine(
 ) -> Engine<Event, Action> {
     let mut engine = Engine::<Event, Action>::default();
 
-    let rpc_client = connector.get_rpc_client(SEPOLIA_CHAIN_ID).unwrap();
-    let ws_client = connector.get_ws_client(SEPOLIA_CHAIN_ID).unwrap();
-
     // Set up intents collector.
     let intents_collector = Box::new(IntentsCollector::new(
-        ws_client,
+        connector.clone(),
         config.addresses.intents_mempool_address.clone(),
     ));
     let intents_collector = CollectorMap::new(intents_collector, Event::NewSwapIntent);
@@ -96,7 +93,7 @@ fn configure_engine(
 
     // Set up intents strategy.
     let strategy = IntentsStrategy::new(
-        connector,
+        connector.clone(),
         inventory,
         config.addresses.vault_address,
         config.balancer.clone(),
@@ -105,8 +102,8 @@ fn configure_engine(
 
     // Set up intents executor.
     engine.add_executor(Box::new(IntentsExecutor::new(
-        rpc_client,
         config.addresses.clone(),
+        connector.clone(),
     )));
 
     engine
