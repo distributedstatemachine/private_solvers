@@ -1,18 +1,22 @@
 use anyhow::{Context, Result};
-use ethers::types::Address;
+use ethers::types::{Address, H256};
 
 // TODO: read config from the JSON files
 
 use crate::config::addresses::{AddressesConfig, AddressesConfigRaw};
+use crate::config::balancer::BalancerPool;
 use crate::config::chain::{ChainConfig, ChainConfigRaw};
 use crate::config::token::{TokenConfig, TokenConfigRaw};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::{env, fs};
 
+use super::balancer::{BalancerConfig, BalancerConfigRaw};
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigRaw {
     pub addresses: AddressesConfigRaw,
+    pub balancer: BalancerConfigRaw,
     pub chains: Vec<ChainConfigRaw>,
     pub tokens: HashMap<String, Vec<TokenConfigRaw>>,
 }
@@ -20,6 +24,7 @@ pub struct ConfigRaw {
 #[derive(Debug, Clone)]
 pub struct Config {
     pub addresses: AddressesConfig,
+    pub balancer: BalancerConfig,
     pub chains: Vec<ChainConfig>,
     pub tokens: Vec<TokenConfig>,
 }
@@ -29,6 +34,7 @@ impl Config {
         let file_content = fs::read_to_string(file_path)?;
         let config: ConfigRaw = serde_json::from_str(&file_content)?;
         let addresses = AddressesConfig {
+            vault_address: config.addresses.vault_address.parse::<Address>().unwrap(),
             intents_mempool_address: config
                 .addresses
                 .intents_mempool_address
@@ -46,7 +52,7 @@ impl Config {
             .flat_map(|(chain_name, tokens)| {
                 let chain_config = chains
                     .iter()
-                    .find(|chain| chain.name.eq(chain_name))
+                    .find(|chain| &chain.name == chain_name)
                     .unwrap();
                 tokens.iter().map(|token| TokenConfig {
                     chain_id: chain_config.chain_id,
@@ -54,8 +60,35 @@ impl Config {
                 })
             })
             .collect();
+
+        let batch_swap_steps_from_kai: HashMap<TokenConfig, Vec<BalancerPool>> = config
+            .balancer
+            .batch_swap_steps_from_kai
+            .iter()
+            .map(|(token_address, pools_addresses)| {
+                (
+                    (tokens
+                        .iter()
+                        .find(|token_config| {
+                            token_config.address == token_address.parse::<Address>().unwrap()
+                        })
+                        .unwrap())
+                    .clone(),
+                    pools_addresses
+                        .iter()
+                        .map(|i| BalancerPool {
+                            id: i.parse::<H256>().unwrap(),
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+
         Ok(Config {
             addresses,
+            balancer: BalancerConfig {
+                batch_swap_steps_from_kai,
+            },
             chains,
             tokens,
         })

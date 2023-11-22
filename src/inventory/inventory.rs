@@ -1,3 +1,4 @@
+use crate::config::chain::ChainId;
 use crate::config::config::Config;
 use crate::config::token::TokenConfig;
 use crate::connectors::connector::Connector;
@@ -42,6 +43,7 @@ impl Inventory {
             .connector
             .get_rpc_client(token_config.chain_id)
             .unwrap();
+
         let erc20 = ERC20MintableBurnable::new(token_config.address, rpc_client.clone());
         let name = erc20.name().await?;
         let symbol = erc20.symbol().await?;
@@ -54,6 +56,28 @@ impl Inventory {
             decimals,
         };
         Ok(token)
+    }
+
+    pub fn find_token_by_address(&self, address: Address, chain_id: ChainId) -> Option<&Token> {
+        self.tokens
+            .iter()
+            .find(|&i| i.address == address && i.chain_id == chain_id)
+    }
+
+    pub fn find_token_by_symbol(&self, symbol: String, chain_id: ChainId) -> Option<&Token> {
+        self.tokens
+            .iter()
+            .find(|&i| i.symbol == symbol && i.chain_id == chain_id)
+    }
+
+    pub fn find_token_by_symbol_partial_match(
+        &self,
+        symbol: String,
+        chain_id: ChainId,
+    ) -> Option<&Token> {
+        self.tokens.iter().find(|&i| {
+            i.symbol.matches(&symbol).collect::<Vec<&str>>().len() == 1 && i.chain_id == chain_id
+        })
     }
 }
 

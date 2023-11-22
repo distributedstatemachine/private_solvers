@@ -7,7 +7,7 @@ pub struct TokenConfigRaw {
     pub address: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct TokenConfig {
     pub chain_id: ChainId,
     pub address: Address,

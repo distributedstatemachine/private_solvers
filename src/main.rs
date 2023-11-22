@@ -1,8 +1,11 @@
+use std::sync::Arc;
+
 use anyhow::Result;
 use artemis_core::engine::Engine;
 use artemis_core::types::CollectorMap;
 use clap::Parser;
 use ethers::signers::{LocalWallet, Signer};
+use inventory::inventory::Inventory;
 use tracing::{info, Level};
 use tracing_subscriber::filter;
 use tracing_subscriber::layer::SubscriberExt;
@@ -50,9 +53,12 @@ async fn main() -> Result<()> {
     info!("Solver address: {}", address);
 
     let connector = Connector::new(config.clone(), wallet.clone()).await?;
+    let connector = Arc::new(connector);
+    let inventory = Inventory::new(config.clone(), connector.clone()).await?;
+    let inventory = Arc::new(inventory);
 
     // Set up engine.
-    let engine = configure_engine(&config, &connector);
+    let engine = configure_engine(&config, connector.clone(), inventory);
 
     // Start engine.
     run_engine(engine).await;
@@ -70,7 +76,11 @@ fn configure_logs() {
         .init();
 }
 
-fn configure_engine(config: &Config, connector: &Connector) -> Engine<Event, Action> {
+fn configure_engine(
+    config: &Config,
+    connector: Arc<Connector>,
+    inventory: Arc<Inventory>,
+) -> Engine<Event, Action> {
     let mut engine = Engine::<Event, Action>::default();
 
     let rpc_client = connector.get_rpc_client(SEPOLIA_CHAIN_ID).unwrap();
@@ -85,7 +95,12 @@ fn configure_engine(config: &Config, connector: &Connector) -> Engine<Event, Act
     engine.add_collector(Box::new(intents_collector));
 
     // Set up intents strategy.
-    let strategy = IntentsStrategy::new();
+    let strategy = IntentsStrategy::new(
+        connector,
+        inventory,
+        config.addresses.vault_address,
+        config.balancer.clone(),
+    );
     engine.add_strategy(Box::new(strategy));
 
     // Set up intents executor.

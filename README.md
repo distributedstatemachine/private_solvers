@@ -17,3 +17,10 @@ cargo run -- --config-file <config file> --private-key <private key>
 - Start the solver to listen to Sepolia.
 - Check out the Khalani SDK (`intents` branch)
 - Run the `intents.e2e.test.ts`. The SDK will publish an intent to the Intent Mempool on Sepolia.
+
+### Running tests
+```shell
+export SEPOLIA_RPC_URL=<sepolia RPC URL>
+export SEPOLIA_WS_URL=<sepolia WS URL>
+cargo test
+```

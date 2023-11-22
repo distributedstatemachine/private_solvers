@@ -3,7 +3,7 @@ use crate::inventory::amount::Amount;
 use anyhow::Context;
 use ethers::types::{Address, U256};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Token {
     pub chain_id: ChainId,
     pub address: Address,

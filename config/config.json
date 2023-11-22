@@ -1,8 +1,23 @@
 {
   "addresses": {
-    "intents_mempool_address": "0x4e961A5F74989A55974D7D088e6a453b0D863b0D"
+    "intents_mempool_address": "0x4e961A5F74989A55974D7D088e6a453b0D863b0D",
+    "vault_address": "0x580d2aa4231E4C2EFfb3A43D3b778cd956C875bf"
+  },
+  "balancer": {
+    "batch_swap_steps_from_kai": {
+      "0x88aa6C2584b2095CFa0e0cD3234B738125F77354": ["0xb50dc24e616bc0b90c6e12b935e43ed21a54be9a000000000000000000000004", "0xbdb2ade29dd506c115b6afc761862e2070e966fe000000000000000000000006"],
+      "0x390882C237BDB20eDb843D95635966ab5feD33BD": ["0x8a8c18bc1a5cb7a0c03fe2c3540b105a1c44d405000000000000000000000005", "0xbdb2ade29dd506c115b6afc761862e2070e966fe000000000000000000000006"],
+      "0x1Db42728c12043B4a88ed30E0c7AA04Ac32cD70a": ["0x7e8dbbbb4c4485f9986f0c5c28ba7638a8a19a42000000000000000000000002", "0xbdb2ade29dd506c115b6afc761862e2070e966fe000000000000000000000006"],
+      "0x7A59a2D8E2A42C73aaa99E809CFe7816F786A3F7": ["0xd610d2f1fbb1a5a0fd320ac4f0bdfee02b0bcf9b000000000000000000000003", "0xbdb2ade29dd506c115b6afc761862e2070e966fe000000000000000000000006"]
+    }
   },
   "chains": [
+    {
+      "name": "khalani",
+      "chain_id": 10012,
+      "rpc_url": "https://testnet.khalani.network",
+      "ws_url": ""
+    },
     {
       "name": "sepolia",
       "chain_id": 11155111,
@@ -11,6 +26,35 @@
     }
   ],
   "tokens": {
+    "khalani": [
+      {
+        "address": "0x477b4198Edd0ED573E900db7e9925FC7bbA35395"
+      },
+      {
+        "address": "0x875863D88BF0C9A088a274a0263A903434b306aa"
+      },
+      {
+        "address": "0xdC28d2d648Ed4c4c6fb641a46e9f4D73aE236De1"
+      },
+      {
+        "address": "0xbB6E9f941330a867055Ea1B7CE063B145373CBf4"
+      },
+      {
+        "address": "0x390882C237BDB20eDb843D95635966ab5feD33BD"
+      },
+      {
+        "address": "0x88aa6C2584b2095CFa0e0cD3234B738125F77354"
+      },
+      {
+        "address": "0x7A59a2D8E2A42C73aaa99E809CFe7816F786A3F7"
+      },
+      {
+        "address": "0x1Db42728c12043B4a88ed30E0c7AA04Ac32cD70a"
+      },
+      {
+        "address": "0x1536Ab28180C16C7d20A0bf66F3966F571aAd528"
+      }
+    ],
     "sepolia": [
       {
         "address": "0x24bcc5d1f6538f4a84cd9009ebd4fa614904fa59"

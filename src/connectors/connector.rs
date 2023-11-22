@@ -13,6 +13,7 @@ use crate::config::config::Config;
 pub type RpcClient = SignerMiddleware<NonceManagerMiddleware<Provider<Http>>, LocalWallet>;
 pub type WsClient = Provider<Ws>;
 
+#[derive(Clone)]
 pub struct Connector {
     address: Address,
     rpc_clients: HashMap<ChainId, Arc<RpcClient>>,
@@ -41,16 +42,18 @@ impl Connector {
             let rpc_client = Self::create_rpc_client(chain_config, wallet.clone())
                 .await
                 .context(format!(
-                    "Failed to create a client for chain {}",
+                    "Failed to create a HTTP client for chain {}",
                     chain_config.name
                 ))?;
             rpc_clients.insert(chain_config.chain_id, rpc_client);
 
-            let ws_client = Self::create_ws_client(chain_config).await.context(format!(
-                "Failed to create a client for chain {}",
-                chain_config.name
-            ))?;
-            ws_clients.insert(chain_config.chain_id, ws_client);
+            if chain_config.ws_url != "" {
+                let ws_client = Self::create_ws_client(chain_config).await.context(format!(
+                    "Failed to create a WebSocket client for chain {}",
+                    chain_config.name
+                ))?;
+                ws_clients.insert(chain_config.chain_id, ws_client);
+            }
         }
         Ok(Connector {
             address: wallet.address(),

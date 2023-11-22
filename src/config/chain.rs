@@ -4,6 +4,7 @@ pub type ChainId = u64;
 
 // TODO: create an enum, use 'strum' crate?
 pub const SEPOLIA_CHAIN_ID: ChainId = 11155111;
+pub const KHALANI_CHAIN_ID: ChainId = 10012;
 
 #[derive(Debug, Clone)]
 pub struct ChainConfig {
