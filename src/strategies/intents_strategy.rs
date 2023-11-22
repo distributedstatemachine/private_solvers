@@ -14,6 +14,7 @@ use crate::connectors::connector::{Connector, RpcClient};
 use crate::inventory::amount::Amount;
 use crate::inventory::inventory::Inventory;
 use crate::strategies::types::{Action, Event};
+use crate::types::swap_intent::SwapIntent;
 
 const SWAP_EXACT_OUT_SWAP_KIND: u8 = 1;
 
@@ -50,9 +51,8 @@ impl Strategy<Event, Action> for IntentsStrategy {
 
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
         let option = match event {
-            Event::NewSwapIntent(new_swap_intent) => {
-                self.process_new_swap_intent(new_swap_intent).await
-            }
+            Event::NewSwapIntent(swap_intent) => self.process_new_swap_intent(swap_intent).await,
+            _ => None,
         };
         option.into_iter().collect()
     }
@@ -142,7 +142,7 @@ impl IntentsStrategy {
     }
 
     // Process new orders as they come in.
-    pub async fn process_new_swap_intent(&mut self, event: NewSwapIntent) -> Option<Action> {
-        Some(Action::SettleIntent(event.0))
+    pub async fn process_new_swap_intent(&mut self, swap_intent: SwapIntent) -> Option<Action> {
+        Some(Action::SettleIntent(swap_intent))
     }
 }

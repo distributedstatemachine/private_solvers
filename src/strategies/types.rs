@@ -1,10 +1,11 @@
-use crate::collectors::intents_collector::NewSwapIntent;
 use crate::types::swap_intent::SwapIntent;
+use ethers::types::H256;
 
 /// Core Event enum.
 #[derive(Debug, Clone)]
 pub enum Event {
-    NewSwapIntent(NewSwapIntent),
+    NewSwapIntent(SwapIntent),
+    TokensLocked { intent_id: H256 },
 }
 
 /// Core Action enum.

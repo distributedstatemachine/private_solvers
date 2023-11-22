@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use artemis_core::engine::Engine;
-use artemis_core::types::CollectorMap;
 use clap::Parser;
 use ethers::signers::{LocalWallet, Signer};
 use inventory::inventory::Inventory;
@@ -14,6 +13,7 @@ use tracing_subscriber::util::SubscriberInitExt;
 use strategies::types::{Action, Event};
 
 use crate::collectors::intents_collector::IntentsCollector;
+use crate::collectors::locked_tokens_collector::LockedTokensCollector;
 use crate::config::config::Config;
 use crate::connectors::connector::Connector;
 use crate::executors::intents_executor::IntentsExecutor;
@@ -83,15 +83,20 @@ fn configure_engine(
 ) -> Engine<Event, Action> {
     let mut engine = Engine::<Event, Action>::default();
 
-    // Set up intents collector.
+    // Set up collectors.
     let intents_collector = Box::new(IntentsCollector::new(
         connector.clone(),
         config.addresses.intents_mempool_address.clone(),
     ));
-    let intents_collector = CollectorMap::new(intents_collector, Event::NewSwapIntent);
-    engine.add_collector(Box::new(intents_collector));
+    engine.add_collector(intents_collector);
 
-    // Set up intents strategy.
+    let locked_tokens_collector = Box::new(LockedTokensCollector::new(
+        connector.clone(),
+        config.addresses.clone(),
+    ));
+    engine.add_collector(locked_tokens_collector);
+
+    // Set up strategies.
     let strategy = IntentsStrategy::new(
         connector.clone(),
         inventory,
@@ -100,7 +105,7 @@ fn configure_engine(
     );
     engine.add_strategy(Box::new(strategy));
 
-    // Set up intents executor.
+    // Set up executors.
     engine.add_executor(Box::new(IntentsExecutor::new(
         config.addresses.clone(),
         connector.clone(),
