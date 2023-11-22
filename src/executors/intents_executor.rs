@@ -11,6 +11,7 @@ use tracing::info;
 use crate::config::addresses::AddressesConfig;
 use crate::connectors::connector::{Connector, RpcClient};
 use crate::ethereum::transaction::submit_transaction;
+use crate::quote::quoted_intent::QuotedIntent;
 use crate::strategies::types::Action;
 use crate::types::swap_intent::SwapIntent;
 
@@ -33,19 +34,20 @@ impl Executor<Action> for IntentsExecutor {
     async fn execute(&self, action: Action) -> Result<()> {
         match action {
             Action::SettleIntent(swap_intent) => self.process_settle_intent(swap_intent).await,
-            Action::LockTokens(swap_intent) => self.lock_tokens(swap_intent).await,
+            Action::LockTokens(quoted_intent) => self.lock_tokens(quoted_intent).await,
+            Action::QuoteIntent(_) => Ok(()),
         }
     }
 }
 
 impl IntentsExecutor {
-    async fn lock_tokens(&self, swap_intent: SwapIntent) -> Result<()> {
-        info!(?swap_intent, "Locking source tokens of the intent");
-        let transaction = self.build_lock_tokens_tx(&swap_intent);
+    async fn lock_tokens(&self, quoted_intent: QuotedIntent) -> Result<()> {
+        info!(?quoted_intent, "Locking source tokens of the intent");
+        let transaction = self.build_lock_tokens_tx(&quoted_intent.swap_intent);
         let receipt = submit_transaction(transaction).await?;
         let tx_hash = receipt.transaction_hash;
         info!(
-            ?swap_intent,
+            ?quoted_intent,
             %tx_hash,
             "Source tokens have been locked"
         );

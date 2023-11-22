@@ -4,7 +4,7 @@ use crate::config::chain::KHALANI_CHAIN_ID;
 use crate::connectors::connector::{Connector, RpcClient};
 use crate::inventory::amount::Amount;
 use crate::inventory::inventory::Inventory;
-use crate::strategies::types::Action;
+use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
 use anyhow::{anyhow, Result};
 use bindings_khalani::vault::{BatchSwapStep, FundManagement, Vault};
@@ -36,20 +36,14 @@ impl InterchainLiquidityHubQuoter {
         }
     }
 
-    pub async fn get_kai_amount_to_fulfill_intent(
-        &self,
-        swap_intent: SwapIntent,
-    ) -> Result<Amount> {
+    pub async fn quote_intent(&self, swap_intent: SwapIntent) -> Result<QuotedIntent> {
         let destination_token = self
             .inventory
-            .find_token_by_address(swap_intent.destination_token, KHALANI_CHAIN_ID);
-
-        let destination_token = match destination_token {
-            Some(_destination_token) => _destination_token.clone(),
-            None => {
-                return Err(anyhow!("Unsupported destination token"));
-            }
-        };
+            .find_token_by_address(swap_intent.destination_token, KHALANI_CHAIN_ID)
+            .ok_or(anyhow!(
+                "Unsupported destination token {}",
+                swap_intent.destination_token
+            ))?;
 
         let mut kln_token_symbol: String = "kln".to_owned();
         let generalized_token_symbol: &str = &destination_token.symbol[..4];
@@ -111,15 +105,17 @@ impl InterchainLiquidityHubQuoter {
             assets,
             fund_management,
         );
+        let estimations = call.call().await?;
+        let kai_amount = Amount::from_token_base_units(U256::try_from(estimations[0])?, kai_token);
 
-        Ok(Amount::from_base_units(
-            U256::try_from(call.call().await?[0])?,
-            kai_token.decimals,
-        ))
-    }
-
-    // Process new orders as they come in.
-    pub async fn process_new_swap_intent(&mut self, swap_intent: SwapIntent) -> Option<Action> {
-        Some(Action::SettleIntent(swap_intent))
+        // TODO: for now we set the destination (expected) amount to be equal to the source amount.
+        //  Handle the decimals difference between source / destination tokens.
+        let destination_amount =
+            Amount::from_token_base_units(swap_intent.source_amount, &destination_token);
+        Ok(QuotedIntent {
+            swap_intent,
+            kai_amount,
+            destination_amount,
+        })
     }
 }

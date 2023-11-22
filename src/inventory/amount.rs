@@ -5,7 +5,7 @@ use std::ops::Add;
 
 pub type Decimals = u8;
 
-#[derive(Debug, Clone, Eq, PartialOrd, PartialEq, Ord)]
+#[derive(Debug, Clone, Eq, PartialOrd, PartialEq, Ord, Default)]
 pub struct Amount {
     pub base_units: U256,
     pub decimals: Decimals,

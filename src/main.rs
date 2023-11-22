@@ -5,6 +5,7 @@ use artemis_core::engine::Engine;
 use clap::Parser;
 use ethers::signers::{LocalWallet, Signer};
 use inventory::inventory::Inventory;
+use tokio::sync::mpsc::channel;
 use tracing::{info, Level};
 use tracing_subscriber::filter;
 use tracing_subscriber::layer::SubscriberExt;
@@ -14,9 +15,13 @@ use strategies::types::{Action, Event};
 
 use crate::collectors::intents_collector::IntentsCollector;
 use crate::collectors::locked_tokens_collector::LockedTokensCollector;
+use crate::collectors::quoted_intents_collector::QuotedIntentsCollector;
 use crate::config::config::Config;
 use crate::connectors::connector::Connector;
 use crate::executors::intents_executor::IntentsExecutor;
+use crate::executors::quoter_executor::QuoterExecutor;
+use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
+use crate::quote::quoted_intent::QuotedIntent;
 use crate::strategies::intents_strategy::IntentsStrategy;
 
 pub mod collectors;
@@ -84,6 +89,8 @@ fn configure_engine(
 ) -> Engine<Event, Action> {
     let mut engine = Engine::<Event, Action>::default();
 
+    let (quoted_intents_sender, quoted_intents_receiver) = channel::<QuotedIntent>(512);
+
     // Set up collectors.
     let intents_collector = Box::new(IntentsCollector::new(
         connector.clone(),
@@ -91,25 +98,35 @@ fn configure_engine(
     ));
     engine.add_collector(intents_collector);
 
+    let quoted_intents_collector = Box::new(QuotedIntentsCollector::new(quoted_intents_receiver));
+    engine.add_collector(quoted_intents_collector);
+
     let locked_tokens_collector = Box::new(LockedTokensCollector::new(
         connector.clone(),
         config.addresses.clone(),
     ));
     engine.add_collector(locked_tokens_collector);
 
-    // Set up strategies.
-    let strategy = IntentsStrategy::new(
+    let interchain_liquidity_hub_quoter = InterchainLiquidityHubQuoter::new(
         connector.clone(),
-        inventory,
-        config.addresses.vault_address,
+        inventory.clone(),
+        config.addresses.clone(),
         config.balancer.clone(),
     );
+
+    // Set up strategies.
+    let strategy = IntentsStrategy::new();
     engine.add_strategy(Box::new(strategy));
 
     // Set up executors.
     engine.add_executor(Box::new(IntentsExecutor::new(
         config.addresses.clone(),
         connector.clone(),
+    )));
+
+    engine.add_executor(Box::new(QuoterExecutor::new(
+        interchain_liquidity_hub_quoter,
+        quoted_intents_sender,
     )));
 
     engine

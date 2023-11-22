@@ -1,3 +1,4 @@
+use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
 use ethers::types::H256;
 
@@ -5,12 +6,14 @@ use ethers::types::H256;
 #[derive(Debug, Clone)]
 pub enum Event {
     NewSwapIntent(SwapIntent),
+    IntentQuoted(QuotedIntent),
     TokensLocked { intent_id: H256 },
 }
 
 /// Core Action enum.
 #[derive(Debug, Clone)]
 pub enum Action {
-    LockTokens(SwapIntent),
+    QuoteIntent(SwapIntent),
+    LockTokens(QuotedIntent),
     SettleIntent(SwapIntent),
 }

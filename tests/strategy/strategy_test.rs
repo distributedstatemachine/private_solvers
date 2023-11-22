@@ -72,20 +72,15 @@ async fn test_strategy() -> Result<()> {
         ..intent_get_usdc_sepolia.clone()
     };
 
-    let amounts = vec![
-        quoter
-            .get_kai_amount_to_fulfill_intent(intent_get_usdc_sepolia)
-            .await?,
-        quoter
-            .get_kai_amount_to_fulfill_intent(intent_get_usdt_sepolia)
-            .await?,
-        quoter
-            .get_kai_amount_to_fulfill_intent(intent_get_usdc_fuji)
-            .await?,
-        quoter
-            .get_kai_amount_to_fulfill_intent(intent_get_usdt_fuji)
-            .await?,
-    ];
+    let amounts: Vec<Amount> = vec![
+        quoter.quote_intent(intent_get_usdc_sepolia).await?,
+        quoter.quote_intent(intent_get_usdt_sepolia).await?,
+        quoter.quote_intent(intent_get_usdc_fuji).await?,
+        quoter.quote_intent(intent_get_usdt_fuji).await?,
+    ]
+    .iter()
+    .map(|quoted_intent| quoted_intent.kai_amount.clone())
+    .collect();
     let expected_ranges: Vec<Vec<i64>> = vec![
         vec![990005080912622, 997705080912622],
         vec![996965540372730, 999965540372730],

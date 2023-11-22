@@ -24,4 +24,11 @@ impl Amount {
             base_units,
         }
     }
+
+    pub fn from_token_base_units(base_units: U256, token: &Token) -> Amount {
+        Amount {
+            decimals: token.decimals,
+            base_units,
+        }
+    }
 }
