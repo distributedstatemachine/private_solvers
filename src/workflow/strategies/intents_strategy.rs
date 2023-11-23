@@ -3,7 +3,7 @@ use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use tracing::info;
 
-use crate::strategies::types::{Action, Event};
+use crate::workflow::strategies::types::{Action, Event};
 
 #[allow(dead_code)]
 pub struct IntentsStrategy;

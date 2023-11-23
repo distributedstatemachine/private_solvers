@@ -2,10 +2,10 @@ use anyhow::Result;
 use artemis_core::types::Collector;
 use ethers::types::U256;
 use futures::StreamExt;
-use khalani_solver::collectors::quoted_intents_collector::QuotedIntentsCollector;
 use khalani_solver::inventory::amount::Amount;
 use khalani_solver::quote::quoted_intent::QuotedIntent;
-use khalani_solver::strategies::types::Event;
+use khalani_solver::workflow::collectors::quoted_intents_collector::QuotedIntentsCollector;
+use khalani_solver::workflow::strategies::types::Event;
 
 #[tokio::test]
 async fn test_quoted_intents_collector() -> Result<()> {

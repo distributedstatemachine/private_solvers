@@ -1,11 +1,12 @@
 use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
-use crate::strategies::types::Action;
 use crate::types::swap_intent::SwapIntent;
+use crate::workflow::strategies::types::Action;
 use anyhow::Result;
 use artemis_core::types::Executor;
 use async_trait::async_trait;
 use tokio::sync::mpsc::Sender;
+use tracing::info;
 
 pub struct QuoterExecutor {
     interchain_liquidity_hub_quoter: InterchainLiquidityHubQuoter,
@@ -36,6 +37,7 @@ impl Executor<Action> for QuoterExecutor {
 
 impl QuoterExecutor {
     async fn quote_intent(&self, swap_intent: SwapIntent) -> Result<()> {
+        info!(?swap_intent, "Quoting intent");
         let quoted_intent = self
             .interchain_liquidity_hub_quoter
             .quote_intent(swap_intent)

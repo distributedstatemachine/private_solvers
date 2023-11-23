@@ -10,27 +10,26 @@ use tracing_subscriber::filter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
-use strategies::types::{Action, Event};
+use workflow::strategies::types::{Action, Event};
 
-use crate::collectors::intents_collector::IntentsCollector;
-use crate::collectors::locked_tokens_collector::LockedTokensCollector;
-use crate::collectors::quoted_intents_collector::QuotedIntentsCollector;
 use crate::config::config::Config;
 use crate::connectors::connector::Connector;
-use crate::executors::intents_executor::IntentsExecutor;
-use crate::executors::quoter_executor::QuoterExecutor;
 use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
-use crate::strategies::intents_strategy::IntentsStrategy;
+use crate::workflow::collectors::intents_collector::IntentsCollector;
+use crate::workflow::collectors::locked_tokens_collector::LockedTokensCollector;
+use crate::workflow::collectors::quoted_intents_collector::QuotedIntentsCollector;
+use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
+use crate::workflow::executors::quoter_executor::QuoterExecutor;
+use crate::workflow::executors::settle_intent_executor::SettleIntentExecutor;
+use crate::workflow::strategies::intents_strategy::IntentsStrategy;
 
-pub mod collectors;
 pub mod config;
 pub mod connectors;
 pub mod ethereum;
-pub mod executors;
 pub mod inventory;
 pub mod quote;
-pub mod strategies;
 pub mod types;
+pub mod workflow;
 
 #[derive(Parser, Debug)]
 pub struct Args {
@@ -115,7 +114,12 @@ fn configure_engine(
     engine.add_strategy(Box::new(strategy));
 
     // Set up executors.
-    engine.add_executor(Box::new(IntentsExecutor::new(
+    engine.add_executor(Box::new(SettleIntentExecutor::new(
+        config.addresses.clone(),
+        connector.clone(),
+    )));
+
+    engine.add_executor(Box::new(LockIntentTokensExecutor::new(
         config.addresses.clone(),
         connector.clone(),
     )));

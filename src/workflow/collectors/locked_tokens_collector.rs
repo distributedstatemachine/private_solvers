@@ -3,13 +3,14 @@ use std::sync::Arc;
 use crate::config::addresses::AddressesConfig;
 use crate::config::chain::SEPOLIA_CHAIN_ID;
 use crate::connectors::connector::{Connector, WsClient};
-use crate::strategies::types::Event;
+use crate::workflow::strategies::types::Event;
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
 use bindings_khalani::escrow::{Escrow, TokensLockedFilter};
 use ethers::contract::Event as ContractEvent;
 use futures::StreamExt;
+use tracing::info;
 
 pub struct LockedTokensCollector {
     tokens_locked_filter: ContractEvent<Arc<WsClient>, WsClient, TokensLockedFilter>,
@@ -33,9 +34,11 @@ impl Collector<Event> for LockedTokensCollector {
         let events_stream = self.tokens_locked_filter.subscribe().await?;
         let intents_stream = events_stream.filter_map(|event| async {
             match event {
-                Ok(event) => Some(Event::TokensLocked {
-                    intent_id: event.intent_id.into(),
-                }),
+                Ok(event) => {
+                    let intent_id = event.intent_id.into();
+                    info!(%intent_id, "Event: swap intent's tokens locked");
+                    Some(Event::TokensLocked { intent_id })
+                }
                 Err(_) => None, // TODO: consider better error handling.
             }
         });

@@ -4,8 +4,9 @@ use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
 use futures::lock::Mutex;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
+use tracing::info;
 
-use crate::strategies::types::Event;
+use crate::workflow::strategies::types::Event;
 
 pub struct QuotedIntentsCollector {
     quoted_intents_receiver: Mutex<Receiver<QuotedIntent>>,
@@ -29,6 +30,7 @@ impl Collector<Event> for QuotedIntentsCollector {
         let stream = async_stream::stream! {
             let mut receiver = self.quoted_intents_receiver.lock().await;
             while let Some(quoted_intent) = receiver.recv().await {
+                info!(?quoted_intent, "Event: intent quoted");
                 yield Event::IntentQuoted(quoted_intent);
             }
         };
