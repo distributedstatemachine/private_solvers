@@ -1,6 +1,6 @@
 use ethers::types::{Address, Bytes, H256, U256};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default, PartialOrd, PartialEq, Eq)]
 pub struct SwapIntent {
     pub intent_id: H256,
 

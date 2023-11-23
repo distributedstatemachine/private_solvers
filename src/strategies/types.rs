@@ -3,7 +3,7 @@ use crate::types::swap_intent::SwapIntent;
 use ethers::types::H256;
 
 /// Core Event enum.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialOrd, PartialEq, Eq)]
 pub enum Event {
     NewSwapIntent(SwapIntent),
     IntentQuoted(QuotedIntent),

@@ -3,7 +3,7 @@ use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
 use futures::lock::Mutex;
-use tokio::sync::mpsc::Receiver;
+use tokio::sync::mpsc::{channel, Receiver, Sender};
 
 use crate::strategies::types::Event;
 
@@ -12,10 +12,14 @@ pub struct QuotedIntentsCollector {
 }
 
 impl QuotedIntentsCollector {
-    pub fn new(quoted_intents_receiver: Receiver<QuotedIntent>) -> Self {
-        Self {
-            quoted_intents_receiver: Mutex::new(quoted_intents_receiver),
-        }
+    pub fn new() -> (Self, Sender<QuotedIntent>) {
+        let (quoted_intents_sender, quoted_intents_receiver) = channel::<QuotedIntent>(512);
+        (
+            Self {
+                quoted_intents_receiver: Mutex::new(quoted_intents_receiver),
+            },
+            quoted_intents_sender,
+        )
     }
 }
 

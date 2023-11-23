@@ -5,7 +5,6 @@ use artemis_core::engine::Engine;
 use clap::Parser;
 use ethers::signers::{LocalWallet, Signer};
 use inventory::inventory::Inventory;
-use tokio::sync::mpsc::channel;
 use tracing::{info, Level};
 use tracing_subscriber::filter;
 use tracing_subscriber::layer::SubscriberExt;
@@ -21,7 +20,6 @@ use crate::connectors::connector::Connector;
 use crate::executors::intents_executor::IntentsExecutor;
 use crate::executors::quoter_executor::QuoterExecutor;
 use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
-use crate::quote::quoted_intent::QuotedIntent;
 use crate::strategies::intents_strategy::IntentsStrategy;
 
 pub mod collectors;
@@ -89,8 +87,6 @@ fn configure_engine(
 ) -> Engine<Event, Action> {
     let mut engine = Engine::<Event, Action>::default();
 
-    let (quoted_intents_sender, quoted_intents_receiver) = channel::<QuotedIntent>(512);
-
     // Set up collectors.
     let intents_collector = Box::new(IntentsCollector::new(
         connector.clone(),
@@ -98,8 +94,8 @@ fn configure_engine(
     ));
     engine.add_collector(intents_collector);
 
-    let quoted_intents_collector = Box::new(QuotedIntentsCollector::new(quoted_intents_receiver));
-    engine.add_collector(quoted_intents_collector);
+    let (quoted_intents_collector, quoted_intents_sender) = QuotedIntentsCollector::new();
+    engine.add_collector(Box::new(quoted_intents_collector));
 
     let locked_tokens_collector = Box::new(LockedTokensCollector::new(
         connector.clone(),
