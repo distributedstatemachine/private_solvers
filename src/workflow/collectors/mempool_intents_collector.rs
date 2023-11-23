@@ -13,11 +13,11 @@ use ethers::types::Address;
 use futures::StreamExt;
 
 /// A collector that listens for new intents in the mempool.
-pub struct IntentsCollector {
+pub struct MempoolIntentsCollector {
     intent_created_filter: ContractEvent<Arc<WsClient>, WsClient, IntentCreatedFilter>,
 }
 
-impl IntentsCollector {
+impl MempoolIntentsCollector {
     pub fn new(connector: Arc<Connector>, intents_mempool_address: Address) -> Self {
         // TODO: replace with the Khalani Chain ID.
         let ws_client = connector.get_ws_client(SEPOLIA_CHAIN_ID).unwrap();
@@ -28,10 +28,8 @@ impl IntentsCollector {
     }
 }
 
-/// Implementation of the [Collector](Collector) trait for the [IntentsCollector](IntentsCollector).
-/// This implementation uses the [PubsubClient](PubsubClient) to subscribe to new blocks.
 #[async_trait]
-impl Collector<Event> for IntentsCollector {
+impl Collector<Event> for MempoolIntentsCollector {
     async fn get_event_stream(&self) -> Result<CollectorStream<'_, Event>> {
         let intents_stream = self.intent_created_filter.subscribe().await?;
         let intents_stream = intents_stream.filter_map(|event| async {

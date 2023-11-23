@@ -3,8 +3,8 @@ use crate::connectors::connector::Connector;
 use crate::inventory::inventory::Inventory;
 use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
-use crate::workflow::collectors::intents_collector::IntentsCollector;
 use crate::workflow::collectors::locked_tokens_collector::LockedTokensCollector;
+use crate::workflow::collectors::mempool_intents_collector::MempoolIntentsCollector;
 use crate::workflow::collectors::quoted_intents_collector::QuotedIntentsCollector;
 use crate::workflow::event::Event;
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
@@ -24,7 +24,7 @@ pub fn configure_engine(
     let mut engine = Engine::<Event, Action>::default();
 
     // Set up collectors.
-    let intents_collector = Box::new(IntentsCollector::new(
+    let intents_collector = Box::new(MempoolIntentsCollector::new(
         connector.clone(),
         config.addresses.intents_mempool_address.clone(),
     ));
