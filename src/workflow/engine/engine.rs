@@ -9,6 +9,7 @@ use crate::workflow::collectors::locked_tokens_proofs_collector::LockedTokensPro
 use crate::workflow::collectors::quoted_intents_collector::QuotedIntentsCollector;
 use crate::workflow::collectors::swap_intent_collector::SwapIntentCollector;
 use crate::workflow::event::Event;
+use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
 use crate::workflow::executors::quoter_executor::QuoterExecutor;
 use crate::workflow::executors::settle_intent_executor::SettleIntentExecutor;
@@ -32,6 +33,8 @@ pub fn configure_engine(
     );
     let escrow_events_locked_tokens_proof_source =
         EscrowEventsLockedTokensProofSource::new(connector.clone(), config.addresses.clone());
+    let send_transaction_lock_intent_tokens_handler =
+        SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
 
     // Set up collectors.
     let swap_intent_collector = SwapIntentCollector::new(intents_mempool_source);
@@ -64,8 +67,7 @@ pub fn configure_engine(
     )));
 
     engine.add_executor(Box::new(LockIntentTokensExecutor::new(
-        config.addresses.clone(),
-        connector.clone(),
+        send_transaction_lock_intent_tokens_handler,
     )));
 
     engine.add_executor(Box::new(QuoterExecutor::new(
