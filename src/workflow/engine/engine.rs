@@ -3,9 +3,10 @@ use crate::connectors::connector::Connector;
 use crate::inventory::inventory::Inventory;
 use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
+use crate::workflow::collectors::ethereum::intents_mempool_source::IntentsMempoolSource;
 use crate::workflow::collectors::locked_tokens_collector::LockedTokensCollector;
-use crate::workflow::collectors::mempool_intents_collector::MempoolIntentsCollector;
 use crate::workflow::collectors::quoted_intents_collector::QuotedIntentsCollector;
+use crate::workflow::collectors::swap_intent_collector::SwapIntentCollector;
 use crate::workflow::event::Event;
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
 use crate::workflow::executors::quoter_executor::QuoterExecutor;
@@ -23,11 +24,15 @@ pub fn configure_engine(
 ) -> Engine<Event, Action> {
     let mut engine = Engine::<Event, Action>::default();
 
-    // Set up collectors.
-    let intents_collector = Box::new(MempoolIntentsCollector::new(
+    // Set up Ethereum specific clients.
+    let intents_mempool_source = IntentsMempoolSource::new(
         connector.clone(),
         config.addresses.intents_mempool_address.clone(),
-    ));
+    );
+
+    // Set up collectors.
+    let swap_intent_collector = SwapIntentCollector::new(intents_mempool_source);
+    let intents_collector = Box::new(swap_intent_collector);
     engine.add_collector(intents_collector);
 
     let (quoted_intents_collector, quoted_intents_sender) = QuotedIntentsCollector::new();
