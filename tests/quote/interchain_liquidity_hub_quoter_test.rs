@@ -83,7 +83,7 @@ async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
     // From 990 to 1010 per 1.
     let expected_range = U256::from(990000000000000u64)..U256::from(1010000000000000u64);
 
-    for (amount) in amounts.iter() {
+    for amount in amounts.iter() {
         assert_in_range(*amount, expected_range.clone());
     }
 
