@@ -13,7 +13,7 @@ use crate::common::create_connector;
 use crate::common::create_e2e_config;
 
 #[tokio::test]
-async fn test_strategy() -> Result<()> {
+async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
     let config = create_e2e_config();
     let connector = create_connector().await.unwrap();
     let connector = Arc::new(connector);
