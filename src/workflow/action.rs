@@ -6,5 +6,5 @@ use crate::types::swap_intent::SwapIntent;
 pub enum Action {
     QuoteIntent(SwapIntent),
     LockTokens(QuotedIntent),
-    SettleIntent(SwapIntent),
+    SettleIntent(QuotedIntent),
 }

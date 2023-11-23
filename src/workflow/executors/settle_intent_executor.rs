@@ -31,7 +31,9 @@ impl SettleIntentExecutor {
 impl Executor<Action> for SettleIntentExecutor {
     async fn execute(&self, action: Action) -> Result<()> {
         match action {
-            Action::SettleIntent(swap_intent) => self.process_settle_intent(swap_intent).await,
+            Action::SettleIntent(quoted_intent) => {
+                self.process_settle_intent(quoted_intent.swap_intent).await
+            }
             _ => Ok(()),
         }
     }

@@ -22,6 +22,7 @@ use crate::workflow::collectors::quoted_intents_collector::QuotedIntentsCollecto
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
 use crate::workflow::executors::quoter_executor::QuoterExecutor;
 use crate::workflow::executors::settle_intent_executor::SettleIntentExecutor;
+use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
 
 pub mod config;
@@ -56,13 +57,15 @@ async fn main() -> Result<()> {
     let address = wallet.address();
     info!("Solver address: {}", address);
 
+    let state_manager = InMemoryStateManager::new();
+
     let connector = Connector::new(config.clone(), wallet.clone()).await?;
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config.clone(), connector.clone()).await?;
     let inventory = Arc::new(inventory);
 
     // Set up engine.
-    let engine = configure_engine(&config, connector.clone(), inventory);
+    let engine = configure_engine(&config, state_manager, connector.clone(), inventory);
 
     // Start engine.
     run_engine(engine).await;
@@ -82,6 +85,7 @@ fn configure_logs() {
 
 fn configure_engine(
     config: &Config,
+    state_manager: InMemoryStateManager,
     connector: Arc<Connector>,
     inventory: Arc<Inventory>,
 ) -> Engine<Event, Action> {
@@ -111,7 +115,7 @@ fn configure_engine(
     );
 
     // Set up strategies.
-    let strategy = IntentsStrategy::new();
+    let strategy = IntentsStrategy::new(state_manager);
     engine.add_strategy(Box::new(strategy));
 
     // Set up executors.

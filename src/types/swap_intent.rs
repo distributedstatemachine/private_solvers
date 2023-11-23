@@ -1,8 +1,9 @@
-use ethers::types::{Address, Bytes, H256, U256};
+use crate::types::intent_id::IntentId;
+use ethers::types::{Address, Bytes, U256};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SwapIntent {
-    pub intent_id: H256,
+    pub intent_id: IntentId,
 
     pub author: Address,
     pub signature: Bytes,
