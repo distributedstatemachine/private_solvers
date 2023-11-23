@@ -9,8 +9,9 @@ use tracing::{info, Level};
 use tracing_subscriber::filter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
+use workflow::action::Action;
 
-use workflow::strategies::types::{Action, Event};
+use workflow::event::Event;
 
 use crate::config::config::Config;
 use crate::connectors::connector::Connector;

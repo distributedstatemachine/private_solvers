@@ -1,7 +1,7 @@
 use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
-use crate::workflow::strategies::types::Action;
+use crate::workflow::action::Action;
 use anyhow::Result;
 use artemis_core::types::Executor;
 use async_trait::async_trait;

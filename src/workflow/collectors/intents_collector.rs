@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::config::chain::SEPOLIA_CHAIN_ID;
 use crate::connectors::connector::{Connector, WsClient};
 use crate::types::swap_intent::SwapIntent;
-use crate::workflow::strategies::types::Event;
+use crate::workflow::event::Event;
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;

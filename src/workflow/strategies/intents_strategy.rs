@@ -1,9 +1,10 @@
+use crate::workflow::action::Action;
 use anyhow::Result;
 use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use tracing::info;
 
-use crate::workflow::strategies::types::{Action, Event};
+use crate::workflow::event::Event;
 
 #[allow(dead_code)]
 pub struct IntentsStrategy;

@@ -6,7 +6,7 @@ use futures::lock::Mutex;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tracing::info;
 
-use crate::workflow::strategies::types::Event;
+use crate::workflow::event::Event;
 
 pub struct QuotedIntentsCollector {
     quoted_intents_receiver: Mutex<Receiver<QuotedIntent>>,
