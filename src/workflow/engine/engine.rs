@@ -1,7 +1,7 @@
 use crate::config::config::Config;
 use crate::connectors::connector::Connector;
 use crate::inventory::inventory::Inventory;
-use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
+use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
 use crate::workflow::collectors::ethereum::escrow_events_locked_tokens_proof_source::EscrowEventsLockedTokensProofSource;
 use crate::workflow::collectors::ethereum::intents_mempool_source::IntentsMempoolSource;

@@ -1,15 +1,19 @@
+use std::sync::Arc;
+
+use anyhow::anyhow;
+use async_trait::async_trait;
+use bindings_khalani::vault::{BatchSwapStep, FundManagement, Vault};
+use ethers::types::{Bytes, U256};
+
 use crate::config::addresses::AddressesConfig;
 use crate::config::balancer::BalancerConfig;
 use crate::config::chain::KHALANI_CHAIN_ID;
 use crate::connectors::connector::{Connector, RpcClient};
 use crate::inventory::amount::Amount;
 use crate::inventory::inventory::Inventory;
+use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
-use anyhow::{anyhow, Result};
-use bindings_khalani::vault::{BatchSwapStep, FundManagement, Vault};
-use ethers::types::{Bytes, U256};
-use std::sync::Arc;
 
 const SWAP_EXACT_OUT_SWAP_KIND: u8 = 1;
 
@@ -35,8 +39,11 @@ impl InterchainLiquidityHubQuoter {
             vault_contract,
         }
     }
+}
 
-    pub async fn quote_intent(&self, swap_intent: SwapIntent) -> Result<QuotedIntent> {
+#[async_trait]
+impl IntentQuoter for InterchainLiquidityHubQuoter {
+    async fn quote_intent(&self, swap_intent: SwapIntent) -> anyhow::Result<QuotedIntent> {
         let destination_token = self
             .inventory
             .find_token_by_address(swap_intent.destination_token, KHALANI_CHAIN_ID)

@@ -1,4 +1,4 @@
-use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
+use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
 use crate::workflow::action::Action;
@@ -8,25 +8,22 @@ use async_trait::async_trait;
 use tokio::sync::mpsc::Sender;
 use tracing::info;
 
-pub struct QuoterExecutor {
-    interchain_liquidity_hub_quoter: InterchainLiquidityHubQuoter,
+pub struct QuoterExecutor<Q: IntentQuoter> {
+    quoter: Q,
     quoted_intents_sender: Sender<QuotedIntent>,
 }
 
-impl QuoterExecutor {
-    pub fn new(
-        interchain_liquidity_hub_quoter: InterchainLiquidityHubQuoter,
-        quoted_intents_sender: Sender<QuotedIntent>,
-    ) -> Self {
+impl<Q: IntentQuoter> QuoterExecutor<Q> {
+    pub fn new(quoter: Q, quoted_intents_sender: Sender<QuotedIntent>) -> Self {
         Self {
-            interchain_liquidity_hub_quoter,
+            quoter,
             quoted_intents_sender,
         }
     }
 }
 
 #[async_trait]
-impl Executor<Action> for QuoterExecutor {
+impl<Q: IntentQuoter + Send + Sync> Executor<Action> for QuoterExecutor<Q> {
     async fn execute(&self, action: Action) -> Result<()> {
         match action {
             Action::QuoteIntent(swap_intent) => self.quote_intent(swap_intent).await,
@@ -35,13 +32,10 @@ impl Executor<Action> for QuoterExecutor {
     }
 }
 
-impl QuoterExecutor {
+impl<Q: IntentQuoter> QuoterExecutor<Q> {
     async fn quote_intent(&self, swap_intent: SwapIntent) -> Result<()> {
         info!(?swap_intent, "Quoting intent");
-        let quoted_intent = self
-            .interchain_liquidity_hub_quoter
-            .quote_intent(swap_intent)
-            .await?;
+        let quoted_intent = self.quoter.quote_intent(swap_intent).await?;
         self.quoted_intents_sender.send(quoted_intent).await?;
         Ok(())
     }

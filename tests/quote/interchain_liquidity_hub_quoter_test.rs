@@ -6,7 +6,8 @@ use ethers::types::U256;
 
 use khalani_solver::config::chain::KHALANI_CHAIN_ID;
 use khalani_solver::inventory::inventory::Inventory;
-use khalani_solver::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
+use khalani_solver::quote::intent_quoter::IntentQuoter;
+use khalani_solver::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use khalani_solver::types::swap_intent::SwapIntent;
 
 use crate::common::create_connector;
