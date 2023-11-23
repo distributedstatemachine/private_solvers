@@ -1,1 +1,2 @@
+pub mod escrow_events_locked_tokens_proof_source;
 pub mod intents_mempool_source;

@@ -3,8 +3,9 @@ use crate::connectors::connector::Connector;
 use crate::inventory::inventory::Inventory;
 use crate::quote::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
+use crate::workflow::collectors::ethereum::escrow_events_locked_tokens_proof_source::EscrowEventsLockedTokensProofSource;
 use crate::workflow::collectors::ethereum::intents_mempool_source::IntentsMempoolSource;
-use crate::workflow::collectors::locked_tokens_collector::LockedTokensCollector;
+use crate::workflow::collectors::locked_tokens_proofs_collector::LockedTokensProofCollector;
 use crate::workflow::collectors::quoted_intents_collector::QuotedIntentsCollector;
 use crate::workflow::collectors::swap_intent_collector::SwapIntentCollector;
 use crate::workflow::event::Event;
@@ -29,6 +30,8 @@ pub fn configure_engine(
         connector.clone(),
         config.addresses.intents_mempool_address.clone(),
     );
+    let escrow_events_locked_tokens_proof_source =
+        EscrowEventsLockedTokensProofSource::new(connector.clone(), config.addresses.clone());
 
     // Set up collectors.
     let swap_intent_collector = SwapIntentCollector::new(intents_mempool_source);
@@ -38,10 +41,9 @@ pub fn configure_engine(
     let (quoted_intents_collector, quoted_intents_sender) = QuotedIntentsCollector::new();
     engine.add_collector(Box::new(quoted_intents_collector));
 
-    let locked_tokens_collector = Box::new(LockedTokensCollector::new(
-        connector.clone(),
-        config.addresses.clone(),
-    ));
+    let locked_tokens_proofs_collector =
+        LockedTokensProofCollector::new(escrow_events_locked_tokens_proof_source);
+    let locked_tokens_collector = Box::new(locked_tokens_proofs_collector);
     engine.add_collector(locked_tokens_collector);
 
     let interchain_liquidity_hub_quoter = InterchainLiquidityHubQuoter::new(

@@ -1,22 +1,24 @@
 use std::sync::Arc;
 
-use crate::config::addresses::AddressesConfig;
-use crate::config::chain::SEPOLIA_CHAIN_ID;
-use crate::connectors::connector::{Connector, WsClient};
-use crate::workflow::event::Event;
 use anyhow::Result;
-use artemis_core::types::{Collector, CollectorStream};
+use artemis_core::types::CollectorStream;
 use async_trait::async_trait;
 use bindings_khalani::escrow::{Escrow, TokensLockedFilter};
 use ethers::contract::Event as ContractEvent;
 use futures::StreamExt;
 use tracing::info;
 
-pub struct LockedTokensCollector {
+use crate::config::addresses::AddressesConfig;
+use crate::config::chain::SEPOLIA_CHAIN_ID;
+use crate::connectors::connector::{Connector, WsClient};
+use crate::types::intent_id::IntentId;
+use crate::workflow::collectors::locked_tokens_proofs_collector::LockedTokensProofSource;
+
+pub struct EscrowEventsLockedTokensProofSource {
     tokens_locked_filter: ContractEvent<Arc<WsClient>, WsClient, TokensLockedFilter>,
 }
 
-impl LockedTokensCollector {
+impl EscrowEventsLockedTokensProofSource {
     pub fn new(connector: Arc<Connector>, addresses_config: AddressesConfig) -> Self {
         // TODO: replace with the Khalani Chain ID.
         // TODO: connect to the Event Verifier on the Khalani Chain.
@@ -29,15 +31,15 @@ impl LockedTokensCollector {
 }
 
 #[async_trait]
-impl Collector<Event> for LockedTokensCollector {
-    async fn get_event_stream(&self) -> Result<CollectorStream<'_, Event>> {
+impl LockedTokensProofSource for EscrowEventsLockedTokensProofSource {
+    async fn get_intents_with_locked_tokens(&self) -> Result<CollectorStream<'_, IntentId>> {
         let events_stream = self.tokens_locked_filter.subscribe().await?;
         let intents_stream = events_stream.filter_map(|event| async {
             match event {
                 Ok(event) => {
                     let intent_id = event.intent_id.into();
                     info!(%intent_id, "Event: swap intent's tokens locked");
-                    Some(Event::TokensLocked { intent_id })
+                    Some(intent_id)
                 }
                 Err(_) => None, // TODO: consider better error handling.
             }
