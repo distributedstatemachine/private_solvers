@@ -482,6 +482,24 @@ pub mod gmp_event_verifier {
             ]),
             events: ::core::convert::From::from([
                 (
+                    ::std::borrow::ToOwned::to_owned("NewEventRegistered"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned("NewEventRegistered"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("eventHash"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("RoleAdminChanged"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Event {
@@ -773,6 +791,16 @@ pub mod gmp_event_verifier {
                 .method_hash([117, 227, 102, 22], event_hash)
                 .expect("method not found (this should never happen)")
         }
+        ///Gets the contract's `NewEventRegistered` event
+        pub fn new_event_registered_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            NewEventRegisteredFilter,
+        > {
+            self.0.event()
+        }
         ///Gets the contract's `RoleAdminChanged` event
         pub fn role_admin_changed_filter(
             &self,
@@ -819,6 +847,23 @@ pub mod gmp_event_verifier {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(name = "NewEventRegistered", abi = "NewEventRegistered(bytes32)")]
+    pub struct NewEventRegisteredFilter {
+        #[ethevent(indexed)]
+        pub event_hash: [u8; 32],
     }
     #[derive(
         Clone,
@@ -898,6 +943,7 @@ pub mod gmp_event_verifier {
         Hash
     )]
     pub enum GMPEventVerifierEvents {
+        NewEventRegisteredFilter(NewEventRegisteredFilter),
         RoleAdminChangedFilter(RoleAdminChangedFilter),
         RoleGrantedFilter(RoleGrantedFilter),
         RoleRevokedFilter(RoleRevokedFilter),
@@ -906,6 +952,9 @@ pub mod gmp_event_verifier {
         fn decode_log(
             log: &::ethers::core::abi::RawLog,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::Error> {
+            if let Ok(decoded) = NewEventRegisteredFilter::decode_log(log) {
+                return Ok(GMPEventVerifierEvents::NewEventRegisteredFilter(decoded));
+            }
             if let Ok(decoded) = RoleAdminChangedFilter::decode_log(log) {
                 return Ok(GMPEventVerifierEvents::RoleAdminChangedFilter(decoded));
             }
@@ -921,12 +970,20 @@ pub mod gmp_event_verifier {
     impl ::core::fmt::Display for GMPEventVerifierEvents {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
+                Self::NewEventRegisteredFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::RoleAdminChangedFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::RoleGrantedFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::RoleRevokedFilter(element) => ::core::fmt::Display::fmt(element, f),
             }
+        }
+    }
+    impl ::core::convert::From<NewEventRegisteredFilter> for GMPEventVerifierEvents {
+        fn from(value: NewEventRegisteredFilter) -> Self {
+            Self::NewEventRegisteredFilter(value)
         }
     }
     impl ::core::convert::From<RoleAdminChangedFilter> for GMPEventVerifierEvents {

@@ -2,7 +2,7 @@
   "addresses": {
     "intents_mempool_address": "0x03C412c436f759B75a52599693d75B1ECAacd7b4",
     "vault_address": "0x580d2aa4231E4C2EFfb3A43D3b778cd956C875bf",
-    "escrow_address": "0x76D9aF8eF2368C6979Be39CE66a55C8B52C14A92"
+    "escrow_address": "0x355344Ee453aa574794aDE180B1d434fE270bEB4"
   },
   "balancer": {
     "batch_swap_steps_from_kai": {
