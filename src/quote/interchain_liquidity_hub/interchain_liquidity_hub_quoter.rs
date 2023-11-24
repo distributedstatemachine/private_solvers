@@ -1,9 +1,10 @@
 use std::sync::Arc;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bindings_balancer::vault::{BatchSwapStep, FundManagement, Vault};
 use ethers::types::{Bytes, U256};
+use tracing::info;
 
 use crate::config::addresses::AddressesConfig;
 use crate::config::balancer::BalancerConfig;
@@ -43,7 +44,15 @@ impl InterchainLiquidityHubQuoter {
 
 #[async_trait]
 impl IntentQuoter for InterchainLiquidityHubQuoter {
-    async fn quote_intent(&self, swap_intent: SwapIntent) -> anyhow::Result<QuotedIntent> {
+    async fn quote_intent(&self, swap_intent: SwapIntent) -> Result<QuotedIntent> {
+        info!(?swap_intent, "Quoting intent");
+
+        return Ok(QuotedIntent {
+            swap_intent,
+            kai_amount: Amount::default(),
+            destination_amount: Amount::default(),
+        });
+        // TODO: uncomment this code after fixes.
         let destination_token = self
             .inventory
             .find_token_by_address(swap_intent.destination_token, KHALANI_CHAIN_ID)
@@ -119,10 +128,12 @@ impl IntentQuoter for InterchainLiquidityHubQuoter {
         //  Handle the decimals difference between source / destination tokens.
         let destination_amount =
             Amount::from_token_base_units(swap_intent.source_amount, &destination_token);
-        Ok(QuotedIntent {
+        let quoted_intent = QuotedIntent {
             swap_intent,
             kai_amount,
             destination_amount,
-        })
+        };
+        info!(?quoted_intent, "Intent quoted");
+        Ok(quoted_intent)
     }
 }
