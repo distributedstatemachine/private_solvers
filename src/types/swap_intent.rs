@@ -14,6 +14,8 @@ pub struct SwapIntent {
     pub destination_token: Address,
     pub source_amount: U256,
     pub source_permit_2: Bytes,
+    pub deadline: U256,
+    pub nonce: U256,
 }
 
 impl From<bindings_khalani::shared_types::SwapIntent> for SwapIntent {
@@ -30,6 +32,8 @@ impl From<bindings_khalani::shared_types::SwapIntent> for SwapIntent {
             destination_token: value.destination_token,
             source_amount: value.source_amount,
             source_permit_2: value.source_permit_2,
+            deadline: value.deadline,
+            nonce: value.nonce,
         }
     }
 }
@@ -46,6 +50,8 @@ impl From<SwapIntent> for bindings_khalani::shared_types::SwapIntent {
             destination_token: value.destination_token,
             source_amount: value.source_amount,
             source_permit_2: value.source_permit_2,
+            deadline: value.deadline,
+            nonce: value.nonce,
         }
     }
 }

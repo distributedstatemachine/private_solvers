@@ -72,6 +72,58 @@ pub struct Facet {
     pub facet_address: ::ethers::core::types::Address,
     pub function_selectors: ::std::vec::Vec<[u8; 4]>,
 }
+///`PermitTransferFrom((address,uint256),uint256,uint256)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct PermitTransferFrom {
+    pub permitted: TokenPermissions,
+    pub nonce: ::ethers::core::types::U256,
+    pub deadline: ::ethers::core::types::U256,
+}
+///`SignatureTransferDetails(address,uint256)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct SignatureTransferDetails {
+    pub to: ::ethers::core::types::Address,
+    pub requested_amount: ::ethers::core::types::U256,
+}
+///`TokenPermissions(address,uint256)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct TokenPermissions {
+    pub token: ::ethers::core::types::Address,
+    pub amount: ::ethers::core::types::U256,
+}
 ///`FuzzSelector(address,bytes4[])`
 #[derive(
     Clone,
@@ -89,7 +141,57 @@ pub struct FuzzSelector {
     pub addr: ::ethers::core::types::Address,
     pub selectors: ::std::vec::Vec<[u8; 4]>,
 }
-///`SwapIntent(address,bytes,uint32,uint32,address,address,uint256,bytes)`
+///`SwapIntentFulfilled(bytes32,address,uint256)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct SwapIntentFulfilled {
+    pub intent_id: [u8; 32],
+    pub filler: ::ethers::core::types::Address,
+    pub fill_time_stamp: ::ethers::core::types::U256,
+}
+///`SwapIntentTokenBurn(bytes32)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct SwapIntentTokenBurn {
+    pub intent_id: [u8; 32],
+}
+///`SwapIntentTokenLock(bytes32)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct SwapIntentTokenLock {
+    pub intent_id: [u8; 32],
+}
+///`SwapIntent(address,bytes,uint32,uint32,address,address,uint256,bytes,uint256,uint256)`
 #[derive(
     Clone,
     ::ethers::contract::EthAbiType,
@@ -111,6 +213,8 @@ pub struct SwapIntent {
     pub destination_token: ::ethers::core::types::Address,
     pub source_amount: ::ethers::core::types::U256,
     pub source_permit_2: ::ethers::core::types::Bytes,
+    pub nonce: ::ethers::core::types::U256,
+    pub deadline: ::ethers::core::types::U256,
 }
 ///`Token(address,uint256)`
 #[derive(

@@ -51,6 +51,8 @@ async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
         destination_token: usdc_sepolia.address,
         source_amount,
         source_permit_2: Default::default(),
+        deadline: Default::default(),
+        nonce: Default::default(),
     };
 
     let intent_get_usdt_sepolia = SwapIntent {

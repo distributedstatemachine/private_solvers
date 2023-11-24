@@ -14,7 +14,30 @@ pub mod swap_intents_library {
     fn __abi() -> ::ethers::core::abi::Abi {
         ::ethers::core::abi::ethabi::Contract {
             constructor: ::core::option::Option::None,
-            functions: ::std::collections::BTreeMap::new(),
+            functions: ::core::convert::From::from([
+                (
+                    ::std::borrow::ToOwned::to_owned("INTENT_TYPE_HASH"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("INTENT_TYPE_HASH"),
+                            inputs: ::std::vec![],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes32"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+            ]),
             events: ::std::collections::BTreeMap::new(),
             errors: ::std::collections::BTreeMap::new(),
             receive: false,
@@ -26,13 +49,13 @@ pub mod swap_intents_library {
         ::ethers::core::abi::Abi,
     > = ::ethers::contract::Lazy::new(__abi);
     #[rustfmt::skip]
-    const __BYTECODE: &[u8] = b"`V`7`\x0B\x82\x82\x829\x80Q`\0\x1A`s\x14`*WcNH{q`\xE0\x1B`\0R`\0`\x04R`$`\0\xFD[0`\0R`s\x81S\x82\x81\xF3\xFEs\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 _\xB71\xF6\x03\xA0C\x96\x08o\x9B\xAE\xFA\xECp\xD4's\xE8\xF7][\x1D\x17\xA1Vw\xA3Uzx\xA2dsolcC\0\x08\x13\x003";
+    const __BYTECODE: &[u8] = b"`\xA6a\08`\x0B\x82\x82\x829\x80Q`\0\x1A`s\x14`+WcNH{q`\xE0\x1B`\0R`\0`\x04R`$`\0\xFD[0`\0R`s\x81S\x82\x81\xF3\xFEs\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\x046\x10`3W`\x005`\xE0\x1C\x80c;\x0C\x8Fs\x14`8W[`\0\x80\xFD[`^\x7F\x9F4\xD6E\xC3}:\xED\xB5\x03Rz\x88\xEB=\xAF\x0B\xAD\xF2*\xDE\x9B\x80C\x07\xCD\xD0\xBF2\x8A\x9B\x13\x81V[`@Q\x90\x81R` \x01`@Q\x80\x91\x03\x90\xF3\xFE\xA2dipfsX\"\x12 1\xBCf\x9DSF\xE7n>e@\x1C\x84\xFDN\x8EnO\xB5\xEC-tro\xBD\xF1\xF8\x18\xCBP\xF2\xDFdsolcC\0\x08\x13\x003";
     /// The bytecode of the contract.
     pub static SWAPINTENTSLIBRARY_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __BYTECODE,
     );
     #[rustfmt::skip]
-    const __DEPLOYED_BYTECODE: &[u8] = b"s\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 _\xB71\xF6\x03\xA0C\x96\x08o\x9B\xAE\xFA\xECp\xD4's\xE8\xF7][\x1D\x17\xA1Vw\xA3Uzx\xA2dsolcC\0\x08\x13\x003";
+    const __DEPLOYED_BYTECODE: &[u8] = b"s\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\x046\x10`3W`\x005`\xE0\x1C\x80c;\x0C\x8Fs\x14`8W[`\0\x80\xFD[`^\x7F\x9F4\xD6E\xC3}:\xED\xB5\x03Rz\x88\xEB=\xAF\x0B\xAD\xF2*\xDE\x9B\x80C\x07\xCD\xD0\xBF2\x8A\x9B\x13\x81V[`@Q\x90\x81R` \x01`@Q\x80\x91\x03\x90\xF3\xFE\xA2dipfsX\"\x12 1\xBCf\x9DSF\xE7n>e@\x1C\x84\xFDN\x8EnO\xB5\xEC-tro\xBD\xF1\xF8\x18\xCBP\xF2\xDFdsolcC\0\x08\x13\x003";
     /// The deployed bytecode of the contract.
     pub static SWAPINTENTSLIBRARY_DEPLOYED_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __DEPLOYED_BYTECODE,
@@ -115,6 +138,14 @@ pub mod swap_intents_library {
             let deployer = ::ethers::contract::ContractDeployer::new(deployer);
             Ok(deployer)
         }
+        ///Calls the contract's `INTENT_TYPE_HASH` (0x3b0c8f73) function
+        pub fn intent_type_hash(
+            &self,
+        ) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
+            self.0
+                .method_hash([59, 12, 143, 115], ())
+                .expect("method not found (this should never happen)")
+        }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
     for SwapIntentsLibrary<M> {
@@ -122,4 +153,33 @@ pub mod swap_intents_library {
             Self::new(contract.address(), contract.client())
         }
     }
+    ///Container type for all input parameters for the `INTENT_TYPE_HASH` function with signature `INTENT_TYPE_HASH()` and selector `0x3b0c8f73`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "INTENT_TYPE_HASH", abi = "INTENT_TYPE_HASH()")]
+    pub struct IntentTypeHashCall;
+    ///Container type for all return fields from the `INTENT_TYPE_HASH` function with signature `INTENT_TYPE_HASH()` and selector `0x3b0c8f73`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct IntentTypeHashReturn(pub [u8; 32]);
 }
