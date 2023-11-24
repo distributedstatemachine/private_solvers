@@ -152,7 +152,6 @@ checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
 [[package]]
 name = "artemis-core"
 version = "0.1.0"
-source = "git+https://github.com/paradigmxyz/artemis#4bb158070833ec2b789a2ece14c896c4b28ce3be"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -340,6 +339,14 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a8241f3ebb85c056b509d4327ad0358fbbba6ffb340bf388f26350aeda225b1"
 dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "bindings-balancer"
+version = "0.1.0"
+dependencies = [
+ "ethers",
  "serde",
 ]
 
@@ -2258,6 +2265,7 @@ dependencies = [
  "artemis-core",
  "async-stream",
  "async-trait",
+ "bindings-balancer",
  "bindings-khalani",
  "clap",
  "ethers",

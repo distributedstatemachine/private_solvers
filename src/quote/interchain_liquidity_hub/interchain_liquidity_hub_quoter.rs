@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use anyhow::anyhow;
 use async_trait::async_trait;
-use bindings_khalani::vault::{BatchSwapStep, FundManagement, Vault};
+use bindings_balancer::vault::{BatchSwapStep, FundManagement, Vault};
 use ethers::types::{Bytes, U256};
 
 use crate::config::addresses::AddressesConfig;
