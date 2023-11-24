@@ -41,6 +41,11 @@ impl Config {
                 .parse::<Address>()
                 .unwrap(),
             escrow_address: config.addresses.escrow_address.parse::<Address>().unwrap(),
+            khalani_chain_event_verifier_address: config
+                .addresses
+                .khalani_chain_event_verifier_address
+                .parse::<Address>()
+                .unwrap(),
         };
         let chains: Vec<ChainConfig> = config
             .chains

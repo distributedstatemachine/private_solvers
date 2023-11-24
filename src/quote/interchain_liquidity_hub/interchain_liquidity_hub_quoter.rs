@@ -42,6 +42,7 @@ impl InterchainLiquidityHubQuoter {
     }
 }
 
+#[allow(unreachable_code)]
 #[async_trait]
 impl IntentQuoter for InterchainLiquidityHubQuoter {
     async fn quote_intent(&self, swap_intent: SwapIntent) -> Result<QuotedIntent> {

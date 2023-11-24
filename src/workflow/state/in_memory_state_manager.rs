@@ -22,4 +22,8 @@ impl StateManager for InMemoryStateManager {
     fn get_state(&self, intent_id: IntentId) -> Option<&IntentState> {
         self.intents.get(&intent_id)
     }
+
+    fn get_known_intents(&self) -> Vec<&IntentId> {
+        return self.intents.keys().collect();
+    }
 }

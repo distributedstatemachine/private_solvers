@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::config::chain::KHALANI_CHAIN_ID;
 use artemis_core::engine::Engine;
 
 use crate::config::config::Config;
@@ -8,11 +9,9 @@ use crate::inventory::inventory::Inventory;
 use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
-use crate::workflow::collectors::ethereum::escrow_events_locked_tokens_proof_source::EscrowEventsLockedTokensProofSource;
+use crate::workflow::collectors::ethereum::gmp_verifier_proof_source::GmpEventVerifierProofSource;
 use crate::workflow::collectors::ethereum::intents_mempool_source::IntentsMempoolSource;
-use crate::workflow::collectors::locked_tokens_proofs_collector::{
-    LockedTokensProofCollector, LockedTokensProofSource,
-};
+use crate::workflow::collectors::proofs_collector::{ProofSource, ProofsCollector};
 use crate::workflow::collectors::swap_intent_collector::{SwapIntentCollector, SwapIntentSource};
 use crate::workflow::event::Event;
 use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
@@ -38,8 +37,11 @@ pub fn configure_engine(
         connector.clone(),
         config.addresses.intents_mempool_address.clone(),
     );
-    let escrow_events_locked_tokens_proof_source =
-        EscrowEventsLockedTokensProofSource::new(connector.clone(), config.addresses.clone());
+    let khalani_gmp_verifier_proof_source = GmpEventVerifierProofSource::new(
+        connector.clone(),
+        KHALANI_CHAIN_ID,
+        config.addresses.clone(),
+    );
     let send_transaction_lock_intent_tokens_handler =
         SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
     let send_transaction_settle_intent_handler =
@@ -54,7 +56,7 @@ pub fn configure_engine(
     register_engine(
         state_manager,
         intents_mempool_source,
-        escrow_events_locked_tokens_proof_source,
+        khalani_gmp_verifier_proof_source,
         send_transaction_lock_intent_tokens_handler,
         send_transaction_settle_intent_handler,
         interchain_liquidity_hub_quoter,
@@ -65,14 +67,14 @@ fn register_engine<
     'lifetime,
     _StateManager,
     _SwapIntentsSource,
-    _LockedTokensProofSource,
+    _ProofSource,
     _LockIntentTokensHandler,
     _SettleIntentHandler,
     _IntentQuoter,
 >(
     state_manager: _StateManager,
     swap_intents_source: _SwapIntentsSource,
-    locked_tokens_proof_source: _LockedTokensProofSource,
+    proof_source: _ProofSource,
     lock_intent_tokens_handler: _LockIntentTokensHandler,
     settle_intent_handler: _SettleIntentHandler,
     intent_quoter: _IntentQuoter,
@@ -80,7 +82,7 @@ fn register_engine<
 where
     _StateManager: StateManager + Send + Sync + 'static,
     _SwapIntentsSource: SwapIntentSource + Send + Sync + 'static,
-    _LockedTokensProofSource: LockedTokensProofSource + Send + Sync + 'static,
+    _ProofSource: ProofSource + Send + Sync + 'static,
     _LockIntentTokensHandler: LockIntentTokensHandler + Send + Sync + 'static,
     _SettleIntentHandler: SettleIntentHandler + Send + Sync + 'static,
     _IntentQuoter: IntentQuoter + Send + Sync + 'static,
@@ -91,9 +93,8 @@ where
     let intents_collector = Box::new(SwapIntentCollector::new(swap_intents_source));
     engine.add_collector(intents_collector);
 
-    let locked_tokens_collector =
-        Box::new(LockedTokensProofCollector::new(locked_tokens_proof_source));
-    engine.add_collector(locked_tokens_collector);
+    let proof_collector = Box::new(ProofsCollector::new(proof_source));
+    engine.add_collector(proof_collector);
 
     // Set up strategies.
     let intents_strategy = Box::new(IntentsStrategy::new(state_manager, intent_quoter));
