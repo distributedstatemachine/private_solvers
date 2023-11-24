@@ -6,6 +6,7 @@ use bindings_khalani::intents_mempool::{IntentCreatedFilter, IntentsMempool};
 use ethers::contract::Event as ContractEvent;
 use ethers::types::Address;
 use futures::StreamExt;
+use tracing::{error, info};
 
 use crate::config::chain::SEPOLIA_CHAIN_ID;
 use crate::connectors::connector::{Connector, WsClient};
@@ -33,11 +34,17 @@ impl SwapIntentSource for IntentsMempoolSource {
         let intents_stream = self.intent_created_filter.subscribe().await?;
         let intents_stream = intents_stream.filter_map(|event| async {
             match event {
-                Ok(event) => Some(SwapIntent {
-                    intent_id: event.intent_id.into(),
-                    ..SwapIntent::from(event.intent)
-                }),
-                Err(_) => None, // TODO: consider better error handling.
+                Ok(event) => {
+                    info!(%event, "New event");
+                    Some(SwapIntent {
+                        intent_id: event.intent_id.into(),
+                        ..SwapIntent::from(event.intent)
+                    })
+                }
+                Err(err) => {
+                    error!(%err, "Failed to parse a new intent event");
+                    None
+                } // TODO: consider better error handling.
             }
         });
         Ok(Box::pin(intents_stream))

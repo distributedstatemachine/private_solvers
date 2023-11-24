@@ -42,6 +42,7 @@ where
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
         match event {
             Event::NewSwapIntent(swap_intent) => {
+                info!(?swap_intent, "Processing new swap intent");
                 self.state_manager
                     .update_state(swap_intent.intent_id, NewIntent(swap_intent.clone()));
                 let quoted_intent = self.intent_quoter.quote_intent(swap_intent).await;
@@ -54,6 +55,7 @@ where
                 } // TODO: handle erroneous quoting.
             }
             Event::TokensLocked { intent_id } => {
+                info!(?intent_id, "Processing TokensLocked event");
                 let previous_state = if let Some(IntentQuoted(quoted_intent)) =
                     self.state_manager.get_state(intent_id)
                 {
