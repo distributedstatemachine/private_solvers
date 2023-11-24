@@ -5,8 +5,6 @@ use artemis_core::engine::Engine;
 use clap::Parser;
 use ethers::signers::{LocalWallet, Signer};
 use tracing::info;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
 
 use inventory::inventory::Inventory;
 use workflow::action::Action;

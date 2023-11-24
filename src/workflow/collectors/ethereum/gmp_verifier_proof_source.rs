@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::time::Duration;
 
 use anyhow::Result;
 use artemis_core::types::CollectorStream;
@@ -6,7 +7,6 @@ use async_stream::__private::AsyncStream;
 use async_trait::async_trait;
 use bindings_khalani::gmp_event_verifier::GMPEventVerifier;
 use ethers::middleware::Middleware;
-use ethers::types::H256;
 use futures::StreamExt;
 
 use crate::config::addresses::AddressesConfig;
@@ -45,20 +45,32 @@ impl GmpEventVerifierProofSource {
 impl ProofSource for GmpEventVerifierProofSource {
     async fn get_proof_ids_stream(&self) -> Result<CollectorStream<'_, ProofId>> {
         let event_stream: AsyncStream<Result<ProofId>, _> = async_stream::try_stream! {
-            let starting_block_number = self.rpc_client.get_block_number().await?;
             let chain_id: ChainId = self.chain_id;
-            info!(current_block_number = ?starting_block_number, ?chain_id, "Current block number");
-            let event = self
-                .event_verifier
-                .new_event_registered_filter()
-                .from_block(starting_block_number);
-            let mut event_stream = event.stream().await?;
+            let mut previous_block_number = self.rpc_client.get_block_number().await?;
+            info!(?previous_block_number, ?chain_id, "Starting block number");
 
-            while let Some(Ok(new_event)) = event_stream.next().await {
-               let proof_id: ProofId = H256::from(new_event.event_hash);
-               let chain_id: ChainId = self.chain_id;
-               info!(?proof_id, ?chain_id, "GMP Event Verifier received a new proof");
-               yield proof_id;
+            // TODO: use sub graphs connection.
+            loop {
+                let current_block_number = self.rpc_client.get_block_number().await?;
+                if previous_block_number == current_block_number {
+                    tokio::time::sleep(Duration::from_secs(5)).await;
+                    continue
+                }
+
+                let event = self
+                    .event_verifier
+                    .new_event_registered_filter()
+                    .from_block(previous_block_number)
+                    .to_block(current_block_number);
+
+                let events = event.query().await?;
+                for event in events {
+                    let proof_id: ProofId = event.event_hash.into();
+                    info!(?proof_id, ?chain_id, "GMP Event Verifier received a new proof");
+                    yield proof_id;
+                }
+
+                previous_block_number = current_block_number + 1;
             }
         };
         let event_stream = Box::pin(event_stream);
