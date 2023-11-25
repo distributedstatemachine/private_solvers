@@ -13,7 +13,7 @@ pub struct Token {
 }
 
 impl Amount {
-    pub fn from_token(user_units: U256, token: &Token) -> Amount {
+    pub fn from_user_units_token(user_units: U256, token: &Token) -> Amount {
         let multiplier = U256::exp10(token.decimals as usize);
         let base_units = user_units
             .checked_mul(multiplier)
