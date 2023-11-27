@@ -1,5 +1,5 @@
 use crate::types::intent_id::IntentId;
-use crate::workflow::state::state::IntentState;
+use crate::workflow::state::IntentState;
 
 pub trait StateManager {
     fn update_state(&mut self, intent_id: IntentId, new_state: IntentState);

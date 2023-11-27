@@ -1,4 +1,4 @@
-use crate::connectors::connector::RpcClient;
+use crate::connectors::RpcClient;
 use anyhow::{anyhow, Result};
 use ethers::prelude::ContractCall;
 use ethers::types::TransactionReceipt;

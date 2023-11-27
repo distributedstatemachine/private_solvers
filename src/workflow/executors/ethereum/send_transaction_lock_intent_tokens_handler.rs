@@ -7,7 +7,7 @@ use ethers::contract::ContractCall;
 use tracing::info;
 
 use crate::config::addresses::AddressesConfig;
-use crate::connectors::connector::{Connector, RpcClient};
+use crate::connectors::{Connector, RpcClient};
 use crate::ethereum::transaction::submit_transaction;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;

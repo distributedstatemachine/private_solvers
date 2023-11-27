@@ -9,7 +9,7 @@ use futures::StreamExt;
 use tracing::{error, info};
 
 use crate::config::chain::SEPOLIA_CHAIN_ID;
-use crate::connectors::connector::{Connector, WsClient};
+use crate::connectors::{Connector, WsClient};
 use crate::types::swap_intent::SwapIntent;
 use crate::workflow::collectors::swap_intent_collector::SwapIntentSource;
 

@@ -1,5 +1,5 @@
 use crate::config::addresses::AddressesConfig;
-use crate::connectors::connector::{Connector, RpcClient};
+use crate::connectors::{Connector, RpcClient};
 use crate::ethereum::transaction::submit_transaction;
 use crate::types::swap_intent::SwapIntent;
 use crate::workflow::executors::settle_intent_executor::SettleIntentHandler;

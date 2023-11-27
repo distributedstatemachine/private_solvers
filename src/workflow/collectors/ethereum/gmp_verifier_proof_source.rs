@@ -11,7 +11,7 @@ use futures::StreamExt;
 
 use crate::config::addresses::AddressesConfig;
 use crate::config::chain::ChainId;
-use crate::connectors::connector::{Connector, RpcClient};
+use crate::connectors::{Connector, RpcClient};
 use crate::types::proof_id::ProofId;
 use crate::workflow::collectors::proofs_collector::ProofSource;
 use tracing::info;

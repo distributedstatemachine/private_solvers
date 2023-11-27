@@ -23,7 +23,7 @@ impl<S: SwapIntentSource> SwapIntentCollector<S> {
 impl<S: SwapIntentSource + Sync + Send> Collector<Event> for SwapIntentCollector<S> {
     async fn get_event_stream(&self) -> Result<CollectorStream<'_, Event>> {
         let intents_stream = self.0.get_new_swap_intents_stream().await?;
-        let intents_stream = intents_stream.map(|swap_intent| Event::NewSwapIntent(swap_intent));
+        let intents_stream = intents_stream.map(Event::NewSwapIntent);
         Ok(Box::pin(intents_stream))
     }
 }
