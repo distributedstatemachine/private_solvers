@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use anyhow::Result;
 
-use khalani_solver::inventory::inventory::Inventory;
 use khalani_solver::inventory::token_balance_query::TokenBalanceQuery;
+use khalani_solver::inventory::Inventory;
 
 use crate::common::{create_connector, create_e2e_config};
 

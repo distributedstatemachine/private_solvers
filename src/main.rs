@@ -6,14 +6,14 @@ use clap::Parser;
 use ethers::signers::{LocalWallet, Signer};
 use tracing::info;
 
-use inventory::inventory::Inventory;
+use inventory::Inventory;
 use workflow::action::Action;
 use workflow::event::Event;
 
-use crate::config::config::Config;
-use crate::connectors::connector::Connector;
+use crate::config::Config;
+use crate::connectors::Connector;
 use crate::diagnostics::logs::configure_logs;
-use crate::workflow::engine::engine::configure_engine;
+use crate::workflow::engine::configure_engine;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 
 pub mod config;

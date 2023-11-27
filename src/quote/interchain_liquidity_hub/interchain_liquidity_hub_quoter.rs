@@ -9,9 +9,9 @@ use tracing::info;
 use crate::config::addresses::AddressesConfig;
 use crate::config::balancer::BalancerConfig;
 use crate::config::chain::KHALANI_CHAIN_ID;
-use crate::connectors::connector::{Connector, RpcClient};
+use crate::connectors::{Connector, RpcClient};
 use crate::inventory::amount::Amount;
-use crate::inventory::inventory::Inventory;
+use crate::inventory::Inventory;
 use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
@@ -128,7 +128,7 @@ impl IntentQuoter for InterchainLiquidityHubQuoter {
         // TODO: for now we set the destination (expected) amount to be equal to the source amount.
         //  Handle the decimals difference between source / destination tokens.
         let destination_amount =
-            Amount::from_token_base_units(swap_intent.source_amount, &destination_token);
+            Amount::from_token_base_units(swap_intent.source_amount, destination_token);
         let quoted_intent = QuotedIntent {
             swap_intent,
             kai_amount,

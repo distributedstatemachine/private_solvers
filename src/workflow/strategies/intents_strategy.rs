@@ -10,8 +10,8 @@ use std::vec;
 use tracing::info;
 
 use crate::workflow::event::Event;
-use crate::workflow::state::state::IntentState::{IntentQuoted, NewIntent, TokensLocked};
 use crate::workflow::state::state_manager::StateManager;
+use crate::workflow::state::IntentState::{IntentQuoted, NewIntent, TokensLocked};
 
 pub struct IntentsStrategy<S: StateManager, Q: IntentQuoter> {
     state_manager: S,
@@ -74,7 +74,7 @@ where
                             "Proof of intent's tokens being locked has been received"
                         );
                         let previous_state = if let Some(IntentQuoted(quoted_intent)) =
-                            self.state_manager.get_state(intent_id.clone())
+                            self.state_manager.get_state(*intent_id)
                         {
                             Some(quoted_intent.clone())
                         } else {
@@ -82,10 +82,8 @@ where
                         };
 
                         if let Some(quoted_intent) = previous_state {
-                            self.state_manager.update_state(
-                                intent_id.clone(),
-                                TokensLocked(quoted_intent.clone()),
-                            );
+                            self.state_manager
+                                .update_state(*intent_id, TokensLocked(quoted_intent.clone()));
                             return vec![Action::SettleIntent(quoted_intent)];
                         } // TODO: handle wrong previous state.
                     }

@@ -1,6 +1,6 @@
 use crate::types::intent_id::IntentId;
-use crate::workflow::state::state::IntentState;
 use crate::workflow::state::state_manager::StateManager;
+use crate::workflow::state::IntentState;
 use std::collections::HashMap;
 
 pub struct InMemoryStateManager {
@@ -12,6 +12,12 @@ impl InMemoryStateManager {
         Self {
             intents: HashMap::new(),
         }
+    }
+}
+
+impl Default for InMemoryStateManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
