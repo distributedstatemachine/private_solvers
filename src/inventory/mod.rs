@@ -91,7 +91,7 @@ impl TokenBalanceQuery for Inventory {
         let rpc_client = self.connector.get_rpc_client(token.chain_id).unwrap();
         let erc20 = ERC20MintableBurnable::new(token.address, rpc_client);
         let balance = erc20.balance_of(owner).await?;
-        let amount = Amount::from_token(balance, token);
+        let amount = Amount::from_token_base_units(balance, token);
         Ok(amount)
     }
 }
