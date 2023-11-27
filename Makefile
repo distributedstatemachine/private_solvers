@@ -1,4 +1,3 @@
-
 # Docker image name
 IMAGE_NAME = solver
 
@@ -12,4 +11,6 @@ docker_build:
 .PHONY: docker_run
 docker_run:
 	@read -p "Enter PRIVATE_KEY: " PRIVATE_KEY; \
-	docker run -e PRIVATE_KEY=$$PRIVATE_KEY -e CONFIG_FILE=$(CONFIG_FILE) $(IMAGE_NAME)
+	read -p "Enter SEPOLIA_RPC_URL: " SEPOLIA_RPC_URL; \
+	read -p "Enter SEPOLIA_WS_URL: " SEPOLIA_WS_URL; \
+	docker run -e PRIVATE_KEY=$$PRIVATE_KEY -e CONFIG_FILE=$(CONFIG_FILE) -e SEPOLIA_RPC_URL=$$SEPOLIA_RPC_URL -e SEPOLIA_WS_URL=$$SEPOLIA_WS_URL $(IMAGE_NAME)
