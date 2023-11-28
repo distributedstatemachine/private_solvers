@@ -1,10 +1,12 @@
 use crate::quote::quoted_intent::QuotedIntent;
+use crate::types::swap_intent::SwapIntent;
 
 /// Core Action enum.
 #[derive(Debug, Clone)]
 pub enum Action {
-    LockTokens(QuotedIntent),
-    SettleIntent(QuotedIntent),
+    LockTokensOnSourceChain(SwapIntent),
+    FillIntentOnDestinationChain(QuotedIntent),
     SwapAndBridge(QuotedIntent),
-    ApproveTokens(QuotedIntent),
+    ApproveTokens(QuotedIntent), // TODO: is it necessary?
+    SettleIntent(SwapIntent),
 }

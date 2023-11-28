@@ -45,6 +45,11 @@ impl Config {
                 .parse::<Address>()
                 .unwrap(),
             escrow_address: config.addresses.escrow_address.parse::<Address>().unwrap(),
+            swap_intent_filler_address: config
+                .addresses
+                .swap_intent_filler_address
+                .parse::<Address>()
+                .unwrap(),
             khalani_chain_event_verifier_address: config
                 .addresses
                 .khalani_chain_event_verifier_address

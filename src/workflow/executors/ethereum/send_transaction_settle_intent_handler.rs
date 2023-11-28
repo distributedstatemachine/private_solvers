@@ -31,11 +31,7 @@ impl SettleIntentHandler for SendTransactionSettleIntentHandler {
         let transaction = self.build_settle_intent_tx(&swap_intent);
         let receipt = submit_transaction(transaction).await?;
         let tx_hash = receipt.transaction_hash;
-        info!(
-            ?swap_intent,
-            %tx_hash,
-            "Intent has been settled"
-        );
+        info!(?swap_intent, ?tx_hash, "Intent has been settled");
         Ok(())
     }
 }

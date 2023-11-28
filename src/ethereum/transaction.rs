@@ -7,8 +7,8 @@ use std::time::Duration;
 use tracing::info;
 
 // Inspired by https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/main/rust/chains/hyperlane-ethereum/src/tx.rs
-pub async fn submit_transaction<T: Detokenize>(
-    transaction: ContractCall<RpcClient, T>,
+pub async fn submit_transaction<D: Detokenize>(
+    transaction: ContractCall<RpcClient, D>,
 ) -> Result<TransactionReceipt> {
     let dispatched_transaction = transaction.send().await?;
     let tx_hash = dispatched_transaction.tx_hash();

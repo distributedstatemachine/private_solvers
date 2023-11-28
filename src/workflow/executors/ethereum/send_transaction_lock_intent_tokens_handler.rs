@@ -9,9 +9,10 @@ use tracing::info;
 use crate::config::addresses::AddressesConfig;
 use crate::connectors::{Connector, RpcClient};
 use crate::ethereum::transaction::submit_transaction;
-use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
-use crate::workflow::executors::lock_tokens_executor::LockIntentTokensHandler;
+use crate::workflow::executors::lock_tokens_executor::{
+    LockIntentTokensHandler, LockIntentTokensHandlerResult,
+};
 
 pub struct SendTransactionLockIntentTokensHandler {
     connector: Arc<Connector>,
@@ -29,17 +30,16 @@ impl SendTransactionLockIntentTokensHandler {
 
 #[async_trait]
 impl LockIntentTokensHandler for SendTransactionLockIntentTokensHandler {
-    async fn lock_tokens(&self, quoted_intent: QuotedIntent) -> Result<()> {
-        info!(?quoted_intent, "Locking source tokens of the intent");
-        let transaction = self.build_lock_tokens_tx(&quoted_intent.swap_intent);
+    async fn lock_tokens(&self, swap_intent: SwapIntent) -> Result<LockIntentTokensHandlerResult> {
+        info!(?swap_intent, "Locking source tokens of the intent");
+        let transaction = self.build_lock_tokens_tx(&swap_intent);
         let receipt = submit_transaction(transaction).await?;
         let tx_hash = receipt.transaction_hash;
-        info!(
-            ?quoted_intent,
-            %tx_hash,
-            "Source tokens have been locked"
-        );
-        Ok(())
+        info!(?swap_intent, ?tx_hash, "Source tokens have been locked");
+        Ok(LockIntentTokensHandlerResult {
+            swap_intent,
+            locking_tx_hash: tx_hash,
+        })
     }
 }
 

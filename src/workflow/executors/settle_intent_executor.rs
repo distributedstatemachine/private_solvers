@@ -22,11 +22,7 @@ impl<H: SettleIntentHandler> SettleIntentExecutor<H> {
 impl<H: SettleIntentHandler + Send + Sync> Executor<Action> for SettleIntentExecutor<H> {
     async fn execute(&self, action: Action) -> Result<()> {
         match action {
-            Action::SettleIntent(quoted_intent) => {
-                self.0
-                    .process_settle_intent(quoted_intent.swap_intent)
-                    .await
-            }
+            Action::SettleIntent(swap_intent) => self.0.process_settle_intent(swap_intent).await,
             _ => Ok(()),
         }
     }

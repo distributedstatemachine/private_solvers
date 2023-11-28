@@ -1,29 +1,26 @@
 use std::sync::Arc;
 
-use crate::config::chain::KHALANI_CHAIN_ID;
 use artemis_core::engine::Engine;
+use futures::lock::Mutex;
 
+use crate::config::chain::KHALANI_CHAIN_ID;
 use crate::config::Config;
 use crate::connectors::Connector;
 use crate::inventory::Inventory;
-use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
-use crate::workflow::collectors::ethereum::gmp_verifier_proof_source::GmpEventVerifierProofSource;
 use crate::workflow::collectors::ethereum::intents_mempool_source::IntentsMempoolSource;
-use crate::workflow::collectors::proofs_collector::{ProofSource, ProofsCollector};
-use crate::workflow::collectors::swap_intent_collector::{SwapIntentCollector, SwapIntentSource};
+use crate::workflow::collectors::proofs::gmp_verifier_proof_source::GmpEventVerifierProofSource;
+use crate::workflow::collectors::proofs::proofs_collector::ProofsCollector;
+use crate::workflow::collectors::swap_intent_collector::SwapIntentCollector;
 use crate::workflow::event::Event;
 use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
 use crate::workflow::executors::ethereum::send_transaction_settle_intent_handler::SendTransactionSettleIntentHandler;
-use crate::workflow::executors::lock_tokens_executor::{
-    LockIntentTokensExecutor, LockIntentTokensHandler,
-};
-use crate::workflow::executors::settle_intent_executor::{
-    SettleIntentExecutor, SettleIntentHandler,
-};
+use crate::workflow::executors::ethereum::send_transaction_swap_intent_filler_handler::SendTransactionSwapIntentFillerHandler;
+use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
+use crate::workflow::executors::settle_intent_executor::SettleIntentExecutor;
+use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerExecutor;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
-use crate::workflow::state::state_manager::StateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
 
 pub fn configure_engine(
@@ -50,58 +47,45 @@ pub fn configure_engine(
         config.addresses.clone(),
         config.balancer.clone(),
     );
+    let swap_intent_filler_handler =
+        SendTransactionSwapIntentFillerHandler::new(config.addresses.clone(), connector.clone());
 
-    register_engine(
-        state_manager,
-        intents_mempool_source,
-        khalani_gmp_verifier_proof_source,
-        send_transaction_lock_intent_tokens_handler,
-        send_transaction_settle_intent_handler,
-        interchain_liquidity_hub_quoter,
-    )
-}
+    let state_manager = Arc::new(Mutex::new(state_manager));
 
-fn register_engine<
-    _StateManager,
-    _SwapIntentsSource,
-    _ProofSource,
-    _LockIntentTokensHandler,
-    _SettleIntentHandler,
-    _IntentQuoter,
->(
-    state_manager: _StateManager,
-    swap_intents_source: _SwapIntentsSource,
-    proof_source: _ProofSource,
-    lock_intent_tokens_handler: _LockIntentTokensHandler,
-    settle_intent_handler: _SettleIntentHandler,
-    intent_quoter: _IntentQuoter,
-) -> Engine<Event, Action>
-where
-    _StateManager: StateManager + Send + Sync + 'static,
-    _SwapIntentsSource: SwapIntentSource + Send + Sync + 'static,
-    _ProofSource: ProofSource + Send + Sync + 'static,
-    _LockIntentTokensHandler: LockIntentTokensHandler + Send + Sync + 'static,
-    _SettleIntentHandler: SettleIntentHandler + Send + Sync + 'static,
-    _IntentQuoter: IntentQuoter + Send + Sync + 'static,
-{
     let mut engine = Engine::<Event, Action>::default();
 
     // Set up collectors.
-    let intents_collector = Box::new(SwapIntentCollector::new(swap_intents_source));
+    let intents_collector = Box::new(SwapIntentCollector::new(intents_mempool_source));
     engine.add_collector(intents_collector);
 
-    let proof_collector = Box::new(ProofsCollector::new(proof_source));
+    let proof_collector = Box::new(ProofsCollector::new(
+        khalani_gmp_verifier_proof_source,
+        state_manager.clone(),
+        connector.clone(),
+    ));
     engine.add_collector(proof_collector);
 
     // Set up strategies.
-    let intents_strategy = Box::new(IntentsStrategy::new(state_manager, intent_quoter));
+    let intents_strategy = Box::new(IntentsStrategy::new(
+        state_manager.clone(),
+        interchain_liquidity_hub_quoter,
+    ));
     engine.add_strategy(intents_strategy);
 
     // Set up executors.
-    let lock_intent_tokens_executor = LockIntentTokensExecutor::new(lock_intent_tokens_handler);
+    let (lock_intent_tokens_executor, lock_intent_tokens_confirmation_collector) =
+        LockIntentTokensExecutor::new(send_transaction_lock_intent_tokens_handler);
     engine.add_executor(Box::new(lock_intent_tokens_executor));
+    engine.add_collector(lock_intent_tokens_confirmation_collector);
 
-    let settle_intent_executor = Box::new(SettleIntentExecutor::new(settle_intent_handler));
+    let (swap_intent_filler_executor, swap_intent_filler_confirmation_collector) =
+        SwapIntentFillerExecutor::new(swap_intent_filler_handler);
+    engine.add_executor(Box::new(swap_intent_filler_executor));
+    engine.add_collector(swap_intent_filler_confirmation_collector);
+
+    let settle_intent_executor = Box::new(SettleIntentExecutor::new(
+        send_transaction_settle_intent_handler,
+    ));
     engine.add_executor(settle_intent_executor);
 
     engine

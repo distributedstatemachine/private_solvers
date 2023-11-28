@@ -1,7 +1,9 @@
+use std::collections::HashMap;
+
 use crate::types::intent_id::IntentId;
+use crate::types::swap_intent::SwapIntent;
 use crate::workflow::state::state_manager::StateManager;
 use crate::workflow::state::IntentState;
-use std::collections::HashMap;
 
 pub struct InMemoryStateManager {
     intents: HashMap<IntentId, IntentState>,
@@ -29,7 +31,28 @@ impl StateManager for InMemoryStateManager {
         self.intents.get(&intent_id)
     }
 
-    fn get_known_intents(&self) -> Vec<&IntentId> {
-        return self.intents.keys().collect();
+    fn get_all_intents(&self) -> Vec<IntentState> {
+        self.intents.values().cloned().collect()
+    }
+
+    fn create_intent_state(&mut self, intent_id: IntentId, swap_intent: SwapIntent) -> IntentId {
+        let intent_state = IntentState {
+            intent_id,
+            swap_intent,
+            ..IntentState::default()
+        };
+        self.intents.insert(intent_id, intent_state);
+        intent_id
+    }
+
+    fn update_intent_state<F>(&mut self, intent_id: IntentId, updater: F) -> Option<IntentState>
+    where
+        F: FnOnce(&mut IntentState),
+    {
+        if let Some(intent_state) = self.intents.get_mut(&intent_id) {
+            updater(intent_state);
+            return Some(intent_state.clone());
+        }
+        None
     }
 }
