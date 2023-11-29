@@ -50,6 +50,11 @@ impl Config {
                 .khalani_chain_event_verifier_address
                 .parse::<Address>()
                 .unwrap(),
+            interchain_liquidity_hub_address: config
+                .addresses
+                .interchain_liquidity_hub_address
+                .parse::<Address>()
+                .unwrap(),
         };
         let chains: Vec<ChainConfig> = config
             .chains

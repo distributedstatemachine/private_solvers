@@ -5,6 +5,8 @@ Khalani solver off-chain bot built with [Artemis](https://github.com/paradigmxyz
 ```shell
 export SEPOLIA_RPC_URL=<sepolia RPC URL>
 export SEPOLIA_WS_URL=<sepolia WS URL>
+export FUJI_RPC_URL=<fuji RPC URL>
+export FUJI_WS_URL=<fuji WS URL>
 cargo run -- --config-file <config file> --private-key <private key>
 ```
 
@@ -22,5 +24,12 @@ cargo run -- --config-file <config file> --private-key <private key>
 ```shell
 export SEPOLIA_RPC_URL=<sepolia RPC URL>
 export SEPOLIA_WS_URL=<sepolia WS URL>
+export FUJI_RPC_URL=<fuji RPC URL>
+export FUJI_WS_URL=<fuji WS URL>
 cargo test
+```
+
+### Example environment variables
+```
+export SEPOLIA_RPC_URL=https://ethereum-sepolia.publicnode.com; export SEPOLIA_WS_URL=wss://ethereum-sepolia.publicnode.com; export FUJI_RPC_URL=https://avalanche-fuji-c-chain.publicnode.com; export FUJI_WS_URL=wss://avalanche-fuji-c-chain.publicnode.com;
 ```

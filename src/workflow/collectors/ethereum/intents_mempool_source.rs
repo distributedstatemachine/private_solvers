@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use anyhow::Result;
 use artemis_core::types::CollectorStream;
 use async_trait::async_trait;
 use bindings_khalani::intents_mempool::{IntentCreatedFilter, IntentsMempool};
@@ -30,7 +31,7 @@ impl IntentsMempoolSource {
 
 #[async_trait]
 impl SwapIntentSource for IntentsMempoolSource {
-    async fn get_new_swap_intents_stream(&self) -> anyhow::Result<CollectorStream<'_, SwapIntent>> {
+    async fn get_new_swap_intents_stream(&self) -> Result<CollectorStream<'_, SwapIntent>> {
         let intents_stream = self.intent_created_filter.subscribe().await?;
         let intents_stream = intents_stream.filter_map(|event| async {
             match event {

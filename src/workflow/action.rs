@@ -5,4 +5,6 @@ use crate::quote::quoted_intent::QuotedIntent;
 pub enum Action {
     LockTokens(QuotedIntent),
     SettleIntent(QuotedIntent),
+    SwapAndBridge(QuotedIntent),
+    ApproveTokens(QuotedIntent),
 }

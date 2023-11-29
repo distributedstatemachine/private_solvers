@@ -7,6 +7,7 @@ pub struct AddressesConfigRaw {
     pub vault_address: String,
     pub escrow_address: String,
     pub khalani_chain_event_verifier_address: String,
+    pub interchain_liquidity_hub_address: String,
 }
 
 #[derive(Debug, Clone)]
@@ -15,4 +16,5 @@ pub struct AddressesConfig {
     pub vault_address: Address,
     pub escrow_address: Address,
     pub khalani_chain_event_verifier_address: Address,
+    pub interchain_liquidity_hub_address: Address,
 }

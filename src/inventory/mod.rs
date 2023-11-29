@@ -1,20 +1,23 @@
 pub mod amount;
 pub mod token;
+pub mod token_allowance_query;
 pub mod token_balance_query;
 
-use crate::config::chain::ChainId;
+use crate::config::chain::{ChainId, KHALANI_CHAIN_ID};
 use crate::config::token::TokenConfig;
 use crate::config::Config;
 use crate::connectors::Connector;
 use crate::inventory::amount::Amount;
 use crate::inventory::token::Token;
 use crate::inventory::token_balance_query::TokenBalanceQuery;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bindings_khalani::erc20_mintable_burnable::ERC20MintableBurnable;
 use ethers::types::Address;
 use std::default::Default;
 use std::sync::Arc;
+
+use self::token_allowance_query::TokenAllowanceQuery;
 
 pub struct Inventory {
     connector: Arc<Connector>,
@@ -83,6 +86,38 @@ impl Inventory {
             i.symbol.matches(&symbol).collect::<Vec<&str>>().len() == 1 && i.chain_id == chain_id
         })
     }
+
+    pub fn find_mirror_token(
+        &self,
+        spoke_chain_token_address: Address,
+        spoke_chain_id: ChainId,
+    ) -> Result<&Token> {
+        let spoke_chain_token = self
+            .find_token_by_address(spoke_chain_token_address, spoke_chain_id)
+            .ok_or(anyhow!(
+                "Unsupported spoke chain token with address {}",
+                spoke_chain_token_address
+            ))?;
+        let generalized_token_symbol: &str = &spoke_chain_token.symbol[..4];
+        let spoke_chain = self
+            .config
+            .chains
+            .iter()
+            .find(|chain| chain.chain_id == spoke_chain_id)
+            .ok_or(anyhow!("Can not find spoke chain for mirror token."))?;
+        let mut mirror_token_symbol: String = generalized_token_symbol.to_string();
+        mirror_token_symbol.push('.');
+        mirror_token_symbol.push_str(&spoke_chain.name);
+
+        let mirror_token = self
+            .find_token_by_symbol(mirror_token_symbol.clone(), KHALANI_CHAIN_ID)
+            .ok_or(anyhow!(
+                "Unsupported mirror token with symbol {}",
+                mirror_token_symbol
+            ))?;
+
+        Ok(mirror_token)
+    }
 }
 
 #[async_trait]
@@ -91,6 +126,22 @@ impl TokenBalanceQuery for Inventory {
         let rpc_client = self.connector.get_rpc_client(token.chain_id).unwrap();
         let erc20 = ERC20MintableBurnable::new(token.address, rpc_client);
         let balance = erc20.balance_of(owner).await?;
+        let amount = Amount::from_token_base_units(balance, token);
+        Ok(amount)
+    }
+}
+
+#[async_trait]
+impl TokenAllowanceQuery for Inventory {
+    async fn get_allowance(
+        &self,
+        token: &Token,
+        owner: Address,
+        spender: Address,
+    ) -> Result<Amount> {
+        let rpc_client = self.connector.get_rpc_client(token.chain_id).unwrap();
+        let erc20 = ERC20MintableBurnable::new(token.address, rpc_client);
+        let balance = erc20.allowance(owner, spender).await?;
         let amount = Amount::from_token_base_units(balance, token);
         Ok(amount)
     }

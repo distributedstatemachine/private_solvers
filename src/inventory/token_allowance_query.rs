@@ -5,6 +5,11 @@ use async_trait::async_trait;
 use ethers::addressbook::Address;
 
 #[async_trait]
-pub trait TokenBalanceQuery {
-    async fn get_balance(&self, token: &Token, owner: Address) -> Result<Amount>;
+pub trait TokenAllowanceQuery {
+    async fn get_allowance(
+        &self,
+        token: &Token,
+        owner: Address,
+        spender: Address,
+    ) -> Result<Amount>;
 }
