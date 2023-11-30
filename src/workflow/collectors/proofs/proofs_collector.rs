@@ -17,7 +17,9 @@ use crate::workflow::state::state_manager::StateManager;
 pub trait ProofSource {
     async fn get_proof_ids_stream(&self) -> Result<CollectorStream<'_, ProofId>>;
 
-    fn get_chain_id(&self) -> ChainId;
+    fn get_prover_chain_id(&self) -> ChainId;
+
+    fn get_verifier_chain_id(&self) -> ChainId;
 }
 
 pub struct ProofsCollector<PS: ProofSource, SM: StateManager> {
@@ -42,29 +44,46 @@ impl<PS: ProofSource + Sync + Send, SM: StateManager + Sync + Send> Collector<Ev
 {
     async fn get_event_stream(&self) -> Result<CollectorStream<'_, Event>> {
         let proof_ids_stream = self.proof_source.get_proof_ids_stream().await?;
-        let chain_id = self.proof_source.get_chain_id();
-        let proof_ids_stream =
-            proof_ids_stream.filter_map(move |proof_id| self.handle(proof_id, chain_id));
+        let prover_chain_id = self.proof_source.get_prover_chain_id();
+        let verifier_chain_id = self.proof_source.get_verifier_chain_id();
+        let proof_ids_stream = proof_ids_stream
+            .filter_map(move |proof_id| self.handle(proof_id, prover_chain_id, verifier_chain_id));
         Ok(Box::pin(proof_ids_stream))
     }
 }
 
 impl<PS: ProofSource, SM: StateManager> ProofsCollector<PS, SM> {
-    async fn handle(&self, proof_id: ProofId, chain_id: ChainId) -> Option<Event> {
-        info!(?chain_id, ?proof_id, "Received new proof");
+    async fn handle(
+        &self,
+        proof_id: ProofId,
+        prover_chain_id: ChainId,
+        verifier_chain_id: ChainId,
+    ) -> Option<Event> {
+        info!(
+            ?prover_chain_id,
+            ?proof_id,
+            ?verifier_chain_id,
+            "Received new proof"
+        );
         let all_intents = self.state_manager.lock().await.get_all_intents();
-        let event =
-            self.proofs_to_events_mapper
-                .map_new_proof_to_event(all_intents, chain_id, proof_id);
+        let event = self
+            .proofs_to_events_mapper
+            .map_new_proof_to_event(all_intents, proof_id);
         if let Some(event) = &event {
             info!(
-                ?chain_id,
+                ?prover_chain_id,
+                ?verifier_chain_id,
                 ?proof_id,
                 ?event,
                 "Proof has been mapped to event"
             );
         } else {
-            warn!(?proof_id, ?chain_id, "No mapping found for the proof");
+            warn!(
+                ?proof_id,
+                ?prover_chain_id,
+                ?verifier_chain_id,
+                "No mapping found for the proof"
+            );
         }
         event
     }

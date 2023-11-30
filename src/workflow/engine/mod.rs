@@ -1,9 +1,5 @@
 use std::sync::Arc;
 
-use artemis_core::engine::Engine;
-use futures::lock::Mutex;
-
-use crate::config::chain::{FUJI_CHAIN_ID, KHALANI_CHAIN_ID};
 use crate::config::Config;
 use crate::connectors::Connector;
 use crate::inventory::Inventory;
@@ -22,6 +18,8 @@ use crate::workflow::executors::settle_intent_executor::SettleIntentExecutor;
 use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerExecutor;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
+use artemis_core::engine::Engine;
+use futures::lock::Mutex;
 
 pub fn configure_engine(
     config: &Config,
@@ -32,13 +30,20 @@ pub fn configure_engine(
     // Set up Ethereum specific clients.
     let intents_mempool_source =
         IntentsMempoolSource::new(connector.clone(), config.addresses.intents_mempool_address);
-    // TODO: configure multiple prover / verifiers.
-    let khalani_gmp_verifier_proof_source = GmpEventVerifierProofSource::new(
-        connector.clone(),
-        KHALANI_CHAIN_ID,
-        FUJI_CHAIN_ID,
-        config.addresses.clone(),
-    );
+    let gmp_event_verifier_sources: Vec<GmpEventVerifierProofSource> = config
+        .addresses
+        .verifiers
+        .iter()
+        .map(|verifier_address| {
+            GmpEventVerifierProofSource::new(
+                connector.clone(),
+                verifier_address.verifier_chain_id,
+                verifier_address.prover_chain_id,
+                config.addresses.clone(),
+            )
+        })
+        .collect();
+
     let send_transaction_lock_intent_tokens_handler =
         SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
     let send_transaction_settle_intent_handler =
@@ -59,12 +64,14 @@ pub fn configure_engine(
     let intents_collector = Box::new(SwapIntentCollector::new(intents_mempool_source));
     engine.add_collector(intents_collector);
 
-    let proof_collector = Box::new(ProofsCollector::new(
-        khalani_gmp_verifier_proof_source,
-        state_manager.clone(),
-        connector.clone(),
-    ));
-    engine.add_collector(proof_collector);
+    for gmp_event_verifier_source in gmp_event_verifier_sources {
+        let proof_collector = Box::new(ProofsCollector::new(
+            gmp_event_verifier_source,
+            state_manager.clone(),
+            connector.clone(),
+        ));
+        engine.add_collector(proof_collector);
+    }
 
     // Set up strategies.
     let intents_strategy = Box::new(IntentsStrategy::new(

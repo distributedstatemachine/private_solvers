@@ -19,7 +19,8 @@ use tracing::{debug, error, info};
 pub struct GmpEventVerifierProofSource {
     event_verifier: GMPEventVerifier<RpcClient>,
     rpc_client: Arc<RpcClient>,
-    chain_id: ChainId,
+    verifier_chain_id: ChainId,
+    prover_chain_id: ChainId,
 }
 
 impl GmpEventVerifierProofSource {
@@ -43,7 +44,8 @@ impl GmpEventVerifierProofSource {
         Self {
             rpc_client: rpc_client.clone(),
             event_verifier,
-            chain_id: verifier_chain_id,
+            verifier_chain_id,
+            prover_chain_id,
         }
     }
 }
@@ -51,15 +53,25 @@ impl GmpEventVerifierProofSource {
 #[async_trait]
 impl ProofSource for GmpEventVerifierProofSource {
     async fn get_proof_ids_stream(&self) -> Result<CollectorStream<'_, ProofId>> {
-        let chain_id: ChainId = self.chain_id;
+        let prover_chain_id: ChainId = self.prover_chain_id;
+        let verifier_chain_id: ChainId = self.prover_chain_id;
         let mut previous_block_number = match self.rpc_client.get_block_number().await {
             Ok(block_number) => block_number,
             Err(e) => {
-                error!(?chain_id, ?e, "Error fetching block");
+                error!(
+                    ?prover_chain_id,
+                    ?verifier_chain_id,
+                    ?e,
+                    "Error fetching block"
+                );
                 return Err(e.into());
             }
         };
-        info!(?previous_block_number, ?chain_id, "Starting block number");
+        info!(
+            ?previous_block_number,
+            ?prover_chain_id,
+            "Starting block number"
+        );
         let mut logged_last_indexed_block_number = previous_block_number;
 
         let event_stream: AsyncStream<Result<ProofId>, _> = async_stream::try_stream! {
@@ -68,7 +80,7 @@ impl ProofSource for GmpEventVerifierProofSource {
                 let current_block_number = match self.rpc_client.get_block_number().await {
                     Ok(block_number) => block_number,
                     Err(e) => {
-                        error!(?chain_id, ?e, "Error fetching block");
+                        error!(?prover_chain_id, ?verifier_chain_id, ?e, "Error fetching block");
                         tokio::time::sleep(Duration::from_secs(5)).await;
                         continue;
                     }
@@ -80,7 +92,7 @@ impl ProofSource for GmpEventVerifierProofSource {
                 }
 
                 if logged_last_indexed_block_number + 50 < current_block_number {
-                    debug!(address = ?self.event_verifier.address(), ?previous_block_number, ?current_block_number, "Indexing the GMP verifier");
+                    debug!(address = ?self.event_verifier.address(), ?previous_block_number, ?current_block_number, ?prover_chain_id, ?verifier_chain_id, "Indexing the GMP verifier");
                     logged_last_indexed_block_number = current_block_number;
                 }
 
@@ -93,7 +105,7 @@ impl ProofSource for GmpEventVerifierProofSource {
                 let events = match event.query().await {
                     Ok(events) => events,
                     Err(e) => {
-                        error!(?e, chain_id, "Error querying events");
+                        error!(?e, ?prover_chain_id, ?verifier_chain_id, "Error querying events");
                         tokio::time::sleep(Duration::from_secs(5)).await;
                         continue;
                     }
@@ -101,7 +113,7 @@ impl ProofSource for GmpEventVerifierProofSource {
 
                 for event in events {
                     let proof_id: ProofId = event.event_hash.into();
-                    info!(?proof_id, ?chain_id, "GMP Event Verifier received a new proof");
+                    info!(?proof_id, ?prover_chain_id, ?verifier_chain_id, "GMP Event Verifier received a new proof");
                     yield proof_id;
                 }
 
@@ -118,7 +130,11 @@ impl ProofSource for GmpEventVerifierProofSource {
         Ok(Box::pin(event_stream))
     }
 
-    fn get_chain_id(&self) -> ChainId {
-        self.chain_id
+    fn get_prover_chain_id(&self) -> ChainId {
+        self.prover_chain_id
+    }
+
+    fn get_verifier_chain_id(&self) -> ChainId {
+        self.verifier_chain_id
     }
 }
