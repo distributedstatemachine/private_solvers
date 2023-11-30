@@ -6,7 +6,7 @@ use async_stream::__private::AsyncStream;
 use async_trait::async_trait;
 use bindings_khalani::intents_mempool::IntentsMempool;
 use ethers::middleware::Middleware;
-use ethers::types::Address;
+use ethers::types::{Address, ValueOrArray};
 use futures::StreamExt;
 use std::time::Duration;
 use tracing::{debug, error, info};
@@ -19,6 +19,7 @@ use crate::workflow::collectors::swap_intent_collector::SwapIntentSource;
 pub struct IntentsMempoolSource {
     rpc_client: Arc<RpcClient>,
     intents_mempool: IntentsMempool<RpcClient>,
+    intents_mempool_address: Address,
 }
 
 impl IntentsMempoolSource {
@@ -28,6 +29,7 @@ impl IntentsMempoolSource {
         Self {
             rpc_client,
             intents_mempool,
+            intents_mempool_address,
         }
     }
 }
@@ -70,6 +72,7 @@ impl SwapIntentSource for IntentsMempoolSource {
                 let event = self
                     .intents_mempool
                     .intent_created_filter()
+                    .address(ValueOrArray::Value(self.intents_mempool_address))
                     .from_block(previous_block_number)
                     .to_block(current_block_number);
 

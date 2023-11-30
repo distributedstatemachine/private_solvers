@@ -7,6 +7,7 @@ use async_stream::__private::AsyncStream;
 use async_trait::async_trait;
 use bindings_khalani::gmp_event_verifier::GMPEventVerifier;
 use ethers::middleware::Middleware;
+use ethers::types::ValueOrArray;
 use futures::StreamExt;
 
 use crate::config::addresses::VerifierConfig;
@@ -79,6 +80,7 @@ impl ProofSource for GmpEventVerifierProofSource {
                 let event = self
                     .event_verifier
                     .new_event_registered_filter()
+                    .address(ValueOrArray::Value(verifier_config.verifier_address.clone()))
                     .from_block(previous_block_number)
                     .to_block(current_block_number);
 
