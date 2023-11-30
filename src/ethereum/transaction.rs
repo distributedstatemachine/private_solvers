@@ -1,3 +1,4 @@
+use crate::config::chain::KHALANI_CHAIN_ID;
 use crate::connectors::RpcClient;
 use anyhow::{anyhow, Result};
 use ethers::abi::Detokenize;
@@ -8,9 +9,17 @@ use tracing::{debug, info};
 
 // Inspired by https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/main/rust/chains/hyperlane-ethereum/src/tx.rs
 pub async fn submit_transaction<D: Detokenize>(
-    transaction: ContractCall<RpcClient, D>,
+    mut transaction: ContractCall<RpcClient, D>,
 ) -> Result<TransactionReceipt> {
     debug!(?transaction.tx, "Dispatching transaction");
+
+    if let Some(chain_id) = transaction.tx.chain_id() {
+        if chain_id.as_u64() == KHALANI_CHAIN_ID {
+            transaction.tx.set_gas_price(8);
+            transaction.tx.set_gas(7000000);
+        }
+    }
+
     let dispatched_transaction = transaction.send().await?;
     let tx_hash = dispatched_transaction.tx_hash();
     info!(?tx_hash, "Dispatched transaction");
