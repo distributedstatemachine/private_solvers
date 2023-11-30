@@ -5,7 +5,7 @@ use anyhow::Result;
 use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use futures::lock::Mutex;
-use tracing::info;
+use tracing::{error, info};
 
 use crate::quote::intent_quoter::IntentQuoter;
 use crate::workflow::action::Action;
@@ -50,9 +50,15 @@ where
                     .lock()
                     .await
                     .create_intent_state(intent_id, swap_intent.clone());
-                if let Ok(quoted_intent) = self.intent_quoter.quote_intent(swap_intent).await {
-                    return self.process_event(Event::IntentQuoted(quoted_intent)).await;
-                } // TODO: handle erroneous quoting.
+                info!(?swap_intent, "Quoting the swap intent");
+                match self.intent_quoter.quote_intent(swap_intent.clone()).await {
+                    Ok(quoted_intent) => {
+                        return self.process_event(Event::IntentQuoted(quoted_intent)).await;
+                    }
+                    Err(e) => {
+                        error!(?swap_intent, ?e, "Failed to quote the swap intent");
+                    }
+                }
             }
             Event::IntentQuoted(quoted_intent) => {
                 info!(?quoted_intent, "Intent is quoted and ready to be filled");
