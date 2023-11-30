@@ -5,7 +5,9 @@
     "escrow_address": "0x355344Ee453aa574794aDE180B1d434fE270bEB4",
     "khalani_chain_event_verifier_address": "0xA15e6235221fFb0f46280Ed3901C8164078b1C08",
     "interchain_liquidity_hub_address": "0xAe3bcdBAb70ED1244FbEe1b39FE6D49d98d4c2BC",
-    "swap_intent_filler_address": "0xC066bf07292dB23F98318AF27Bba53940cBa6373"
+    "swap_intent_fillers": {
+      "fuji": "0xC066bf07292dB23F98318AF27Bba53940cBa6373"
+    }
   },
   "balancer": {
     "batch_swap_steps_from_kai": {

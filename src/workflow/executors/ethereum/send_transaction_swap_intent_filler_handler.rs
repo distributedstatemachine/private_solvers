@@ -67,8 +67,12 @@ impl SendTransactionSwapIntentFillerHandler {
     ) -> ContractCall<RpcClient, ()> {
         let destination_chain_id = quoted_intent.swap_intent.destination_chain_id.into();
         let rpc_client = self.connector.get_rpc_client(destination_chain_id).unwrap();
-        let swap_intent_filler =
-            SwapIntentFiller::new(self.addresses_config.swap_intent_filler_address, rpc_client);
+        let swap_intent_filler_address = self
+            .addresses_config
+            .swap_intent_fillers
+            .get(&destination_chain_id)
+            .unwrap();
+        let swap_intent_filler = SwapIntentFiller::new(*swap_intent_filler_address, rpc_client);
         let solver_address = self.connector.get_address();
         let mut call = swap_intent_filler.fill_swap_intent(
             quoted_intent.swap_intent.clone().into(),

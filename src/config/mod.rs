@@ -37,35 +37,46 @@ impl Config {
     pub fn read_config(file_path: &str) -> Result<Config> {
         let file_content = fs::read_to_string(file_path)?;
         let config: ConfigRaw = serde_json::from_str(&file_content)?;
-        let addresses = AddressesConfig {
-            vault_address: config.addresses.vault_address.parse::<Address>().unwrap(),
-            intents_mempool_address: config
-                .addresses
-                .intents_mempool_address
-                .parse::<Address>()
-                .unwrap(),
-            escrow_address: config.addresses.escrow_address.parse::<Address>().unwrap(),
-            swap_intent_filler_address: config
-                .addresses
-                .swap_intent_filler_address
-                .parse::<Address>()
-                .unwrap(),
-            khalani_chain_event_verifier_address: config
-                .addresses
-                .khalani_chain_event_verifier_address
-                .parse::<Address>()
-                .unwrap(),
-            interchain_liquidity_hub_address: config
-                .addresses
-                .interchain_liquidity_hub_address
-                .parse::<Address>()
-                .unwrap(),
-        };
+        let addresses_config_raw = config.addresses;
         let chains: Vec<ChainConfig> = config
             .chains
             .iter()
             .map(Self::create_chain_config)
             .collect();
+        let addresses = AddressesConfig {
+            vault_address: addresses_config_raw
+                .vault_address
+                .parse::<Address>()
+                .unwrap(),
+            intents_mempool_address: addresses_config_raw
+                .intents_mempool_address
+                .parse::<Address>()
+                .unwrap(),
+            escrow_address: addresses_config_raw
+                .escrow_address
+                .parse::<Address>()
+                .unwrap(),
+            khalani_chain_event_verifier_address: addresses_config_raw
+                .khalani_chain_event_verifier_address
+                .parse::<Address>()
+                .unwrap(),
+            interchain_liquidity_hub_address: addresses_config_raw
+                .interchain_liquidity_hub_address
+                .parse::<Address>()
+                .unwrap(),
+            swap_intent_fillers: addresses_config_raw
+                .swap_intent_fillers
+                .iter()
+                .map(|(chain_name, address)| {
+                    let chain_config = chains
+                        .iter()
+                        .find(|chain| &chain.name == chain_name)
+                        .unwrap();
+                    (chain_config.chain_id, address.parse::<Address>().unwrap())
+                })
+                .collect(),
+        };
+
         let tokens: Vec<TokenConfig> = config
             .tokens
             .iter()
