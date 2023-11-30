@@ -1,4 +1,4 @@
-pub use gmp_event_prover::*;
+pub use base_rewarder::*;
 /// This module was auto-generated with ethers-rs Abigen.
 /// More information at: <https://github.com/gakonst/ethers-rs>
 #[allow(
@@ -9,7 +9,7 @@ pub use gmp_event_prover::*;
     dead_code,
     non_camel_case_types,
 )]
-pub mod gmp_event_prover {
+pub mod base_rewarder {
     #[allow(deprecated)]
     fn __abi() -> ::ethers::core::abi::Abi {
         ::ethers::core::abi::ethabi::Contract {
@@ -38,13 +38,15 @@ pub mod gmp_event_prover {
                     ],
                 ),
                 (
-                    ::std::borrow::ToOwned::to_owned("addEventRegisterer"),
+                    ::std::borrow::ToOwned::to_owned("addSettlementReactor"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
-                            name: ::std::borrow::ToOwned::to_owned("addEventRegisterer"),
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "addSettlementReactor",
+                            ),
                             inputs: ::std::vec![
                                 ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::borrow::ToOwned::to_owned("eventRegisterer"),
+                                    name: ::std::borrow::ToOwned::to_owned("settlementReactor"),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Address,
                                     internal_type: ::core::option::Option::Some(
                                         ::std::borrow::ToOwned::to_owned("address"),
@@ -54,28 +56,6 @@ pub mod gmp_event_prover {
                             outputs: ::std::vec![],
                             constant: ::core::option::Option::None,
                             state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
-                        },
-                    ],
-                ),
-                (
-                    ::std::borrow::ToOwned::to_owned("destinationChainDomain"),
-                    ::std::vec![
-                        ::ethers::core::abi::ethabi::Function {
-                            name: ::std::borrow::ToOwned::to_owned(
-                                "destinationChainDomain",
-                            ),
-                            inputs: ::std::vec![],
-                            outputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::string::String::new(),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(32usize),
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned("uint32"),
-                                    ),
-                                },
-                            ],
-                            constant: ::core::option::Option::None,
-                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
                         },
                     ],
                 ),
@@ -183,28 +163,6 @@ pub mod gmp_event_prover {
                     ],
                 ),
                 (
-                    ::std::borrow::ToOwned::to_owned("gmpEventVerifierDestination"),
-                    ::std::vec![
-                        ::ethers::core::abi::ethabi::Function {
-                            name: ::std::borrow::ToOwned::to_owned(
-                                "gmpEventVerifierDestination",
-                            ),
-                            inputs: ::std::vec![],
-                            outputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::string::String::new(),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned("address"),
-                                    ),
-                                },
-                            ],
-                            constant: ::core::option::Option::None,
-                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
-                        },
-                    ],
-                ),
-                (
                     ::std::borrow::ToOwned::to_owned("grantRole"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -271,70 +229,6 @@ pub mod gmp_event_prover {
                     ],
                 ),
                 (
-                    ::std::borrow::ToOwned::to_owned("hyperlaneIgp"),
-                    ::std::vec![
-                        ::ethers::core::abi::ethabi::Function {
-                            name: ::std::borrow::ToOwned::to_owned("hyperlaneIgp"),
-                            inputs: ::std::vec![],
-                            outputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::string::String::new(),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned(
-                                            "contract IInterchainGasPaymaster",
-                                        ),
-                                    ),
-                                },
-                            ],
-                            constant: ::core::option::Option::None,
-                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
-                        },
-                    ],
-                ),
-                (
-                    ::std::borrow::ToOwned::to_owned("hyperlaneMailbox"),
-                    ::std::vec![
-                        ::ethers::core::abi::ethabi::Function {
-                            name: ::std::borrow::ToOwned::to_owned("hyperlaneMailbox"),
-                            inputs: ::std::vec![],
-                            outputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::string::String::new(),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned("contract IMailbox"),
-                                    ),
-                                },
-                            ],
-                            constant: ::core::option::Option::None,
-                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
-                        },
-                    ],
-                ),
-                (
-                    ::std::borrow::ToOwned::to_owned("registerEvent"),
-                    ::std::vec![
-                        ::ethers::core::abi::ethabi::Function {
-                            name: ::std::borrow::ToOwned::to_owned("registerEvent"),
-                            inputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::borrow::ToOwned::to_owned("eventHash"),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
-                                        32usize,
-                                    ),
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned("bytes32"),
-                                    ),
-                                },
-                            ],
-                            outputs: ::std::vec![],
-                            constant: ::core::option::Option::None,
-                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
-                        },
-                    ],
-                ),
-                (
                     ::std::borrow::ToOwned::to_owned("renounceRole"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -380,6 +274,120 @@ pub mod gmp_event_prover {
                                 },
                                 ::ethers::core::abi::ethabi::Param {
                                     name: ::std::borrow::ToOwned::to_owned("account"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("reward"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("reward"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("chainId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(32usize),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("uint32"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("token"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("amount"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("uint256"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("to"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("reward"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("token"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("amount"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
+                                        256usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("uint256"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("to"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("rewardSource"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("rewardSource"),
+                            inputs: ::std::vec![],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Address,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("address"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("setRewardSource"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("setRewardSource"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("_rewardSource"),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Address,
                                     internal_type: ::core::option::Option::Some(
                                         ::std::borrow::ToOwned::to_owned("address"),
@@ -519,34 +527,34 @@ pub mod gmp_event_prover {
         }
     }
     ///The parsed JSON ABI of the contract.
-    pub static GMPEVENTPROVER_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(
+    pub static BASEREWARDER_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(
         __abi,
     );
-    pub struct GMPEventProver<M>(::ethers::contract::Contract<M>);
-    impl<M> ::core::clone::Clone for GMPEventProver<M> {
+    pub struct BaseRewarder<M>(::ethers::contract::Contract<M>);
+    impl<M> ::core::clone::Clone for BaseRewarder<M> {
         fn clone(&self) -> Self {
             Self(::core::clone::Clone::clone(&self.0))
         }
     }
-    impl<M> ::core::ops::Deref for GMPEventProver<M> {
+    impl<M> ::core::ops::Deref for BaseRewarder<M> {
         type Target = ::ethers::contract::Contract<M>;
         fn deref(&self) -> &Self::Target {
             &self.0
         }
     }
-    impl<M> ::core::ops::DerefMut for GMPEventProver<M> {
+    impl<M> ::core::ops::DerefMut for BaseRewarder<M> {
         fn deref_mut(&mut self) -> &mut Self::Target {
             &mut self.0
         }
     }
-    impl<M> ::core::fmt::Debug for GMPEventProver<M> {
+    impl<M> ::core::fmt::Debug for BaseRewarder<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(::core::stringify!(GMPEventProver))
+            f.debug_tuple(::core::stringify!(BaseRewarder))
                 .field(&self.address())
                 .finish()
         }
     }
-    impl<M: ::ethers::providers::Middleware> GMPEventProver<M> {
+    impl<M: ::ethers::providers::Middleware> BaseRewarder<M> {
         /// Creates a new contract instance with the specified `ethers` client at
         /// `address`. The contract derefs to a `ethers::Contract` object.
         pub fn new<T: Into<::ethers::core::types::Address>>(
@@ -556,7 +564,7 @@ pub mod gmp_event_prover {
             Self(
                 ::ethers::contract::Contract::new(
                     address.into(),
-                    GMPEVENTPROVER_ABI.clone(),
+                    BASEREWARDER_ABI.clone(),
                     client,
                 ),
             )
@@ -569,21 +577,13 @@ pub mod gmp_event_prover {
                 .method_hash([162, 23, 253, 223], ())
                 .expect("method not found (this should never happen)")
         }
-        ///Calls the contract's `addEventRegisterer` (0x6ff3fe95) function
-        pub fn add_event_registerer(
+        ///Calls the contract's `addSettlementReactor` (0x0163e524) function
+        pub fn add_settlement_reactor(
             &self,
-            event_registerer: ::ethers::core::types::Address,
+            settlement_reactor: ::ethers::core::types::Address,
         ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
-                .method_hash([111, 243, 254, 149], event_registerer)
-                .expect("method not found (this should never happen)")
-        }
-        ///Calls the contract's `destinationChainDomain` (0xe69bc525) function
-        pub fn destination_chain_domain(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<M, u32> {
-            self.0
-                .method_hash([230, 155, 197, 37], ())
+                .method_hash([1, 99, 229, 36], settlement_reactor)
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `getRoleAdmin` (0x248a9ca3) function
@@ -617,17 +617,6 @@ pub mod gmp_event_prover {
                 .method_hash([202, 21, 200, 115], role)
                 .expect("method not found (this should never happen)")
         }
-        ///Calls the contract's `gmpEventVerifierDestination` (0xf28f042b) function
-        pub fn gmp_event_verifier_destination(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
-            self.0
-                .method_hash([242, 143, 4, 43], ())
-                .expect("method not found (this should never happen)")
-        }
         ///Calls the contract's `grantRole` (0x2f2ff15d) function
         pub fn grant_role(
             &self,
@@ -648,37 +637,6 @@ pub mod gmp_event_prover {
                 .method_hash([145, 209, 72, 84], (role, account))
                 .expect("method not found (this should never happen)")
         }
-        ///Calls the contract's `hyperlaneIgp` (0x49d3264c) function
-        pub fn hyperlane_igp(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
-            self.0
-                .method_hash([73, 211, 38, 76], ())
-                .expect("method not found (this should never happen)")
-        }
-        ///Calls the contract's `hyperlaneMailbox` (0x1a6e4db4) function
-        pub fn hyperlane_mailbox(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
-            self.0
-                .method_hash([26, 110, 77, 180], ())
-                .expect("method not found (this should never happen)")
-        }
-        ///Calls the contract's `registerEvent` (0xd66b22c8) function
-        pub fn register_event(
-            &self,
-            event_hash: [u8; 32],
-        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
-            self.0
-                .method_hash([214, 107, 34, 200], event_hash)
-                .expect("method not found (this should never happen)")
-        }
         ///Calls the contract's `renounceRole` (0x36568abe) function
         pub fn renounce_role(
             &self,
@@ -697,6 +655,49 @@ pub mod gmp_event_prover {
         ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
                 .method_hash([213, 71, 116, 31], (role, account))
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `reward` (0x1806c343) function
+        pub fn reward_with_chain_id_and_token_and_amount(
+            &self,
+            chain_id: u32,
+            token: ::ethers::core::types::Address,
+            amount: ::ethers::core::types::U256,
+            to: ::ethers::core::types::Address,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([24, 6, 195, 67], (chain_id, token, amount, to))
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `reward` (0x4530cc9f) function
+        pub fn reward(
+            &self,
+            token: ::ethers::core::types::Address,
+            amount: ::ethers::core::types::U256,
+            to: ::ethers::core::types::Address,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([69, 48, 204, 159], (token, amount, to))
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `rewardSource` (0x9cfbc002) function
+        pub fn reward_source(
+            &self,
+        ) -> ::ethers::contract::builders::ContractCall<
+            M,
+            ::ethers::core::types::Address,
+        > {
+            self.0
+                .method_hash([156, 251, 192, 2], ())
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `setRewardSource` (0x44aac9a7) function
+        pub fn set_reward_source(
+            &self,
+            reward_source: ::ethers::core::types::Address,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([68, 170, 201, 167], reward_source)
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `supportsInterface` (0x01ffc9a7) function
@@ -744,13 +745,13 @@ pub mod gmp_event_prover {
         ) -> ::ethers::contract::builders::Event<
             ::std::sync::Arc<M>,
             M,
-            GMPEventProverEvents,
+            BaseRewarderEvents,
         > {
             self.0.event_with_filter(::core::default::Default::default())
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for GMPEventProver<M> {
+    for BaseRewarder<M> {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
@@ -832,28 +833,28 @@ pub mod gmp_event_prover {
         Eq,
         Hash
     )]
-    pub enum GMPEventProverEvents {
+    pub enum BaseRewarderEvents {
         RoleAdminChangedFilter(RoleAdminChangedFilter),
         RoleGrantedFilter(RoleGrantedFilter),
         RoleRevokedFilter(RoleRevokedFilter),
     }
-    impl ::ethers::contract::EthLogDecode for GMPEventProverEvents {
+    impl ::ethers::contract::EthLogDecode for BaseRewarderEvents {
         fn decode_log(
             log: &::ethers::core::abi::RawLog,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::Error> {
             if let Ok(decoded) = RoleAdminChangedFilter::decode_log(log) {
-                return Ok(GMPEventProverEvents::RoleAdminChangedFilter(decoded));
+                return Ok(BaseRewarderEvents::RoleAdminChangedFilter(decoded));
             }
             if let Ok(decoded) = RoleGrantedFilter::decode_log(log) {
-                return Ok(GMPEventProverEvents::RoleGrantedFilter(decoded));
+                return Ok(BaseRewarderEvents::RoleGrantedFilter(decoded));
             }
             if let Ok(decoded) = RoleRevokedFilter::decode_log(log) {
-                return Ok(GMPEventProverEvents::RoleRevokedFilter(decoded));
+                return Ok(BaseRewarderEvents::RoleRevokedFilter(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData)
         }
     }
-    impl ::core::fmt::Display for GMPEventProverEvents {
+    impl ::core::fmt::Display for BaseRewarderEvents {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
                 Self::RoleAdminChangedFilter(element) => {
@@ -864,17 +865,17 @@ pub mod gmp_event_prover {
             }
         }
     }
-    impl ::core::convert::From<RoleAdminChangedFilter> for GMPEventProverEvents {
+    impl ::core::convert::From<RoleAdminChangedFilter> for BaseRewarderEvents {
         fn from(value: RoleAdminChangedFilter) -> Self {
             Self::RoleAdminChangedFilter(value)
         }
     }
-    impl ::core::convert::From<RoleGrantedFilter> for GMPEventProverEvents {
+    impl ::core::convert::From<RoleGrantedFilter> for BaseRewarderEvents {
         fn from(value: RoleGrantedFilter) -> Self {
             Self::RoleGrantedFilter(value)
         }
     }
-    impl ::core::convert::From<RoleRevokedFilter> for GMPEventProverEvents {
+    impl ::core::convert::From<RoleRevokedFilter> for BaseRewarderEvents {
         fn from(value: RoleRevokedFilter) -> Self {
             Self::RoleRevokedFilter(value)
         }
@@ -894,7 +895,7 @@ pub mod gmp_event_prover {
     )]
     #[ethcall(name = "DEFAULT_ADMIN_ROLE", abi = "DEFAULT_ADMIN_ROLE()")]
     pub struct DefaultAdminRoleCall;
-    ///Container type for all input parameters for the `addEventRegisterer` function with signature `addEventRegisterer(address)` and selector `0x6ff3fe95`
+    ///Container type for all input parameters for the `addSettlementReactor` function with signature `addSettlementReactor(address)` and selector `0x0163e524`
     #[derive(
         Clone,
         ::ethers::contract::EthCall,
@@ -907,25 +908,10 @@ pub mod gmp_event_prover {
         Eq,
         Hash
     )]
-    #[ethcall(name = "addEventRegisterer", abi = "addEventRegisterer(address)")]
-    pub struct AddEventRegistererCall {
-        pub event_registerer: ::ethers::core::types::Address,
+    #[ethcall(name = "addSettlementReactor", abi = "addSettlementReactor(address)")]
+    pub struct AddSettlementReactorCall {
+        pub settlement_reactor: ::ethers::core::types::Address,
     }
-    ///Container type for all input parameters for the `destinationChainDomain` function with signature `destinationChainDomain()` and selector `0xe69bc525`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthCall,
-        ::ethers::contract::EthDisplay,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    #[ethcall(name = "destinationChainDomain", abi = "destinationChainDomain()")]
-    pub struct DestinationChainDomainCall;
     ///Container type for all input parameters for the `getRoleAdmin` function with signature `getRoleAdmin(bytes32)` and selector `0x248a9ca3`
     #[derive(
         Clone,
@@ -978,24 +964,6 @@ pub mod gmp_event_prover {
     pub struct GetRoleMemberCountCall {
         pub role: [u8; 32],
     }
-    ///Container type for all input parameters for the `gmpEventVerifierDestination` function with signature `gmpEventVerifierDestination()` and selector `0xf28f042b`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthCall,
-        ::ethers::contract::EthDisplay,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    #[ethcall(
-        name = "gmpEventVerifierDestination",
-        abi = "gmpEventVerifierDestination()"
-    )]
-    pub struct GmpEventVerifierDestinationCall;
     ///Container type for all input parameters for the `grantRole` function with signature `grantRole(bytes32,address)` and selector `0x2f2ff15d`
     #[derive(
         Clone,
@@ -1031,53 +999,6 @@ pub mod gmp_event_prover {
     pub struct HasRoleCall {
         pub role: [u8; 32],
         pub account: ::ethers::core::types::Address,
-    }
-    ///Container type for all input parameters for the `hyperlaneIgp` function with signature `hyperlaneIgp()` and selector `0x49d3264c`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthCall,
-        ::ethers::contract::EthDisplay,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    #[ethcall(name = "hyperlaneIgp", abi = "hyperlaneIgp()")]
-    pub struct HyperlaneIgpCall;
-    ///Container type for all input parameters for the `hyperlaneMailbox` function with signature `hyperlaneMailbox()` and selector `0x1a6e4db4`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthCall,
-        ::ethers::contract::EthDisplay,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    #[ethcall(name = "hyperlaneMailbox", abi = "hyperlaneMailbox()")]
-    pub struct HyperlaneMailboxCall;
-    ///Container type for all input parameters for the `registerEvent` function with signature `registerEvent(bytes32)` and selector `0xd66b22c8`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthCall,
-        ::ethers::contract::EthDisplay,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    #[ethcall(name = "registerEvent", abi = "registerEvent(bytes32)")]
-    pub struct RegisterEventCall {
-        pub event_hash: [u8; 32],
     }
     ///Container type for all input parameters for the `renounceRole` function with signature `renounceRole(bytes32,address)` and selector `0x36568abe`
     #[derive(
@@ -1115,6 +1036,77 @@ pub mod gmp_event_prover {
         pub role: [u8; 32],
         pub account: ::ethers::core::types::Address,
     }
+    ///Container type for all input parameters for the `reward` function with signature `reward(uint32,address,uint256,address)` and selector `0x1806c343`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "reward", abi = "reward(uint32,address,uint256,address)")]
+    pub struct RewardWithChainIdAndTokenAndAmountCall {
+        pub chain_id: u32,
+        pub token: ::ethers::core::types::Address,
+        pub amount: ::ethers::core::types::U256,
+        pub to: ::ethers::core::types::Address,
+    }
+    ///Container type for all input parameters for the `reward` function with signature `reward(address,uint256,address)` and selector `0x4530cc9f`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "reward", abi = "reward(address,uint256,address)")]
+    pub struct RewardCall {
+        pub token: ::ethers::core::types::Address,
+        pub amount: ::ethers::core::types::U256,
+        pub to: ::ethers::core::types::Address,
+    }
+    ///Container type for all input parameters for the `rewardSource` function with signature `rewardSource()` and selector `0x9cfbc002`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "rewardSource", abi = "rewardSource()")]
+    pub struct RewardSourceCall;
+    ///Container type for all input parameters for the `setRewardSource` function with signature `setRewardSource(address)` and selector `0x44aac9a7`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "setRewardSource", abi = "setRewardSource(address)")]
+    pub struct SetRewardSourceCall {
+        pub reward_source: ::ethers::core::types::Address,
+    }
     ///Container type for all input parameters for the `supportsInterface` function with signature `supportsInterface(bytes4)` and selector `0x01ffc9a7`
     #[derive(
         Clone,
@@ -1143,24 +1135,23 @@ pub mod gmp_event_prover {
         Eq,
         Hash
     )]
-    pub enum GMPEventProverCalls {
+    pub enum BaseRewarderCalls {
         DefaultAdminRole(DefaultAdminRoleCall),
-        AddEventRegisterer(AddEventRegistererCall),
-        DestinationChainDomain(DestinationChainDomainCall),
+        AddSettlementReactor(AddSettlementReactorCall),
         GetRoleAdmin(GetRoleAdminCall),
         GetRoleMember(GetRoleMemberCall),
         GetRoleMemberCount(GetRoleMemberCountCall),
-        GmpEventVerifierDestination(GmpEventVerifierDestinationCall),
         GrantRole(GrantRoleCall),
         HasRole(HasRoleCall),
-        HyperlaneIgp(HyperlaneIgpCall),
-        HyperlaneMailbox(HyperlaneMailboxCall),
-        RegisterEvent(RegisterEventCall),
         RenounceRole(RenounceRoleCall),
         RevokeRole(RevokeRoleCall),
+        RewardWithChainIdAndTokenAndAmount(RewardWithChainIdAndTokenAndAmountCall),
+        Reward(RewardCall),
+        RewardSource(RewardSourceCall),
+        SetRewardSource(SetRewardSourceCall),
         SupportsInterface(SupportsInterfaceCall),
     }
-    impl ::ethers::core::abi::AbiDecode for GMPEventProverCalls {
+    impl ::ethers::core::abi::AbiDecode for BaseRewarderCalls {
         fn decode(
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
@@ -1170,15 +1161,10 @@ pub mod gmp_event_prover {
             ) {
                 return Ok(Self::DefaultAdminRole(decoded));
             }
-            if let Ok(decoded) = <AddEventRegistererCall as ::ethers::core::abi::AbiDecode>::decode(
+            if let Ok(decoded) = <AddSettlementReactorCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
-                return Ok(Self::AddEventRegisterer(decoded));
-            }
-            if let Ok(decoded) = <DestinationChainDomainCall as ::ethers::core::abi::AbiDecode>::decode(
-                data,
-            ) {
-                return Ok(Self::DestinationChainDomain(decoded));
+                return Ok(Self::AddSettlementReactor(decoded));
             }
             if let Ok(decoded) = <GetRoleAdminCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
@@ -1195,11 +1181,6 @@ pub mod gmp_event_prover {
             ) {
                 return Ok(Self::GetRoleMemberCount(decoded));
             }
-            if let Ok(decoded) = <GmpEventVerifierDestinationCall as ::ethers::core::abi::AbiDecode>::decode(
-                data,
-            ) {
-                return Ok(Self::GmpEventVerifierDestination(decoded));
-            }
             if let Ok(decoded) = <GrantRoleCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
@@ -1209,21 +1190,6 @@ pub mod gmp_event_prover {
                 data,
             ) {
                 return Ok(Self::HasRole(decoded));
-            }
-            if let Ok(decoded) = <HyperlaneIgpCall as ::ethers::core::abi::AbiDecode>::decode(
-                data,
-            ) {
-                return Ok(Self::HyperlaneIgp(decoded));
-            }
-            if let Ok(decoded) = <HyperlaneMailboxCall as ::ethers::core::abi::AbiDecode>::decode(
-                data,
-            ) {
-                return Ok(Self::HyperlaneMailbox(decoded));
-            }
-            if let Ok(decoded) = <RegisterEventCall as ::ethers::core::abi::AbiDecode>::decode(
-                data,
-            ) {
-                return Ok(Self::RegisterEvent(decoded));
             }
             if let Ok(decoded) = <RenounceRoleCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
@@ -1235,6 +1201,26 @@ pub mod gmp_event_prover {
             ) {
                 return Ok(Self::RevokeRole(decoded));
             }
+            if let Ok(decoded) = <RewardWithChainIdAndTokenAndAmountCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::RewardWithChainIdAndTokenAndAmount(decoded));
+            }
+            if let Ok(decoded) = <RewardCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::Reward(decoded));
+            }
+            if let Ok(decoded) = <RewardSourceCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::RewardSource(decoded));
+            }
+            if let Ok(decoded) = <SetRewardSourceCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::SetRewardSource(decoded));
+            }
             if let Ok(decoded) = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
@@ -1243,16 +1229,13 @@ pub mod gmp_event_prover {
             Err(::ethers::core::abi::Error::InvalidData.into())
         }
     }
-    impl ::ethers::core::abi::AbiEncode for GMPEventProverCalls {
+    impl ::ethers::core::abi::AbiEncode for BaseRewarderCalls {
         fn encode(self) -> Vec<u8> {
             match self {
                 Self::DefaultAdminRole(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::AddEventRegisterer(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::DestinationChainDomain(element) => {
+                Self::AddSettlementReactor(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::GetRoleAdmin(element) => {
@@ -1264,26 +1247,24 @@ pub mod gmp_event_prover {
                 Self::GetRoleMemberCount(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::GmpEventVerifierDestination(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
                 Self::GrantRole(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::HasRole(element) => ::ethers::core::abi::AbiEncode::encode(element),
-                Self::HyperlaneIgp(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::HyperlaneMailbox(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::RegisterEvent(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
                 Self::RenounceRole(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::RevokeRole(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::RewardWithChainIdAndTokenAndAmount(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::Reward(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::RewardSource(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::SetRewardSource(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::SupportsInterface(element) => {
@@ -1292,14 +1273,11 @@ pub mod gmp_event_prover {
             }
         }
     }
-    impl ::core::fmt::Display for GMPEventProverCalls {
+    impl ::core::fmt::Display for BaseRewarderCalls {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
                 Self::DefaultAdminRole(element) => ::core::fmt::Display::fmt(element, f),
-                Self::AddEventRegisterer(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::DestinationChainDomain(element) => {
+                Self::AddSettlementReactor(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::GetRoleAdmin(element) => ::core::fmt::Display::fmt(element, f),
@@ -1307,91 +1285,87 @@ pub mod gmp_event_prover {
                 Self::GetRoleMemberCount(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
-                Self::GmpEventVerifierDestination(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
                 Self::GrantRole(element) => ::core::fmt::Display::fmt(element, f),
                 Self::HasRole(element) => ::core::fmt::Display::fmt(element, f),
-                Self::HyperlaneIgp(element) => ::core::fmt::Display::fmt(element, f),
-                Self::HyperlaneMailbox(element) => ::core::fmt::Display::fmt(element, f),
-                Self::RegisterEvent(element) => ::core::fmt::Display::fmt(element, f),
                 Self::RenounceRole(element) => ::core::fmt::Display::fmt(element, f),
                 Self::RevokeRole(element) => ::core::fmt::Display::fmt(element, f),
+                Self::RewardWithChainIdAndTokenAndAmount(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::Reward(element) => ::core::fmt::Display::fmt(element, f),
+                Self::RewardSource(element) => ::core::fmt::Display::fmt(element, f),
+                Self::SetRewardSource(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SupportsInterface(element) => ::core::fmt::Display::fmt(element, f),
             }
         }
     }
-    impl ::core::convert::From<DefaultAdminRoleCall> for GMPEventProverCalls {
+    impl ::core::convert::From<DefaultAdminRoleCall> for BaseRewarderCalls {
         fn from(value: DefaultAdminRoleCall) -> Self {
             Self::DefaultAdminRole(value)
         }
     }
-    impl ::core::convert::From<AddEventRegistererCall> for GMPEventProverCalls {
-        fn from(value: AddEventRegistererCall) -> Self {
-            Self::AddEventRegisterer(value)
+    impl ::core::convert::From<AddSettlementReactorCall> for BaseRewarderCalls {
+        fn from(value: AddSettlementReactorCall) -> Self {
+            Self::AddSettlementReactor(value)
         }
     }
-    impl ::core::convert::From<DestinationChainDomainCall> for GMPEventProverCalls {
-        fn from(value: DestinationChainDomainCall) -> Self {
-            Self::DestinationChainDomain(value)
-        }
-    }
-    impl ::core::convert::From<GetRoleAdminCall> for GMPEventProverCalls {
+    impl ::core::convert::From<GetRoleAdminCall> for BaseRewarderCalls {
         fn from(value: GetRoleAdminCall) -> Self {
             Self::GetRoleAdmin(value)
         }
     }
-    impl ::core::convert::From<GetRoleMemberCall> for GMPEventProverCalls {
+    impl ::core::convert::From<GetRoleMemberCall> for BaseRewarderCalls {
         fn from(value: GetRoleMemberCall) -> Self {
             Self::GetRoleMember(value)
         }
     }
-    impl ::core::convert::From<GetRoleMemberCountCall> for GMPEventProverCalls {
+    impl ::core::convert::From<GetRoleMemberCountCall> for BaseRewarderCalls {
         fn from(value: GetRoleMemberCountCall) -> Self {
             Self::GetRoleMemberCount(value)
         }
     }
-    impl ::core::convert::From<GmpEventVerifierDestinationCall> for GMPEventProverCalls {
-        fn from(value: GmpEventVerifierDestinationCall) -> Self {
-            Self::GmpEventVerifierDestination(value)
-        }
-    }
-    impl ::core::convert::From<GrantRoleCall> for GMPEventProverCalls {
+    impl ::core::convert::From<GrantRoleCall> for BaseRewarderCalls {
         fn from(value: GrantRoleCall) -> Self {
             Self::GrantRole(value)
         }
     }
-    impl ::core::convert::From<HasRoleCall> for GMPEventProverCalls {
+    impl ::core::convert::From<HasRoleCall> for BaseRewarderCalls {
         fn from(value: HasRoleCall) -> Self {
             Self::HasRole(value)
         }
     }
-    impl ::core::convert::From<HyperlaneIgpCall> for GMPEventProverCalls {
-        fn from(value: HyperlaneIgpCall) -> Self {
-            Self::HyperlaneIgp(value)
-        }
-    }
-    impl ::core::convert::From<HyperlaneMailboxCall> for GMPEventProverCalls {
-        fn from(value: HyperlaneMailboxCall) -> Self {
-            Self::HyperlaneMailbox(value)
-        }
-    }
-    impl ::core::convert::From<RegisterEventCall> for GMPEventProverCalls {
-        fn from(value: RegisterEventCall) -> Self {
-            Self::RegisterEvent(value)
-        }
-    }
-    impl ::core::convert::From<RenounceRoleCall> for GMPEventProverCalls {
+    impl ::core::convert::From<RenounceRoleCall> for BaseRewarderCalls {
         fn from(value: RenounceRoleCall) -> Self {
             Self::RenounceRole(value)
         }
     }
-    impl ::core::convert::From<RevokeRoleCall> for GMPEventProverCalls {
+    impl ::core::convert::From<RevokeRoleCall> for BaseRewarderCalls {
         fn from(value: RevokeRoleCall) -> Self {
             Self::RevokeRole(value)
         }
     }
-    impl ::core::convert::From<SupportsInterfaceCall> for GMPEventProverCalls {
+    impl ::core::convert::From<RewardWithChainIdAndTokenAndAmountCall>
+    for BaseRewarderCalls {
+        fn from(value: RewardWithChainIdAndTokenAndAmountCall) -> Self {
+            Self::RewardWithChainIdAndTokenAndAmount(value)
+        }
+    }
+    impl ::core::convert::From<RewardCall> for BaseRewarderCalls {
+        fn from(value: RewardCall) -> Self {
+            Self::Reward(value)
+        }
+    }
+    impl ::core::convert::From<RewardSourceCall> for BaseRewarderCalls {
+        fn from(value: RewardSourceCall) -> Self {
+            Self::RewardSource(value)
+        }
+    }
+    impl ::core::convert::From<SetRewardSourceCall> for BaseRewarderCalls {
+        fn from(value: SetRewardSourceCall) -> Self {
+            Self::SetRewardSource(value)
+        }
+    }
+    impl ::core::convert::From<SupportsInterfaceCall> for BaseRewarderCalls {
         fn from(value: SupportsInterfaceCall) -> Self {
             Self::SupportsInterface(value)
         }
@@ -1410,20 +1384,6 @@ pub mod gmp_event_prover {
         Hash
     )]
     pub struct DefaultAdminRoleReturn(pub [u8; 32]);
-    ///Container type for all return fields from the `destinationChainDomain` function with signature `destinationChainDomain()` and selector `0xe69bc525`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthAbiType,
-        ::ethers::contract::EthAbiCodec,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    pub struct DestinationChainDomainReturn(pub u32);
     ///Container type for all return fields from the `getRoleAdmin` function with signature `getRoleAdmin(bytes32)` and selector `0x248a9ca3`
     #[derive(
         Clone,
@@ -1466,20 +1426,6 @@ pub mod gmp_event_prover {
         Hash
     )]
     pub struct GetRoleMemberCountReturn(pub ::ethers::core::types::U256);
-    ///Container type for all return fields from the `gmpEventVerifierDestination` function with signature `gmpEventVerifierDestination()` and selector `0xf28f042b`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthAbiType,
-        ::ethers::contract::EthAbiCodec,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    pub struct GmpEventVerifierDestinationReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `hasRole` function with signature `hasRole(bytes32,address)` and selector `0x91d14854`
     #[derive(
         Clone,
@@ -1494,7 +1440,7 @@ pub mod gmp_event_prover {
         Hash
     )]
     pub struct HasRoleReturn(pub bool);
-    ///Container type for all return fields from the `hyperlaneIgp` function with signature `hyperlaneIgp()` and selector `0x49d3264c`
+    ///Container type for all return fields from the `rewardSource` function with signature `rewardSource()` and selector `0x9cfbc002`
     #[derive(
         Clone,
         ::ethers::contract::EthAbiType,
@@ -1507,21 +1453,7 @@ pub mod gmp_event_prover {
         Eq,
         Hash
     )]
-    pub struct HyperlaneIgpReturn(pub ::ethers::core::types::Address);
-    ///Container type for all return fields from the `hyperlaneMailbox` function with signature `hyperlaneMailbox()` and selector `0x1a6e4db4`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthAbiType,
-        ::ethers::contract::EthAbiCodec,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    pub struct HyperlaneMailboxReturn(pub ::ethers::core::types::Address);
+    pub struct RewardSourceReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `supportsInterface` function with signature `supportsInterface(bytes4)` and selector `0x01ffc9a7`
     #[derive(
         Clone,

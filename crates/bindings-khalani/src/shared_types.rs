@@ -141,7 +141,7 @@ pub struct FuzzSelector {
     pub addr: ::ethers::core::types::Address,
     pub selectors: ::std::vec::Vec<[u8; 4]>,
 }
-///`SwapIntentFulfilled(bytes32,address,uint256)`
+///`SwapIntentFilled(bytes32,address,uint256,uint256)`
 #[derive(
     Clone,
     ::ethers::contract::EthAbiType,
@@ -154,10 +154,11 @@ pub struct FuzzSelector {
     Eq,
     Hash
 )]
-pub struct SwapIntentFulfilled {
+pub struct SwapIntentFilled {
     pub intent_id: [u8; 32],
     pub filler: ::ethers::core::types::Address,
     pub fill_time_stamp: ::ethers::core::types::U256,
+    pub fill_amount: ::ethers::core::types::U256,
 }
 ///`SwapIntentTokenBurn(bytes32)`
 #[derive(

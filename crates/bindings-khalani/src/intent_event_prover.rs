@@ -1,4 +1,4 @@
-pub use intent_event_verifier::*;
+pub use intent_event_prover::*;
 /// This module was auto-generated with ethers-rs Abigen.
 /// More information at: <https://github.com/gakonst/ethers-rs>
 #[allow(
@@ -9,7 +9,7 @@ pub use intent_event_verifier::*;
     dead_code,
     non_camel_case_types,
 )]
-pub mod intent_event_verifier {
+pub mod intent_event_prover {
     pub use super::super::shared_types::*;
     #[allow(deprecated)]
     fn __abi() -> ::ethers::core::abi::Abi {
@@ -17,10 +17,10 @@ pub mod intent_event_verifier {
             constructor: ::core::option::Option::None,
             functions: ::core::convert::From::from([
                 (
-                    ::std::borrow::ToOwned::to_owned("verify"),
+                    ::std::borrow::ToOwned::to_owned("registerEvent"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
-                            name: ::std::borrow::ToOwned::to_owned("verify"),
+                            name: ::std::borrow::ToOwned::to_owned("registerEvent"),
                             inputs: ::std::vec![
                                 ::ethers::core::abi::ethabi::Param {
                                     name: ::std::borrow::ToOwned::to_owned("eventHash"),
@@ -32,30 +32,22 @@ pub mod intent_event_verifier {
                                     ),
                                 },
                             ],
-                            outputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::string::String::new(),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Bool,
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned("bool"),
-                                    ),
-                                },
-                            ],
+                            outputs: ::std::vec![],
                             constant: ::core::option::Option::None,
                             state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
                         },
                     ],
                 ),
                 (
-                    ::std::borrow::ToOwned::to_owned("verifySwapIntentFilledEvent"),
+                    ::std::borrow::ToOwned::to_owned("registerSwapIntentFilledEvent"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
                             name: ::std::borrow::ToOwned::to_owned(
-                                "verifySwapIntentFilledEvent",
+                                "registerSwapIntentFilledEvent",
                             ),
                             inputs: ::std::vec![
                                 ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::borrow::ToOwned::to_owned("event_"),
+                                    name: ::std::borrow::ToOwned::to_owned("_event"),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
                                         ::std::vec![
                                             ::ethers::core::abi::ethabi::ParamType::FixedBytes(32usize),
@@ -71,30 +63,22 @@ pub mod intent_event_verifier {
                                     ),
                                 },
                             ],
-                            outputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::string::String::new(),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Bool,
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned("bool"),
-                                    ),
-                                },
-                            ],
+                            outputs: ::std::vec![],
                             constant: ::core::option::Option::None,
                             state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
                         },
                     ],
                 ),
                 (
-                    ::std::borrow::ToOwned::to_owned("verifySwapIntentTokenBurnEvent"),
+                    ::std::borrow::ToOwned::to_owned("registerSwapIntentTokenBurnEvent"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
                             name: ::std::borrow::ToOwned::to_owned(
-                                "verifySwapIntentTokenBurnEvent",
+                                "registerSwapIntentTokenBurnEvent",
                             ),
                             inputs: ::std::vec![
                                 ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::borrow::ToOwned::to_owned("event_"),
+                                    name: ::std::borrow::ToOwned::to_owned("_event"),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
                                         ::std::vec![
                                             ::ethers::core::abi::ethabi::ParamType::FixedBytes(32usize),
@@ -107,30 +91,22 @@ pub mod intent_event_verifier {
                                     ),
                                 },
                             ],
-                            outputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::string::String::new(),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Bool,
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned("bool"),
-                                    ),
-                                },
-                            ],
+                            outputs: ::std::vec![],
                             constant: ::core::option::Option::None,
                             state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
                         },
                     ],
                 ),
                 (
-                    ::std::borrow::ToOwned::to_owned("verifySwapIntentTokenLockEvent"),
+                    ::std::borrow::ToOwned::to_owned("registerSwapIntentTokenLockEvent"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
                             name: ::std::borrow::ToOwned::to_owned(
-                                "verifySwapIntentTokenLockEvent",
+                                "registerSwapIntentTokenLockEvent",
                             ),
                             inputs: ::std::vec![
                                 ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::borrow::ToOwned::to_owned("event_"),
+                                    name: ::std::borrow::ToOwned::to_owned("_event"),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
                                         ::std::vec![
                                             ::ethers::core::abi::ethabi::ParamType::FixedBytes(32usize),
@@ -143,15 +119,7 @@ pub mod intent_event_verifier {
                                     ),
                                 },
                             ],
-                            outputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::Param {
-                                    name: ::std::string::String::new(),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Bool,
-                                    internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned("bool"),
-                                    ),
-                                },
-                            ],
+                            outputs: ::std::vec![],
                             constant: ::core::option::Option::None,
                             state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
                         },
@@ -165,34 +133,34 @@ pub mod intent_event_verifier {
         }
     }
     ///The parsed JSON ABI of the contract.
-    pub static INTENTEVENTVERIFIER_ABI: ::ethers::contract::Lazy<
+    pub static INTENTEVENTPROVER_ABI: ::ethers::contract::Lazy<
         ::ethers::core::abi::Abi,
     > = ::ethers::contract::Lazy::new(__abi);
-    pub struct IntentEventVerifier<M>(::ethers::contract::Contract<M>);
-    impl<M> ::core::clone::Clone for IntentEventVerifier<M> {
+    pub struct IntentEventProver<M>(::ethers::contract::Contract<M>);
+    impl<M> ::core::clone::Clone for IntentEventProver<M> {
         fn clone(&self) -> Self {
             Self(::core::clone::Clone::clone(&self.0))
         }
     }
-    impl<M> ::core::ops::Deref for IntentEventVerifier<M> {
+    impl<M> ::core::ops::Deref for IntentEventProver<M> {
         type Target = ::ethers::contract::Contract<M>;
         fn deref(&self) -> &Self::Target {
             &self.0
         }
     }
-    impl<M> ::core::ops::DerefMut for IntentEventVerifier<M> {
+    impl<M> ::core::ops::DerefMut for IntentEventProver<M> {
         fn deref_mut(&mut self) -> &mut Self::Target {
             &mut self.0
         }
     }
-    impl<M> ::core::fmt::Debug for IntentEventVerifier<M> {
+    impl<M> ::core::fmt::Debug for IntentEventProver<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(::core::stringify!(IntentEventVerifier))
+            f.debug_tuple(::core::stringify!(IntentEventProver))
                 .field(&self.address())
                 .finish()
         }
     }
-    impl<M: ::ethers::providers::Middleware> IntentEventVerifier<M> {
+    impl<M: ::ethers::providers::Middleware> IntentEventProver<M> {
         /// Creates a new contract instance with the specified `ethers` client at
         /// `address`. The contract derefs to a `ethers::Contract` object.
         pub fn new<T: Into<::ethers::core::types::Address>>(
@@ -202,55 +170,55 @@ pub mod intent_event_verifier {
             Self(
                 ::ethers::contract::Contract::new(
                     address.into(),
-                    INTENTEVENTVERIFIER_ABI.clone(),
+                    INTENTEVENTPROVER_ABI.clone(),
                     client,
                 ),
             )
         }
-        ///Calls the contract's `verify` (0x75e36616) function
-        pub fn verify(
+        ///Calls the contract's `registerEvent` (0xd66b22c8) function
+        pub fn register_event(
             &self,
             event_hash: [u8; 32],
-        ) -> ::ethers::contract::builders::ContractCall<M, bool> {
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
-                .method_hash([117, 227, 102, 22], event_hash)
+                .method_hash([214, 107, 34, 200], event_hash)
                 .expect("method not found (this should never happen)")
         }
-        ///Calls the contract's `verifySwapIntentFilledEvent` (0xeb8e712d) function
-        pub fn verify_swap_intent_filled_event(
+        ///Calls the contract's `registerSwapIntentFilledEvent` (0x7eb620a7) function
+        pub fn register_swap_intent_filled_event(
             &self,
             event: SwapIntentFilled,
-        ) -> ::ethers::contract::builders::ContractCall<M, bool> {
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
-                .method_hash([235, 142, 113, 45], (event,))
+                .method_hash([126, 182, 32, 167], (event,))
                 .expect("method not found (this should never happen)")
         }
-        ///Calls the contract's `verifySwapIntentTokenBurnEvent` (0xb20dc007) function
-        pub fn verify_swap_intent_token_burn_event(
+        ///Calls the contract's `registerSwapIntentTokenBurnEvent` (0x5d0680dc) function
+        pub fn register_swap_intent_token_burn_event(
             &self,
             event: SwapIntentTokenBurn,
-        ) -> ::ethers::contract::builders::ContractCall<M, bool> {
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
-                .method_hash([178, 13, 192, 7], (event,))
+                .method_hash([93, 6, 128, 220], (event,))
                 .expect("method not found (this should never happen)")
         }
-        ///Calls the contract's `verifySwapIntentTokenLockEvent` (0xb86c94b2) function
-        pub fn verify_swap_intent_token_lock_event(
+        ///Calls the contract's `registerSwapIntentTokenLockEvent` (0x13d8b954) function
+        pub fn register_swap_intent_token_lock_event(
             &self,
             event: SwapIntentTokenLock,
-        ) -> ::ethers::contract::builders::ContractCall<M, bool> {
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
-                .method_hash([184, 108, 148, 178], (event,))
+                .method_hash([19, 216, 185, 84], (event,))
                 .expect("method not found (this should never happen)")
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for IntentEventVerifier<M> {
+    for IntentEventProver<M> {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
     }
-    ///Container type for all input parameters for the `verify` function with signature `verify(bytes32)` and selector `0x75e36616`
+    ///Container type for all input parameters for the `registerEvent` function with signature `registerEvent(bytes32)` and selector `0xd66b22c8`
     #[derive(
         Clone,
         ::ethers::contract::EthCall,
@@ -263,11 +231,11 @@ pub mod intent_event_verifier {
         Eq,
         Hash
     )]
-    #[ethcall(name = "verify", abi = "verify(bytes32)")]
-    pub struct VerifyCall {
+    #[ethcall(name = "registerEvent", abi = "registerEvent(bytes32)")]
+    pub struct RegisterEventCall {
         pub event_hash: [u8; 32],
     }
-    ///Container type for all input parameters for the `verifySwapIntentFilledEvent` function with signature `verifySwapIntentFilledEvent((bytes32,address,uint256,uint256))` and selector `0xeb8e712d`
+    ///Container type for all input parameters for the `registerSwapIntentFilledEvent` function with signature `registerSwapIntentFilledEvent((bytes32,address,uint256,uint256))` and selector `0x7eb620a7`
     #[derive(
         Clone,
         ::ethers::contract::EthCall,
@@ -281,13 +249,13 @@ pub mod intent_event_verifier {
         Hash
     )]
     #[ethcall(
-        name = "verifySwapIntentFilledEvent",
-        abi = "verifySwapIntentFilledEvent((bytes32,address,uint256,uint256))"
+        name = "registerSwapIntentFilledEvent",
+        abi = "registerSwapIntentFilledEvent((bytes32,address,uint256,uint256))"
     )]
-    pub struct VerifySwapIntentFilledEventCall {
+    pub struct RegisterSwapIntentFilledEventCall {
         pub event: SwapIntentFilled,
     }
-    ///Container type for all input parameters for the `verifySwapIntentTokenBurnEvent` function with signature `verifySwapIntentTokenBurnEvent((bytes32))` and selector `0xb20dc007`
+    ///Container type for all input parameters for the `registerSwapIntentTokenBurnEvent` function with signature `registerSwapIntentTokenBurnEvent((bytes32))` and selector `0x5d0680dc`
     #[derive(
         Clone,
         ::ethers::contract::EthCall,
@@ -301,13 +269,13 @@ pub mod intent_event_verifier {
         Hash
     )]
     #[ethcall(
-        name = "verifySwapIntentTokenBurnEvent",
-        abi = "verifySwapIntentTokenBurnEvent((bytes32))"
+        name = "registerSwapIntentTokenBurnEvent",
+        abi = "registerSwapIntentTokenBurnEvent((bytes32))"
     )]
-    pub struct VerifySwapIntentTokenBurnEventCall {
+    pub struct RegisterSwapIntentTokenBurnEventCall {
         pub event: SwapIntentTokenBurn,
     }
-    ///Container type for all input parameters for the `verifySwapIntentTokenLockEvent` function with signature `verifySwapIntentTokenLockEvent((bytes32))` and selector `0xb86c94b2`
+    ///Container type for all input parameters for the `registerSwapIntentTokenLockEvent` function with signature `registerSwapIntentTokenLockEvent((bytes32))` and selector `0x13d8b954`
     #[derive(
         Clone,
         ::ethers::contract::EthCall,
@@ -321,10 +289,10 @@ pub mod intent_event_verifier {
         Hash
     )]
     #[ethcall(
-        name = "verifySwapIntentTokenLockEvent",
-        abi = "verifySwapIntentTokenLockEvent((bytes32))"
+        name = "registerSwapIntentTokenLockEvent",
+        abi = "registerSwapIntentTokenLockEvent((bytes32))"
     )]
-    pub struct VerifySwapIntentTokenLockEventCall {
+    pub struct RegisterSwapIntentTokenLockEventCall {
         pub event: SwapIntentTokenLock,
     }
     ///Container type for all of the contract's call
@@ -338,149 +306,95 @@ pub mod intent_event_verifier {
         Eq,
         Hash
     )]
-    pub enum IntentEventVerifierCalls {
-        Verify(VerifyCall),
-        VerifySwapIntentFilledEvent(VerifySwapIntentFilledEventCall),
-        VerifySwapIntentTokenBurnEvent(VerifySwapIntentTokenBurnEventCall),
-        VerifySwapIntentTokenLockEvent(VerifySwapIntentTokenLockEventCall),
+    pub enum IntentEventProverCalls {
+        RegisterEvent(RegisterEventCall),
+        RegisterSwapIntentFilledEvent(RegisterSwapIntentFilledEventCall),
+        RegisterSwapIntentTokenBurnEvent(RegisterSwapIntentTokenBurnEventCall),
+        RegisterSwapIntentTokenLockEvent(RegisterSwapIntentTokenLockEventCall),
     }
-    impl ::ethers::core::abi::AbiDecode for IntentEventVerifierCalls {
+    impl ::ethers::core::abi::AbiDecode for IntentEventProverCalls {
         fn decode(
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded) = <VerifyCall as ::ethers::core::abi::AbiDecode>::decode(
+            if let Ok(decoded) = <RegisterEventCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
-                return Ok(Self::Verify(decoded));
+                return Ok(Self::RegisterEvent(decoded));
             }
-            if let Ok(decoded) = <VerifySwapIntentFilledEventCall as ::ethers::core::abi::AbiDecode>::decode(
+            if let Ok(decoded) = <RegisterSwapIntentFilledEventCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
-                return Ok(Self::VerifySwapIntentFilledEvent(decoded));
+                return Ok(Self::RegisterSwapIntentFilledEvent(decoded));
             }
-            if let Ok(decoded) = <VerifySwapIntentTokenBurnEventCall as ::ethers::core::abi::AbiDecode>::decode(
+            if let Ok(decoded) = <RegisterSwapIntentTokenBurnEventCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
-                return Ok(Self::VerifySwapIntentTokenBurnEvent(decoded));
+                return Ok(Self::RegisterSwapIntentTokenBurnEvent(decoded));
             }
-            if let Ok(decoded) = <VerifySwapIntentTokenLockEventCall as ::ethers::core::abi::AbiDecode>::decode(
+            if let Ok(decoded) = <RegisterSwapIntentTokenLockEventCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
             ) {
-                return Ok(Self::VerifySwapIntentTokenLockEvent(decoded));
+                return Ok(Self::RegisterSwapIntentTokenLockEvent(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
         }
     }
-    impl ::ethers::core::abi::AbiEncode for IntentEventVerifierCalls {
+    impl ::ethers::core::abi::AbiEncode for IntentEventProverCalls {
         fn encode(self) -> Vec<u8> {
             match self {
-                Self::Verify(element) => ::ethers::core::abi::AbiEncode::encode(element),
-                Self::VerifySwapIntentFilledEvent(element) => {
+                Self::RegisterEvent(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::VerifySwapIntentTokenBurnEvent(element) => {
+                Self::RegisterSwapIntentFilledEvent(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::VerifySwapIntentTokenLockEvent(element) => {
+                Self::RegisterSwapIntentTokenBurnEvent(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::RegisterSwapIntentTokenLockEvent(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
             }
         }
     }
-    impl ::core::fmt::Display for IntentEventVerifierCalls {
+    impl ::core::fmt::Display for IntentEventProverCalls {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
-                Self::Verify(element) => ::core::fmt::Display::fmt(element, f),
-                Self::VerifySwapIntentFilledEvent(element) => {
+                Self::RegisterEvent(element) => ::core::fmt::Display::fmt(element, f),
+                Self::RegisterSwapIntentFilledEvent(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
-                Self::VerifySwapIntentTokenBurnEvent(element) => {
+                Self::RegisterSwapIntentTokenBurnEvent(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
-                Self::VerifySwapIntentTokenLockEvent(element) => {
+                Self::RegisterSwapIntentTokenLockEvent(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
             }
         }
     }
-    impl ::core::convert::From<VerifyCall> for IntentEventVerifierCalls {
-        fn from(value: VerifyCall) -> Self {
-            Self::Verify(value)
+    impl ::core::convert::From<RegisterEventCall> for IntentEventProverCalls {
+        fn from(value: RegisterEventCall) -> Self {
+            Self::RegisterEvent(value)
         }
     }
-    impl ::core::convert::From<VerifySwapIntentFilledEventCall>
-    for IntentEventVerifierCalls {
-        fn from(value: VerifySwapIntentFilledEventCall) -> Self {
-            Self::VerifySwapIntentFilledEvent(value)
+    impl ::core::convert::From<RegisterSwapIntentFilledEventCall>
+    for IntentEventProverCalls {
+        fn from(value: RegisterSwapIntentFilledEventCall) -> Self {
+            Self::RegisterSwapIntentFilledEvent(value)
         }
     }
-    impl ::core::convert::From<VerifySwapIntentTokenBurnEventCall>
-    for IntentEventVerifierCalls {
-        fn from(value: VerifySwapIntentTokenBurnEventCall) -> Self {
-            Self::VerifySwapIntentTokenBurnEvent(value)
+    impl ::core::convert::From<RegisterSwapIntentTokenBurnEventCall>
+    for IntentEventProverCalls {
+        fn from(value: RegisterSwapIntentTokenBurnEventCall) -> Self {
+            Self::RegisterSwapIntentTokenBurnEvent(value)
         }
     }
-    impl ::core::convert::From<VerifySwapIntentTokenLockEventCall>
-    for IntentEventVerifierCalls {
-        fn from(value: VerifySwapIntentTokenLockEventCall) -> Self {
-            Self::VerifySwapIntentTokenLockEvent(value)
+    impl ::core::convert::From<RegisterSwapIntentTokenLockEventCall>
+    for IntentEventProverCalls {
+        fn from(value: RegisterSwapIntentTokenLockEventCall) -> Self {
+            Self::RegisterSwapIntentTokenLockEvent(value)
         }
     }
-    ///Container type for all return fields from the `verify` function with signature `verify(bytes32)` and selector `0x75e36616`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthAbiType,
-        ::ethers::contract::EthAbiCodec,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    pub struct VerifyReturn(pub bool);
-    ///Container type for all return fields from the `verifySwapIntentFilledEvent` function with signature `verifySwapIntentFilledEvent((bytes32,address,uint256,uint256))` and selector `0xeb8e712d`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthAbiType,
-        ::ethers::contract::EthAbiCodec,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    pub struct VerifySwapIntentFilledEventReturn(pub bool);
-    ///Container type for all return fields from the `verifySwapIntentTokenBurnEvent` function with signature `verifySwapIntentTokenBurnEvent((bytes32))` and selector `0xb20dc007`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthAbiType,
-        ::ethers::contract::EthAbiCodec,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    pub struct VerifySwapIntentTokenBurnEventReturn(pub bool);
-    ///Container type for all return fields from the `verifySwapIntentTokenLockEvent` function with signature `verifySwapIntentTokenLockEvent((bytes32))` and selector `0xb86c94b2`
-    #[derive(
-        Clone,
-        ::ethers::contract::EthAbiType,
-        ::ethers::contract::EthAbiCodec,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
-    pub struct VerifySwapIntentTokenLockEventReturn(pub bool);
 }
