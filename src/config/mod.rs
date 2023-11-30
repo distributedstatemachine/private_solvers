@@ -10,7 +10,7 @@ use ethers::types::{Address, H256};
 
 use crate::config::addresses::{AddressesConfig, AddressesConfigRaw};
 use crate::config::balancer::BalancerPool;
-use crate::config::chain::{ChainConfig, ChainConfigRaw};
+use crate::config::chain::{ChainConfig, ChainConfigRaw, ChainId};
 use crate::config::token::{TokenConfig, TokenConfigRaw};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -48,10 +48,6 @@ impl Config {
                 .intents_mempool_address
                 .parse::<Address>()
                 .unwrap(),
-            escrow_address: addresses_config_raw
-                .escrow_address
-                .parse::<Address>()
-                .unwrap(),
             khalani_chain_event_verifier_address: addresses_config_raw
                 .khalani_chain_event_verifier_address
                 .parse::<Address>()
@@ -60,17 +56,11 @@ impl Config {
                 .interchain_liquidity_hub_address
                 .parse::<Address>()
                 .unwrap(),
-            swap_intent_fillers: addresses_config_raw
-                .swap_intent_fillers
-                .iter()
-                .map(|(chain_name, address)| {
-                    let chain_config = chains
-                        .iter()
-                        .find(|chain| &chain.name == chain_name)
-                        .unwrap();
-                    (chain_config.chain_id, address.parse::<Address>().unwrap())
-                })
-                .collect(),
+            escrows: Self::parse_chain_to_address_map(&addresses_config_raw.escrows, &chains),
+            swap_intent_fillers: Self::parse_chain_to_address_map(
+                &addresses_config_raw.swap_intent_fillers,
+                &chains,
+            ),
         };
 
         let tokens: Vec<TokenConfig> = config
@@ -128,6 +118,22 @@ impl Config {
             chains,
             tokens,
         })
+    }
+
+    fn parse_chain_to_address_map(
+        chain_to_address_map: &HashMap<String, String>,
+        chains: &[ChainConfig],
+    ) -> HashMap<ChainId, Address> {
+        chain_to_address_map
+            .iter()
+            .map(|(chain_name, address)| {
+                let chain_config = chains
+                    .iter()
+                    .find(|chain| &chain.name == chain_name)
+                    .unwrap();
+                (chain_config.chain_id, address.parse::<Address>().unwrap())
+            })
+            .collect()
     }
 
     fn create_chain_config(chain_raw: &ChainConfigRaw) -> ChainConfig {

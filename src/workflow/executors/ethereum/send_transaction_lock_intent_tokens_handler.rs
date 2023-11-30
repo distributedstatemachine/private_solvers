@@ -45,11 +45,12 @@ impl LockIntentTokensHandler for SendTransactionLockIntentTokensHandler {
 
 impl SendTransactionLockIntentTokensHandler {
     fn build_lock_tokens_tx(&self, swap_intent: &SwapIntent) -> ContractCall<RpcClient, ()> {
-        let chain_id = swap_intent.source_chain_id.into();
-        let rpc_client = self.connector.get_rpc_client(chain_id).unwrap();
-        let escrow = Escrow::new(self.addresses_config.escrow_address, rpc_client);
+        let source_chain_id = swap_intent.source_chain_id.into();
+        let rpc_client = self.connector.get_rpc_client(source_chain_id).unwrap();
+        let escrow_address = self.addresses_config.escrows.get(&source_chain_id).unwrap();
+        let escrow = Escrow::new(*escrow_address, rpc_client);
         let mut call = escrow.lock_tokens(swap_intent.clone().into());
-        call.tx.set_chain_id(chain_id);
+        call.tx.set_chain_id(source_chain_id);
         call
     }
 }
