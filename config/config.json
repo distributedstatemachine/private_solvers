@@ -1,6 +1,7 @@
 {
   "addresses": {
     "intents_mempool_address": "0x5aA4E9B8e24903a0327FFbe1803aF0B721Eb6a94",
+    "settlement_reactor_address": "0x9aDCA49Ce95084d25c1b91A43A0833CC3085D2Df",
     "verifiers": {
       "khalani": {
         "sepolia": "0x594C00467783cf0f422EAd0d4b605F1134D7F0e3",

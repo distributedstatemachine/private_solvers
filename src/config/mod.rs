@@ -48,6 +48,10 @@ impl Config {
                 .intents_mempool_address
                 .parse::<Address>()
                 .unwrap(),
+            settlement_reactor_address: addresses_config_raw
+                .settlement_reactor_address
+                .parse::<Address>()
+                .unwrap(),
             verifiers: addresses_config_raw
                 .verifiers
                 .iter()

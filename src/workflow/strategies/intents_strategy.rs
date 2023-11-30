@@ -76,15 +76,16 @@ where
                     "Tokens have been locked on the source chain, awaiting the proof on the Khalani Chain"
                 );
 
-                let swap_intent = locked_tokens_intent.swap_intent;
+                let swap_intent = &locked_tokens_intent.swap_intent;
                 let intent_id = swap_intent.intent_id;
-                let intent_state = self
-                    .state_manager
-                    .lock()
-                    .await
-                    .update_intent_state(intent_id, |intent| {
-                        intent.is_tokens_locked_on_source_chain = true
-                    });
+                let intent_state =
+                    self.state_manager
+                        .lock()
+                        .await
+                        .update_intent_state(intent_id, |intent| {
+                            intent.lock_intent_tokens_handler_result =
+                                Some(locked_tokens_intent.clone());
+                        });
                 if let Some(intent_state) = intent_state {
                     // TODO: try to avoid this assertion by enforcing intent state subtypes.
                     let quoted_intent = intent_state.quoted_intent.unwrap();
@@ -106,19 +107,18 @@ where
                     });
 
                 if let Some(intent_state) = intent_state {
-                    if intent_state.is_ready_to_settle() {
-                        info!(?intent_id, "Intent  ready to be settled");
-                        return vec![Action::SettleIntent(intent_state.swap_intent)];
+                    if let Some(settlement_data) = intent_state.get_settlement_data() {
+                        info!(?intent_id, "Intent ready to be settled");
+                        return vec![Action::SettleIntent(settlement_data)];
                     }
                 }
             }
-            Event::IntentFilledOnDestination(filled_intent_result) => {
-                info!(?filled_intent_result, "Intent filled on destination");
+            Event::IntentFilledOnDestination(filler_handler_result) => {
+                info!(?filler_handler_result, "Intent filled on destination chain");
                 self.state_manager.lock().await.update_intent_state(
-                    filled_intent_result.quoted_intent.swap_intent.intent_id,
+                    filler_handler_result.quoted_intent.swap_intent.intent_id,
                     |intent| {
-                        intent.is_filled_on_destination = true;
-                        intent.fill_timestamp = Some(filled_intent_result.fill_timestamp);
+                        intent.filler_handler_result = Some(filler_handler_result);
                     },
                 );
             }
@@ -134,9 +134,9 @@ where
                         });
 
                 if let Some(intent_state) = intent_state {
-                    if intent_state.is_ready_to_settle() {
+                    if let Some(settlement_data) = intent_state.get_settlement_data() {
                         info!(?intent_id, "Intent is ready to be settled");
-                        return vec![Action::SettleIntent(intent_state.swap_intent)];
+                        return vec![Action::SettleIntent(settlement_data)];
                     }
                 }
             }

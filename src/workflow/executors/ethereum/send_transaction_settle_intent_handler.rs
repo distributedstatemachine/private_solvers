@@ -1,14 +1,18 @@
-use crate::config::addresses::AddressesConfig;
-use crate::connectors::{Connector, RpcClient};
-use crate::ethereum::transaction::submit_transaction;
-use crate::types::swap_intent::SwapIntent;
-use crate::workflow::executors::settle_intent_executor::SettleIntentHandler;
+use std::sync::Arc;
+
 use anyhow::Result;
 use async_trait::async_trait;
-use bindings_khalani::intents_mempool::IntentsMempool;
+use bindings_khalani::settlement_reactor::SettlementReactor;
 use ethers::contract::ContractCall;
-use std::sync::Arc;
 use tracing::info;
+
+use crate::config::addresses::AddressesConfig;
+use crate::config::chain::KHALANI_CHAIN_ID;
+use crate::connectors::{Connector, RpcClient};
+use crate::ethereum::transaction::submit_transaction;
+use crate::workflow::executors::settle_intent_executor::{
+    SettleIntentHandler, SwapIntentSettlementData,
+};
 
 pub struct SendTransactionSettleIntentHandler {
     connector: Arc<Connector>,
@@ -26,24 +30,42 @@ impl SendTransactionSettleIntentHandler {
 
 #[async_trait]
 impl SettleIntentHandler for SendTransactionSettleIntentHandler {
-    async fn process_settle_intent(&self, swap_intent: SwapIntent) -> Result<()> {
-        info!(?swap_intent, "Settling intent");
-        let transaction = self.build_settle_intent_tx(&swap_intent);
+    async fn process_settle_intent(
+        &self,
+        swap_intent_settlement_data: SwapIntentSettlementData,
+    ) -> Result<()> {
+        info!(?swap_intent_settlement_data, "Settling intent");
+        let transaction = self.build_settle_intent_tx(&swap_intent_settlement_data);
         let receipt = submit_transaction(transaction).await?;
         let tx_hash = receipt.transaction_hash;
-        info!(?swap_intent, ?tx_hash, "Intent has been settled");
+        info!(
+            ?swap_intent_settlement_data,
+            ?tx_hash,
+            "Intent has been settled"
+        );
         Ok(())
     }
 }
 
 impl SendTransactionSettleIntentHandler {
-    fn build_settle_intent_tx(&self, swap_intent: &SwapIntent) -> ContractCall<RpcClient, ()> {
-        let chain_id = swap_intent.source_chain_id.into();
-        let rpc_client = self.connector.get_rpc_client(chain_id).unwrap();
-        let intents_mempool =
-            IntentsMempool::new(self.addresses_config.intents_mempool_address, rpc_client);
-        let mut call = intents_mempool.settle_intent(swap_intent.intent_id.0);
-        call.tx.set_chain_id(chain_id);
+    fn build_settle_intent_tx(
+        &self,
+        swap_intent_settlement_data: &SwapIntentSettlementData,
+    ) -> ContractCall<RpcClient, ()> {
+        let rpc_client = self.connector.get_rpc_client(KHALANI_CHAIN_ID).unwrap();
+        let settlement_reactor =
+            SettlementReactor::new(self.addresses_config.settlement_reactor_address, rpc_client);
+        let mut call = settlement_reactor.settle(
+            swap_intent_settlement_data
+                .quoted_intent
+                .swap_intent
+                .clone()
+                .into(),
+            swap_intent_settlement_data.filler,
+            swap_intent_settlement_data.fill_timestamp,
+            swap_intent_settlement_data.fill_amount,
+        );
+        call.tx.set_chain_id(KHALANI_CHAIN_ID);
         call
     }
 }

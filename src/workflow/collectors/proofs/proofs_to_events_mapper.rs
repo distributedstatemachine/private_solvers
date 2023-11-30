@@ -60,9 +60,15 @@ impl ProofsToEventsMapper {
         proof_id: ProofId,
         intent_state: &IntentState,
     ) -> Option<Event> {
-        // TODO: try to avoid these assertions by enforcing intent state subtypes.
-        let fill_timestamp = intent_state.clone().fill_timestamp.unwrap();
-        let quoted_intent = intent_state.clone().quoted_intent.unwrap();
+        let filler_handler_result = match intent_state.clone().filler_handler_result {
+            Some(filler_handler_result) => filler_handler_result,
+            None => return None,
+        };
+        let fill_timestamp = filler_handler_result.fill_timestamp;
+        let quoted_intent = match intent_state.clone().quoted_intent {
+            Some(quoted_intent) => quoted_intent,
+            None => return None,
+        };
 
         let intent_id = intent_state.intent_id;
 
