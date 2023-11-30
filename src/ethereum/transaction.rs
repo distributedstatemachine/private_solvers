@@ -4,12 +4,13 @@ use ethers::abi::Detokenize;
 use ethers::prelude::ContractCall;
 use ethers::types::TransactionReceipt;
 use std::time::Duration;
-use tracing::info;
+use tracing::{debug, info};
 
 // Inspired by https://github.com/hyperlane-xyz/hyperlane-monorepo/blob/main/rust/chains/hyperlane-ethereum/src/tx.rs
 pub async fn submit_transaction<D: Detokenize>(
     transaction: ContractCall<RpcClient, D>,
 ) -> Result<TransactionReceipt> {
+    debug!(?transaction.tx, "Dispatching transaction");
     let dispatched_transaction = transaction.send().await?;
     let tx_hash = dispatched_transaction.tx_hash();
     info!(?tx_hash, "Dispatched transaction");

@@ -80,7 +80,6 @@ impl SendTransactionSwapIntentFillerHandler {
             quoted_intent.destination_amount.base_units,
         );
         call.tx.set_chain_id(destination_chain_id);
-        info!(?call.tx, "Prepared transaction");
         call
     }
 }

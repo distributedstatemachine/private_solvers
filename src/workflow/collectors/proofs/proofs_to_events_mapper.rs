@@ -3,6 +3,7 @@ use std::sync::Arc;
 use ethers::abi::{encode_packed, Token as AbiToken};
 use ethers::types::H256;
 use ethers::utils::keccak256;
+use tracing::debug;
 
 use crate::connectors::Connector;
 use crate::types::proof_id::ProofId;
@@ -49,6 +50,12 @@ impl ProofsToEventsMapper {
         ])
         .unwrap();
         let expected_proof_id = keccak256(swap_intent_token_lock_event).into();
+        debug!(
+            ?intent_id,
+            ?proof_id,
+            ?expected_proof_id,
+            "Trying to map SwapIntentTokenLock proof onto event"
+        );
         if proof_id == expected_proof_id {
             return Some(Event::ProvedTokensLockedOnSourceChain(intent_id));
         }
@@ -87,6 +94,12 @@ impl ProofsToEventsMapper {
         ])
         .unwrap();
         let expected_proof_id = keccak256(swap_intent_filled_event).into();
+        debug!(
+            ?intent_id,
+            ?proof_id,
+            ?expected_proof_id,
+            "Trying to map SwapIntentFilled proof onto event"
+        );
         if proof_id == expected_proof_id {
             return Some(Event::ProvedSwapIntentFilledOnDestinationChain(intent_id));
         }
