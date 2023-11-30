@@ -22,12 +22,8 @@ async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config.clone(), connector.clone()).await?;
     let inventory = Arc::new(inventory);
-    let quoter = InterchainLiquidityHubQuoter::new(
-        connector,
-        inventory.clone(),
-        config.addresses.clone(),
-        config.balancer.clone(),
-    );
+    let quoter =
+        InterchainLiquidityHubQuoter::new(connector, inventory.clone(), config.balancer.clone());
 
     let usdc_sepolia = inventory
         .find_token_by_symbol("USDC".into(), SEPOLIA_CHAIN_ID)

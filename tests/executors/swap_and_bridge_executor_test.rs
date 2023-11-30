@@ -31,12 +31,11 @@ async fn test_swap_and_bridge_preview() -> Result<()> {
     let quoter = InterchainLiquidityHubQuoter::new(
         connector.clone(),
         inventory.clone(),
-        config.addresses.clone(),
         config.balancer.clone(),
     );
     let quoter = Arc::new(quoter);
     let handler = SendTransactionSwapAndBridgeHandler::new(
-        config.addresses.clone(),
+        config.balancer.clone(),
         connector.clone(),
         quoter.clone(),
         inventory.clone(),
@@ -82,7 +81,7 @@ async fn test_swap_and_bridge_preview() -> Result<()> {
     if kai_allowance.lt(&quoted_intent.kai_amount) {
         println!("Approving tokens");
         let approve_handler = SendTransactionApproveTokensHandler::new(
-            config.addresses.clone(),
+            config.balancer.clone(),
             connector.clone(),
             inventory.clone(),
         );
@@ -118,12 +117,11 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
     let quoter = InterchainLiquidityHubQuoter::new(
         connector.clone(),
         inventory.clone(),
-        config.addresses.clone(),
         config.balancer.clone(),
     );
     let quoter = Arc::new(quoter);
     let handler = SendTransactionSwapAndBridgeHandler::new(
-        config.addresses.clone(),
+        config.balancer.clone(),
         connector,
         quoter.clone(),
         inventory.clone(),

@@ -1,12 +1,5 @@
 use std::sync::Arc;
 
-use anyhow::{anyhow, Result};
-use async_trait::async_trait;
-use bindings_balancer::vault::{BatchSwapStep, FundManagement, Vault};
-use ethers::types::{Address, Bytes, U256};
-use tracing::info;
-
-use crate::config::addresses::AddressesConfig;
 use crate::config::balancer::{BalancerConfig, BalancerPool};
 use crate::config::chain::{ChainId, KHALANI_CHAIN_ID};
 use crate::connectors::{Connector, RpcClient};
@@ -16,6 +9,11 @@ use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
 use crate::workflow::executors::ethereum::send_transaction_swap_and_bridge_handler::BalancerSwapTokensInvolved;
+use anyhow::{anyhow, Result};
+use async_trait::async_trait;
+use bindings_balancer::vault::{BatchSwapStep, FundManagement, Vault};
+use ethers::types::{Address, Bytes, U256};
+use tracing::info;
 
 const SWAP_EXACT_OUT_SWAP_KIND: u8 = 1;
 
@@ -29,11 +27,10 @@ impl InterchainLiquidityHubQuoter {
     pub fn new(
         connector: Arc<Connector>,
         inventory: Arc<Inventory>,
-        addresses_config: AddressesConfig,
         balancer_config: BalancerConfig,
     ) -> Self {
         let client = connector.get_rpc_client(KHALANI_CHAIN_ID).unwrap();
-        let vault_contract = Vault::new(addresses_config.vault_address, client.clone());
+        let vault_contract = Vault::new(balancer_config.vault_address, client.clone());
 
         Self {
             balancer_config,

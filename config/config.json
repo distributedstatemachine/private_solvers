@@ -1,15 +1,15 @@
 {
   "addresses": {
     "intents_mempool_address": "0x03C412c436f759B75a52599693d75B1ECAacd7b4",
-    "vault_address": "0x580d2aa4231E4C2EFfb3A43D3b778cd956C875bf",
     "escrow_address": "0x355344Ee453aa574794aDE180B1d434fE270bEB4",
     "khalani_chain_event_verifier_address": "0xA15e6235221fFb0f46280Ed3901C8164078b1C08",
-    "interchain_liquidity_hub_address": "0xAe3bcdBAb70ED1244FbEe1b39FE6D49d98d4c2BC",
     "swap_intent_fillers": {
       "fuji": "0xC066bf07292dB23F98318AF27Bba53940cBa6373"
     }
   },
   "balancer": {
+    "vault_address": "0x580d2aa4231E4C2EFfb3A43D3b778cd956C875bf",
+    "interchain_liquidity_hub_address": "0xAe3bcdBAb70ED1244FbEe1b39FE6D49d98d4c2BC",
     "batch_swap_steps_from_kai": {
       "0x88aa6C2584b2095CFa0e0cD3234B738125F77354": [
         "0xb50dc24e616bc0b90c6e12b935e43ed21a54be9a000000000000000000000004",

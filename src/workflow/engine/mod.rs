@@ -44,7 +44,6 @@ pub fn configure_engine(
     let interchain_liquidity_hub_quoter = InterchainLiquidityHubQuoter::new(
         connector.clone(),
         inventory.clone(),
-        config.addresses.clone(),
         config.balancer.clone(),
     );
     let swap_intent_filler_handler =

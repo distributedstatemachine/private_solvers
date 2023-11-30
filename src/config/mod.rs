@@ -44,10 +44,6 @@ impl Config {
             .map(Self::create_chain_config)
             .collect();
         let addresses = AddressesConfig {
-            vault_address: addresses_config_raw
-                .vault_address
-                .parse::<Address>()
-                .unwrap(),
             intents_mempool_address: addresses_config_raw
                 .intents_mempool_address
                 .parse::<Address>()
@@ -92,33 +88,42 @@ impl Config {
             })
             .collect();
 
-        let batch_swap_steps_from_kai: HashMap<TokenConfig, Vec<BalancerPool>> = config
-            .balancer
-            .batch_swap_steps_from_kai
-            .iter()
-            .map(|(token_address, pools_addresses)| {
-                (
-                    (tokens
-                        .iter()
-                        .find(|token_config| {
-                            token_config.address == token_address.parse::<Address>().unwrap()
-                        })
-                        .unwrap())
-                    .clone(),
-                    pools_addresses
-                        .iter()
-                        .map(|i| BalancerPool {
-                            id: i.parse::<H256>().unwrap(),
-                        })
-                        .collect(),
-                )
-            })
-            .collect();
+        let balancer_config_raw = config.balancer;
+        let batch_swap_steps_from_kai: HashMap<TokenConfig, Vec<BalancerPool>> =
+            balancer_config_raw
+                .batch_swap_steps_from_kai
+                .iter()
+                .map(|(token_address, pools_addresses)| {
+                    (
+                        (tokens
+                            .iter()
+                            .find(|token_config| {
+                                token_config.address == token_address.parse::<Address>().unwrap()
+                            })
+                            .unwrap())
+                        .clone(),
+                        pools_addresses
+                            .iter()
+                            .map(|i| BalancerPool {
+                                id: i.parse::<H256>().unwrap(),
+                            })
+                            .collect(),
+                    )
+                })
+                .collect();
 
         Ok(Config {
             addresses,
             balancer: BalancerConfig {
                 batch_swap_steps_from_kai,
+                vault_address: balancer_config_raw
+                    .vault_address
+                    .parse::<Address>()
+                    .unwrap(),
+                interchain_liquidity_hub_address: addresses_config_raw
+                    .interchain_liquidity_hub_address
+                    .parse::<Address>()
+                    .unwrap(),
             },
             chains,
             tokens,

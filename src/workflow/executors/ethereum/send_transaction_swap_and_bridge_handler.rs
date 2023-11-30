@@ -2,17 +2,7 @@ use std::ops::Add;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use anyhow::{anyhow, Result};
-use async_trait::async_trait;
-use bindings_balancer::vault::{BatchSwapStep, FundManagement, Vault};
-use bindings_khalani::interchain_liquidity_hub_wrapper::{
-    BatchSwapStep as BatchSwapStepInterchainLiquidityHubWrapper, InterchainLiquidityHubWrapper,
-};
-use ethers::contract::ContractCall;
-use ethers::types::{Address, Bytes, U256};
-use tracing::info;
-
-use crate::config::addresses::AddressesConfig;
+use crate::config::balancer::BalancerConfig;
 use crate::config::chain::KHALANI_CHAIN_ID;
 use crate::connectors::{Connector, RpcClient};
 use crate::ethereum::transaction::submit_transaction;
@@ -23,6 +13,15 @@ use crate::inventory::Inventory;
 use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::workflow::executors::swap_and_bridge_executor::SwapAndBridgeHandler;
+use anyhow::{anyhow, Result};
+use async_trait::async_trait;
+use bindings_balancer::vault::{BatchSwapStep, FundManagement, Vault};
+use bindings_khalani::interchain_liquidity_hub_wrapper::{
+    BatchSwapStep as BatchSwapStepInterchainLiquidityHubWrapper, InterchainLiquidityHubWrapper,
+};
+use ethers::contract::ContractCall;
+use ethers::types::{Address, Bytes, U256};
+use tracing::info;
 
 const SWAP_GIVEN_IN_SWAP_KIND: u8 = 0;
 
@@ -42,15 +41,15 @@ pub struct SendTransactionSwapAndBridgeHandler {
 
 impl SendTransactionSwapAndBridgeHandler {
     pub fn new(
-        addresses_config: AddressesConfig,
+        balancer_config: BalancerConfig,
         connector: Arc<Connector>,
         quoter: Arc<InterchainLiquidityHubQuoter>,
         inventory: Arc<Inventory>,
     ) -> Self {
         let client = connector.get_rpc_client(KHALANI_CHAIN_ID).unwrap();
-        let vault_contract = Vault::new(addresses_config.vault_address, client.clone());
+        let vault_contract = Vault::new(balancer_config.vault_address, client.clone());
         let interchain_liquidity_hub = InterchainLiquidityHubWrapper::new(
-            addresses_config.interchain_liquidity_hub_address,
+            balancer_config.interchain_liquidity_hub_address,
             client,
         );
 
