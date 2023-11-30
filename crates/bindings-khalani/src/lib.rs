@@ -119,6 +119,8 @@ pub mod mock_counter;
 pub mod mock_erc20;
 pub mod mock_igp;
 pub mod mock_khalani_receiver;
+pub mod swap_intent_filler;
+pub mod swap_intent_filler_events;
 pub mod mock_liquidity_aggregator;
 pub mod mock_liquidity_projector;
 pub mod mock_mailbox;
