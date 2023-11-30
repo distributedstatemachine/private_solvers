@@ -25,18 +25,25 @@ pub struct GmpEventVerifierProofSource {
 impl GmpEventVerifierProofSource {
     pub fn new(
         connector: Arc<Connector>,
-        chain_id: ChainId,
+        verifier_chain_id: ChainId,
+        prover_chain_id: ChainId,
         addresses_config: AddressesConfig,
     ) -> Self {
-        let rpc_client = connector.get_rpc_client(chain_id).unwrap();
-        let event_verifier = GMPEventVerifier::new(
-            addresses_config.khalani_chain_event_verifier_address,
-            rpc_client.clone(),
-        );
+        let rpc_client = connector.get_rpc_client(verifier_chain_id).unwrap();
+        let verifier_address = addresses_config
+            .verifiers
+            .iter()
+            .find(|verifier_address| {
+                verifier_address.prover_chain_id == prover_chain_id
+                    && verifier_address.verifier_chain_id == verifier_chain_id
+            })
+            .unwrap()
+            .verifier_address;
+        let event_verifier = GMPEventVerifier::new(verifier_address, rpc_client.clone());
         Self {
             rpc_client: rpc_client.clone(),
             event_verifier,
-            chain_id,
+            chain_id: verifier_chain_id,
         }
     }
 }

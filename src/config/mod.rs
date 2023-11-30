@@ -8,7 +8,7 @@ use ethers::types::{Address, H256};
 
 // TODO: read config from the JSON files
 
-use crate::config::addresses::{AddressesConfig, AddressesConfigRaw};
+use crate::config::addresses::{AddressesConfig, AddressesConfigRaw, VerifierAddress};
 use crate::config::balancer::BalancerPool;
 use crate::config::chain::{ChainConfig, ChainConfigRaw, ChainId};
 use crate::config::token::{TokenConfig, TokenConfigRaw};
@@ -48,14 +48,28 @@ impl Config {
                 .intents_mempool_address
                 .parse::<Address>()
                 .unwrap(),
-            khalani_chain_event_verifier_address: addresses_config_raw
-                .khalani_chain_event_verifier_address
-                .parse::<Address>()
-                .unwrap(),
-            interchain_liquidity_hub_address: addresses_config_raw
-                .interchain_liquidity_hub_address
-                .parse::<Address>()
-                .unwrap(),
+            verifiers: addresses_config_raw
+                .verifiers
+                .iter()
+                .flat_map(|(verifier_chain_name, prover_chains)| {
+                    let verifier_chain_config = chains
+                        .iter()
+                        .find(|chain| &chain.name == verifier_chain_name)
+                        .unwrap();
+                    let verifier_chain_id = verifier_chain_config.chain_id;
+                    let prover_chain_to_verifier_address =
+                        Self::parse_chain_to_address_map(prover_chains, &chains);
+                    let verifier_addresses: Vec<VerifierAddress> = prover_chain_to_verifier_address
+                        .iter()
+                        .map(|(prover_chain_id, verifier_address)| VerifierAddress {
+                            verifier_chain_id,
+                            prover_chain_id: *prover_chain_id,
+                            verifier_address: *verifier_address,
+                        })
+                        .collect();
+                    verifier_addresses
+                })
+                .collect(),
             escrows: Self::parse_chain_to_address_map(&addresses_config_raw.escrows, &chains),
             swap_intent_fillers: Self::parse_chain_to_address_map(
                 &addresses_config_raw.swap_intent_fillers,
@@ -110,7 +124,7 @@ impl Config {
                     .vault_address
                     .parse::<Address>()
                     .unwrap(),
-                interchain_liquidity_hub_address: addresses_config_raw
+                interchain_liquidity_hub_address: balancer_config_raw
                     .interchain_liquidity_hub_address
                     .parse::<Address>()
                     .unwrap(),

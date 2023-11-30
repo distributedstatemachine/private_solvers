@@ -74,7 +74,7 @@ async fn test_swap_and_bridge_preview() -> Result<()> {
         .get_allowance(
             kai_token,
             sender,
-            config.addresses.interchain_liquidity_hub_address,
+            config.balancer.interchain_liquidity_hub_address,
         )
         .await?;
 

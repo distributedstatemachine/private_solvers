@@ -1,7 +1,11 @@
 {
   "addresses": {
     "intents_mempool_address": "0x03C412c436f759B75a52599693d75B1ECAacd7b4",
-    "khalani_chain_event_verifier_address": "0xA15e6235221fFb0f46280Ed3901C8164078b1C08",
+    "verifiers": {
+      "khalani": {
+        "fuji": "0xA15e6235221fFb0f46280Ed3901C8164078b1C08"
+      }
+    },
     "escrows": {
       "sepolia": "0x355344Ee453aa574794aDE180B1d434fE270bEB4"
     },

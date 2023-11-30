@@ -3,7 +3,7 @@ use std::sync::Arc;
 use artemis_core::engine::Engine;
 use futures::lock::Mutex;
 
-use crate::config::chain::KHALANI_CHAIN_ID;
+use crate::config::chain::{FUJI_CHAIN_ID, KHALANI_CHAIN_ID};
 use crate::config::Config;
 use crate::connectors::Connector;
 use crate::inventory::Inventory;
@@ -32,9 +32,11 @@ pub fn configure_engine(
     // Set up Ethereum specific clients.
     let intents_mempool_source =
         IntentsMempoolSource::new(connector.clone(), config.addresses.intents_mempool_address);
+    // TODO: configure multiple prover / verifiers.
     let khalani_gmp_verifier_proof_source = GmpEventVerifierProofSource::new(
         connector.clone(),
         KHALANI_CHAIN_ID,
+        FUJI_CHAIN_ID,
         config.addresses.clone(),
     );
     let send_transaction_lock_intent_tokens_handler =
