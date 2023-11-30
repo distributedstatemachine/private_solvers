@@ -34,13 +34,8 @@ pub fn configure_engine(
         .addresses
         .verifiers
         .iter()
-        .map(|verifier_address| {
-            GmpEventVerifierProofSource::new(
-                connector.clone(),
-                verifier_address.verifier_chain_id,
-                verifier_address.prover_chain_id,
-                config.addresses.clone(),
-            )
+        .map(|verifier_config| {
+            GmpEventVerifierProofSource::new(connector.clone(), verifier_config.clone())
         })
         .collect();
 

@@ -8,7 +8,7 @@ use ethers::types::{Address, H256};
 
 // TODO: read config from the JSON files
 
-use crate::config::addresses::{AddressesConfig, AddressesConfigRaw, VerifierAddress};
+use crate::config::addresses::{AddressesConfig, AddressesConfigRaw, VerifierConfig};
 use crate::config::balancer::BalancerPool;
 use crate::config::chain::{ChainConfig, ChainConfigRaw, ChainId};
 use crate::config::token::{TokenConfig, TokenConfigRaw};
@@ -63,9 +63,9 @@ impl Config {
                     let verifier_chain_id = verifier_chain_config.chain_id;
                     let prover_chain_to_verifier_address =
                         Self::parse_chain_to_address_map(prover_chains, &chains);
-                    let verifier_addresses: Vec<VerifierAddress> = prover_chain_to_verifier_address
+                    let verifier_addresses: Vec<VerifierConfig> = prover_chain_to_verifier_address
                         .iter()
-                        .map(|(prover_chain_id, verifier_address)| VerifierAddress {
+                        .map(|(prover_chain_id, verifier_address)| VerifierConfig {
                             verifier_chain_id,
                             prover_chain_id: *prover_chain_id,
                             verifier_address: *verifier_address,

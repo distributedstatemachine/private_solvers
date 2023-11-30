@@ -9,8 +9,7 @@ use bindings_khalani::gmp_event_verifier::GMPEventVerifier;
 use ethers::middleware::Middleware;
 use futures::StreamExt;
 
-use crate::config::addresses::AddressesConfig;
-use crate::config::chain::ChainId;
+use crate::config::addresses::VerifierConfig;
 use crate::connectors::{Connector, RpcClient};
 use crate::types::proof_id::ProofId;
 use crate::workflow::collectors::proofs::proofs_collector::ProofSource;
@@ -19,33 +18,20 @@ use tracing::{debug, error, info};
 pub struct GmpEventVerifierProofSource {
     event_verifier: GMPEventVerifier<RpcClient>,
     rpc_client: Arc<RpcClient>,
-    verifier_chain_id: ChainId,
-    prover_chain_id: ChainId,
+    verifier_config: VerifierConfig,
 }
 
 impl GmpEventVerifierProofSource {
-    pub fn new(
-        connector: Arc<Connector>,
-        verifier_chain_id: ChainId,
-        prover_chain_id: ChainId,
-        addresses_config: AddressesConfig,
-    ) -> Self {
-        let rpc_client = connector.get_rpc_client(verifier_chain_id).unwrap();
-        let verifier_address = addresses_config
-            .verifiers
-            .iter()
-            .find(|verifier_address| {
-                verifier_address.prover_chain_id == prover_chain_id
-                    && verifier_address.verifier_chain_id == verifier_chain_id
-            })
-            .unwrap()
-            .verifier_address;
-        let event_verifier = GMPEventVerifier::new(verifier_address, rpc_client.clone());
+    pub fn new(connector: Arc<Connector>, verifier_config: VerifierConfig) -> Self {
+        let rpc_client = connector
+            .get_rpc_client(verifier_config.verifier_chain_id)
+            .unwrap();
+        let event_verifier =
+            GMPEventVerifier::new(verifier_config.verifier_address, rpc_client.clone());
         Self {
             rpc_client: rpc_client.clone(),
             event_verifier,
-            verifier_chain_id,
-            prover_chain_id,
+            verifier_config,
         }
     }
 }
@@ -53,23 +39,17 @@ impl GmpEventVerifierProofSource {
 #[async_trait]
 impl ProofSource for GmpEventVerifierProofSource {
     async fn get_proof_ids_stream(&self) -> Result<CollectorStream<'_, ProofId>> {
-        let prover_chain_id: ChainId = self.prover_chain_id;
-        let verifier_chain_id: ChainId = self.prover_chain_id;
+        let verifier_config = self.verifier_config.clone();
         let mut previous_block_number = match self.rpc_client.get_block_number().await {
             Ok(block_number) => block_number,
             Err(e) => {
-                error!(
-                    ?prover_chain_id,
-                    ?verifier_chain_id,
-                    ?e,
-                    "Error fetching block"
-                );
+                error!(?verifier_config, ?e, "Error fetching block");
                 return Err(e.into());
             }
         };
         info!(
             ?previous_block_number,
-            ?prover_chain_id,
+            ?verifier_config,
             "Starting block number"
         );
         let mut logged_last_indexed_block_number = previous_block_number;
@@ -80,7 +60,7 @@ impl ProofSource for GmpEventVerifierProofSource {
                 let current_block_number = match self.rpc_client.get_block_number().await {
                     Ok(block_number) => block_number,
                     Err(e) => {
-                        error!(?prover_chain_id, ?verifier_chain_id, ?e, "Error fetching block");
+                        error!(?verifier_config, ?e, "Error fetching block");
                         tokio::time::sleep(Duration::from_secs(5)).await;
                         continue;
                     }
@@ -92,7 +72,7 @@ impl ProofSource for GmpEventVerifierProofSource {
                 }
 
                 if logged_last_indexed_block_number + 50 < current_block_number {
-                    debug!(address = ?self.event_verifier.address(), ?previous_block_number, ?current_block_number, ?prover_chain_id, ?verifier_chain_id, "Indexing the GMP verifier");
+                    debug!(address = ?self.event_verifier.address(), ?previous_block_number, ?current_block_number, ?verifier_config, "Indexing the GMP verifier");
                     logged_last_indexed_block_number = current_block_number;
                 }
 
@@ -105,7 +85,7 @@ impl ProofSource for GmpEventVerifierProofSource {
                 let events = match event.query().await {
                     Ok(events) => events,
                     Err(e) => {
-                        error!(?e, ?prover_chain_id, ?verifier_chain_id, "Error querying events");
+                        error!(?e, ?verifier_config, "Error querying events");
                         tokio::time::sleep(Duration::from_secs(5)).await;
                         continue;
                     }
@@ -113,7 +93,7 @@ impl ProofSource for GmpEventVerifierProofSource {
 
                 for event in events {
                     let proof_id: ProofId = event.event_hash.into();
-                    info!(?proof_id, ?prover_chain_id, ?verifier_chain_id, "GMP Event Verifier received a new proof");
+                    info!(?proof_id, ?verifier_config, "GMP Event Verifier received a new proof");
                     yield proof_id;
                 }
 
@@ -130,11 +110,7 @@ impl ProofSource for GmpEventVerifierProofSource {
         Ok(Box::pin(event_stream))
     }
 
-    fn get_prover_chain_id(&self) -> ChainId {
-        self.prover_chain_id
-    }
-
-    fn get_verifier_chain_id(&self) -> ChainId {
-        self.verifier_chain_id
+    fn get_verifier_config(&self) -> VerifierConfig {
+        self.verifier_config.clone()
     }
 }
