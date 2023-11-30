@@ -1,16 +1,19 @@
 {
   "addresses": {
-    "intents_mempool_address": "0x03C412c436f759B75a52599693d75B1ECAacd7b4",
+    "intents_mempool_address": "0x5aA4E9B8e24903a0327FFbe1803aF0B721Eb6a94",
     "verifiers": {
       "khalani": {
-        "fuji": "0xA15e6235221fFb0f46280Ed3901C8164078b1C08"
+        "sepolia": "0x594C00467783cf0f422EAd0d4b605F1134D7F0e3",
+        "fuji": "0x5FCbd49F076CC2F7AB199471CB8248E61c89A3b8"
       }
     },
     "escrows": {
-      "sepolia": "0x355344Ee453aa574794aDE180B1d434fE270bEB4"
+      "sepolia": "0x027338BB3dEd3A9F68bf08b6Af96fe3983916bD9",
+      "fuji": "0x0727D632966E3baC67b717cae152C6e7503dCcD0"
     },
     "swap_intent_fillers": {
-      "fuji": "0xC066bf07292dB23F98318AF27Bba53940cBa6373"
+      "sepolia": "0xE8C8bf42BF612022BA012C67C8276c927CB77398",
+      "fuji": "0x39de5Be710360aFBbB663036B5fb046585d9dbb3"
     }
   },
   "balancer": {
@@ -68,7 +71,7 @@
       "name": "sepolia",
       "chain_id": 11155111,
       "rpc_url": "$SEPOLIA_RPC_URL",
-      "ws_url": "$SEPOLIA_WS_URL"
+      "ws_url": ""
     },
     {
       "name": "fuji",
