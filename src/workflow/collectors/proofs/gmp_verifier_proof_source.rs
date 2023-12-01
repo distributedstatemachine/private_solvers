@@ -80,7 +80,7 @@ impl ProofSource for GmpEventVerifierProofSource {
                 let event = self
                     .event_verifier
                     .new_event_registered_filter()
-                    .address(ValueOrArray::Value(verifier_config.verifier_address.clone()))
+                    .address(ValueOrArray::Value(verifier_config.verifier_address))
                     .from_block(previous_block_number)
                     .to_block(current_block_number);
 
