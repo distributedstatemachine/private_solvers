@@ -1,15 +1,12 @@
-use tracing::Level;
-use tracing_subscriber::filter;
-use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::fmt::Subscriber;
 use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::EnvFilter;
 
 pub fn configure_logs() {
-    let filter = filter::Targets::new()
-        .with_target("artemis_core", Level::INFO)
-        .with_target("khalani_solver", Level::INFO);
+    let env_filter = EnvFilter::from_default_env();
 
-    tracing_subscriber::registry()
-        .with(tracing_subscriber::fmt::layer())
-        .with(filter)
+    Subscriber::builder()
+        .with_env_filter(env_filter)
+        .finish()
         .init();
 }
