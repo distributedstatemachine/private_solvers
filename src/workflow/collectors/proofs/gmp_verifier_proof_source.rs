@@ -14,6 +14,7 @@ use crate::config::addresses::VerifierConfig;
 use crate::connectors::{Connector, RpcClient};
 use crate::types::proof_id::ProofId;
 use crate::workflow::collectors::proofs::proofs_collector::ProofSource;
+
 use tracing::{debug, error, info};
 
 pub struct GmpEventVerifierProofSource {

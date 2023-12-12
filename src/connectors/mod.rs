@@ -9,6 +9,7 @@ use ethers::types::Address;
 
 use crate::config::chain::{ChainConfig, ChainId};
 use crate::config::Config;
+use crate::error::ChainError;
 
 pub type RpcClient = SignerMiddleware<NonceManagerMiddleware<Provider<Http>>, LocalWallet>;
 pub type WsClient = Provider<Ws>;
@@ -25,8 +26,11 @@ impl Connector {
         self.address
     }
 
-    pub fn get_rpc_client(&self, chain_id: ChainId) -> Option<Arc<RpcClient>> {
-        self.rpc_clients.get(&chain_id).cloned()
+    pub fn get_rpc_client(&self, chain_id: ChainId) -> Result<Arc<RpcClient>, ChainError> {
+        self.rpc_clients
+            .get(&chain_id)
+            .cloned()
+            .ok_or(ChainError::ClientNotFound(chain_id))
     }
 
     pub fn get_ws_client(&self, chain_id: ChainId) -> Option<Arc<WsClient>> {
@@ -39,19 +43,13 @@ impl Connector {
         let mut rpc_clients: HashMap<ChainId, Arc<RpcClient>> = HashMap::new();
         let mut ws_clients: HashMap<ChainId, Arc<WsClient>> = HashMap::new();
         for chain_config in &config.chains {
-            let rpc_client = Self::create_rpc_client(chain_config, wallet.clone())
-                .await
-                .context(format!(
-                    "Failed to create a HTTP client for chain {}",
-                    chain_config.name
-                ))?;
+            let rpc_client = Self::create_rpc_client(chain_config, wallet.clone()).await?;
             rpc_clients.insert(chain_config.chain_id, rpc_client);
 
             if !chain_config.ws_url.is_empty() {
-                let ws_client = Self::create_ws_client(chain_config).await.context(format!(
-                    "Failed to create a WebSocket client for chain {}",
-                    chain_config.name
-                ))?;
+                let ws_client = Self::create_ws_client(chain_config)
+                    .await
+                    .context(ChainError::FailedCreateWebsocket(chain_config.name.clone()))?;
                 ws_clients.insert(chain_config.chain_id, ws_client);
             }
         }
@@ -66,13 +64,8 @@ impl Connector {
         chain_config: &ChainConfig,
         wallet: LocalWallet,
     ) -> Result<Arc<RpcClient>> {
-        let client =
-            Provider::<Http>::try_from(chain_config.rpc_url.clone()).unwrap_or_else(|_| {
-                panic!(
-                    "Failed to create HTTP client for chain {}",
-                    chain_config.name
-                )
-            });
+        let client = Provider::<Http>::try_from(chain_config.rpc_url.clone())
+            .context(ChainError::FailedCreateClient(chain_config.name.clone()))?;
         let chain_id = client.get_chainid().await?.as_u64();
         if chain_id != chain_config.chain_id {
             return Err(anyhow!(

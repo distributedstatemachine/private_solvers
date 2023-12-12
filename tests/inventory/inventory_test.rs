@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 
 use khalani_solver::inventory::token_balance_query::TokenBalanceQuery;
 use khalani_solver::inventory::Inventory;
@@ -9,11 +9,14 @@ use crate::common::{create_connector, create_e2e_config};
 
 #[tokio::test]
 async fn test_inventory() -> Result<()> {
-    let config = create_e2e_config();
-    let connector = create_connector().await.unwrap();
+    let config = create_e2e_config().unwrap();
+    let connector = create_connector().await?;
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config, connector.clone()).await?;
-    let usdc_token = inventory.tokens.first().unwrap();
+    let usdc_token = inventory
+        .tokens
+        .first()
+        .ok_or_else(|| anyhow!("No tokens available in inventory"))?;
     println!("{:?}", usdc_token);
     let address = connector.get_address();
     let balance = inventory.get_balance(usdc_token, address).await?;

@@ -5,6 +5,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use crate::config::balancer::BalancerConfig;
 use crate::config::chain::KHALANI_CHAIN_ID;
 use crate::connectors::{Connector, RpcClient};
+use crate::error::ChainError;
 use crate::ethereum::transaction::submit_transaction;
 use crate::inventory::token::Token;
 use crate::inventory::token_allowance_query::TokenAllowanceQuery;
@@ -13,6 +14,7 @@ use crate::inventory::Inventory;
 use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::workflow::executors::swap_and_bridge_executor::SwapAndBridgeHandler;
+
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bindings_balancer::vault::{BatchSwapStep, FundManagement, Vault};
@@ -45,21 +47,21 @@ impl SendTransactionSwapAndBridgeHandler {
         connector: Arc<Connector>,
         quoter: Arc<InterchainLiquidityHubQuoter>,
         inventory: Arc<Inventory>,
-    ) -> Self {
-        let client = connector.get_rpc_client(KHALANI_CHAIN_ID).unwrap();
+    ) -> Result<Self, ChainError> {
+        let client = connector.get_rpc_client(KHALANI_CHAIN_ID)?;
         let vault_contract = Vault::new(balancer_config.vault_address, client.clone());
         let interchain_liquidity_hub = InterchainLiquidityHubWrapper::new(
             balancer_config.interchain_liquidity_hub_address,
             client,
         );
 
-        Self {
+        Ok(Self {
             connector,
             interchain_liquidity_hub,
             inventory,
             quoter,
             vault_contract,
-        }
+        })
     }
 }
 

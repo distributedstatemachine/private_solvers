@@ -7,6 +7,7 @@ use async_trait::async_trait;
 use futures::lock::Mutex;
 use tracing::{error, info};
 
+use crate::error::StateError;
 use crate::quote::intent_quoter::IntentQuoter;
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
@@ -53,7 +54,7 @@ where
                 info!(?swap_intent, "Quoting the swap intent");
                 match self.intent_quoter.quote_intent(swap_intent.clone()).await {
                     Ok(quoted_intent) => {
-                        return self.process_event(Event::IntentQuoted(quoted_intent)).await;
+                        self.process_event(Event::IntentQuoted(quoted_intent)).await;
                     }
                     Err(e) => {
                         error!(?swap_intent, ?e, "Failed to quote the swap intent");
@@ -88,8 +89,15 @@ where
                         });
                 if let Some(intent_state) = intent_state {
                     // TODO: try to avoid this assertion by enforcing intent state subtypes.
-                    let quoted_intent = intent_state.quoted_intent.unwrap();
-                    return vec![Action::FillIntentOnDestinationChain(quoted_intent.clone())];
+                    if let Some(quoted_intent) = intent_state.quoted_intent {
+                        return vec![Action::FillIntentOnDestinationChain(quoted_intent.clone())];
+                    } else {
+                        eprintln!(
+                            "{}",
+                            StateError::NotFound(String::from("Quoted intent"), intent_id)
+                        );
+                        return vec![];
+                    }
                 }
             }
             Event::ProvedTokensLockedOnSourceChain(intent_id) => {

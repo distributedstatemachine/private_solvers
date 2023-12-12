@@ -9,6 +9,7 @@ use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::swap_intent::SwapIntent;
 use crate::workflow::executors::ethereum::send_transaction_swap_and_bridge_handler::BalancerSwapTokensInvolved;
+
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bindings_balancer::vault::{BatchSwapStep, FundManagement, Vault};
@@ -109,12 +110,10 @@ impl InterchainLiquidityHubQuoter {
 
         let kai_token = self
             .inventory
-            .find_token_by_symbol("KAI".into(), KHALANI_CHAIN_ID)
-            .unwrap();
+            .find_token_by_symbol("KAI".into(), KHALANI_CHAIN_ID)?;
         let kln_token = self
             .inventory
-            .find_token_by_symbol_partial_match(kln_token_symbol, KHALANI_CHAIN_ID)
-            .unwrap();
+            .find_token_by_symbol_partial_match(kln_token_symbol, KHALANI_CHAIN_ID)?;
 
         Ok(BalancerSwapTokensInvolved {
             destination_mirror_token: destination_mirror_token.clone(),

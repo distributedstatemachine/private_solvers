@@ -9,6 +9,7 @@ use tracing::info;
 use crate::config::addresses::AddressesConfig;
 use crate::config::chain::KHALANI_CHAIN_ID;
 use crate::connectors::{Connector, RpcClient};
+use crate::error::ChainError;
 use crate::ethereum::transaction::submit_transaction;
 use crate::workflow::executors::settle_intent_executor::{
     SettleIntentHandler, SwapIntentSettlementData,
@@ -35,7 +36,7 @@ impl SettleIntentHandler for SendTransactionSettleIntentHandler {
         swap_intent_settlement_data: SwapIntentSettlementData,
     ) -> Result<()> {
         info!(?swap_intent_settlement_data, "Settling intent");
-        let transaction = self.build_settle_intent_tx(&swap_intent_settlement_data);
+        let transaction = self.build_settle_intent_tx(&swap_intent_settlement_data)?;
         let receipt = submit_transaction(transaction).await?;
         let tx_hash = receipt.transaction_hash;
         info!(
@@ -51,8 +52,8 @@ impl SendTransactionSettleIntentHandler {
     fn build_settle_intent_tx(
         &self,
         swap_intent_settlement_data: &SwapIntentSettlementData,
-    ) -> ContractCall<RpcClient, ()> {
-        let rpc_client = self.connector.get_rpc_client(KHALANI_CHAIN_ID).unwrap();
+    ) -> Result<ContractCall<RpcClient, ()>, ChainError> {
+        let rpc_client = self.connector.get_rpc_client(KHALANI_CHAIN_ID)?;
         let settlement_reactor =
             SettlementReactor::new(self.addresses_config.settlement_reactor_address, rpc_client);
         let mut call = settlement_reactor.settle(
@@ -66,6 +67,6 @@ impl SendTransactionSettleIntentHandler {
             swap_intent_settlement_data.fill_amount,
         );
         call.tx.set_chain_id(KHALANI_CHAIN_ID);
-        call
+        Ok(call)
     }
 }

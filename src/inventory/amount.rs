@@ -1,6 +1,6 @@
 use ethers::types::U256;
 use ethers::utils::format_units;
-use std::fmt::{Display, Formatter};
+use std::fmt::{self, Display, Formatter};
 use std::ops::Add;
 
 pub type Decimals = u8;
@@ -33,9 +33,14 @@ impl Add for Amount {
 }
 
 impl Display for Amount {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let result: String = format_units(self.base_units, self.decimals as u32).unwrap();
-        write!(f, "{}", result)
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match format_units(self.base_units, self.decimals as u32) {
+            Ok(result) => write!(f, "{}", result),
+            Err(error) => {
+                writeln!(f, "Error formatting units {}", error)?;
+                Err(fmt::Error)
+            }
+        }
     }
 }
 

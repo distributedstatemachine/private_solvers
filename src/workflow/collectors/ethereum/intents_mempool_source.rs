@@ -26,6 +26,7 @@ impl IntentsMempoolSource {
     pub fn new(connector: Arc<Connector>, intents_mempool_address: Address) -> Self {
         let rpc_client = connector.get_rpc_client(KHALANI_CHAIN_ID).unwrap();
         let intents_mempool = IntentsMempool::new(intents_mempool_address, rpc_client.clone());
+
         Self {
             rpc_client,
             intents_mempool,

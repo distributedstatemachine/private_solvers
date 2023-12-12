@@ -48,7 +48,7 @@ impl ProofsToEventsMapper {
             AbiToken::String(String::from("SwapIntentTokenLock")),
             AbiToken::FixedBytes(Vec::from(intent_id.as_bytes())),
         ])
-        .unwrap();
+        .ok()?;
         let expected_proof_id = keccak256(swap_intent_token_lock_event).into();
         debug!(
             ?intent_id,
@@ -57,9 +57,10 @@ impl ProofsToEventsMapper {
             "Trying to map SwapIntentTokenLock proof onto event"
         );
         if proof_id == expected_proof_id {
-            return Some(Event::ProvedTokensLockedOnSourceChain(intent_id));
+            Some(Event::ProvedTokensLockedOnSourceChain(intent_id))
+        } else {
+            None
         }
-        None
     }
 
     fn try_map_swap_intent_filled_proof_event(
@@ -92,7 +93,7 @@ impl ProofsToEventsMapper {
                 H256::from_low_u64_be(fill_amount.as_u64()).as_bytes(),
             )),
         ])
-        .unwrap();
+        .ok()?;
         let expected_proof_id = keccak256(swap_intent_filled_event).into();
         debug!(
             ?intent_id,
@@ -101,8 +102,9 @@ impl ProofsToEventsMapper {
             "Trying to map SwapIntentFilled proof onto event"
         );
         if proof_id == expected_proof_id {
-            return Some(Event::ProvedSwapIntentFilledOnDestinationChain(intent_id));
+            Some(Event::ProvedSwapIntentFilledOnDestinationChain(intent_id))
+        } else {
+            None
         }
-        None
     }
 }

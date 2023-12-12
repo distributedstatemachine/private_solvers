@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use artemis_core::engine::Engine;
 use clap::Parser;
 use ethers::signers::{LocalWallet, Signer};
@@ -18,6 +18,7 @@ use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 
 pub mod config;
 pub mod connectors;
+pub mod error;
 pub mod ethereum;
 pub mod inventory;
 pub mod quote;
@@ -43,10 +44,14 @@ async fn main() -> Result<()> {
 
     let args = Args::parse();
 
-    let config = Config::read_config(args.config_file.as_str()).unwrap();
+    let config =
+        Config::read_config(args.config_file.as_str()).context("Failed to read config file")?;
     info!(?config, "Config");
 
-    let wallet: LocalWallet = args.private_key.parse::<LocalWallet>().unwrap();
+    let wallet: LocalWallet = args
+        .private_key
+        .parse::<LocalWallet>()
+        .expect("Failed to parse private key");
     let address = wallet.address();
     info!(?address, "Solver address");
 

@@ -23,8 +23,8 @@ use crate::common::create_e2e_config;
 
 #[tokio::test]
 async fn test_swap_and_bridge_preview() -> Result<()> {
-    let config = create_e2e_config();
-    let connector = create_connector().await.unwrap();
+    let config = create_e2e_config().unwrap();
+    let connector = create_connector().await?;
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config.clone(), connector.clone()).await?;
     let inventory = Arc::new(inventory);
@@ -39,22 +39,16 @@ async fn test_swap_and_bridge_preview() -> Result<()> {
         connector.clone(),
         quoter.clone(),
         inventory.clone(),
-    );
+    )
+    .unwrap();
 
-    let kai_token = inventory
-        .find_token_by_symbol("KAI".into(), KHALANI_CHAIN_ID)
-        .unwrap();
+    let kai_token = inventory.find_token_by_symbol("KAI".into(), KHALANI_CHAIN_ID)?;
 
-    let usdc_sepolia = inventory
-        .find_token_by_symbol("USDC".into(), SEPOLIA_CHAIN_ID)
-        .unwrap();
-    let usdt_sepolia = inventory
-        .find_token_by_symbol("USDT".into(), SEPOLIA_CHAIN_ID)
-        .unwrap();
+    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), SEPOLIA_CHAIN_ID)?;
+    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), SEPOLIA_CHAIN_ID)?;
 
-    let usdt_sepolia_mirror_token = inventory
-        .find_token_by_symbol("USDT.sepolia".into(), KHALANI_CHAIN_ID)
-        .unwrap();
+    let usdt_sepolia_mirror_token =
+        inventory.find_token_by_symbol("USDT.sepolia".into(), KHALANI_CHAIN_ID)?;
 
     let sender = connector.get_address();
     let source_amount = U256::from_str_radix("1000000000", 10).unwrap();
@@ -109,8 +103,8 @@ async fn test_swap_and_bridge_preview() -> Result<()> {
 #[ignore]
 #[tokio::test]
 async fn test_swap_and_bridge_executor() -> Result<()> {
-    let config = create_e2e_config();
-    let connector = create_connector().await.unwrap();
+    let config = create_e2e_config().unwrap();
+    let connector = create_connector().await?;
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config.clone(), connector.clone()).await?;
     let inventory = Arc::new(inventory);
@@ -125,15 +119,12 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
         connector,
         quoter.clone(),
         inventory.clone(),
-    );
+    )
+    .unwrap();
     let executor = SwapAndBridgeExecutor::new(handler);
 
-    let usdc_sepolia = inventory
-        .find_token_by_symbol("USDC".into(), SEPOLIA_CHAIN_ID)
-        .unwrap();
-    let usdt_sepolia = inventory
-        .find_token_by_symbol("USDT".into(), SEPOLIA_CHAIN_ID)
-        .unwrap();
+    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), SEPOLIA_CHAIN_ID)?;
+    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), SEPOLIA_CHAIN_ID)?;
 
     let source_amount = U256::from_str_radix("1000000000", 10).unwrap();
     let intent_swap_usdc_to_usdt_sepolia = SwapIntent {

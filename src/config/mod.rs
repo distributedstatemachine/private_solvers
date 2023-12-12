@@ -17,6 +17,7 @@ use std::collections::HashMap;
 use std::{env, fs};
 
 use crate::config::balancer::{BalancerConfig, BalancerConfigRaw};
+use crate::error::ConfigError;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigRaw {
     pub addresses: AddressesConfigRaw,
@@ -38,100 +39,111 @@ impl Config {
         let file_content = fs::read_to_string(file_path)?;
         let config: ConfigRaw = serde_json::from_str(&file_content)?;
         let addresses_config_raw = config.addresses;
-        let chains: Vec<ChainConfig> = config
+        let chains = config
             .chains
             .iter()
             .map(Self::create_chain_config)
-            .collect();
+            .collect::<Result<Vec<ChainConfig>>>()?;
         let addresses = AddressesConfig {
-            intents_mempool_address: addresses_config_raw
-                .intents_mempool_address
-                .parse::<Address>()
-                .unwrap(),
-            settlement_reactor_address: addresses_config_raw
-                .settlement_reactor_address
-                .parse::<Address>()
-                .unwrap(),
-            verifiers: addresses_config_raw
-                .verifiers
-                .iter()
-                .flat_map(|(verifier_chain_name, prover_chains)| {
+            intents_mempool_address: Self::parse_address(
+                &addresses_config_raw.intents_mempool_address,
+                "intents_mempool_address",
+            )?,
+            settlement_reactor_address: Self::parse_address(
+                &addresses_config_raw.settlement_reactor_address,
+                "settlement_reactor_address",
+            )?,
+            verifiers: {
+                let mut verifier_addresses = Vec::new();
+                for (verifier_chain_name, prover_chains) in &addresses_config_raw.verifiers {
                     let verifier_chain_config = chains
                         .iter()
                         .find(|chain| &chain.name == verifier_chain_name)
-                        .unwrap();
+                        .context(ConfigError::FieldNotFound(
+                            String::from("Verifier chain"),
+                            verifier_chain_name.clone(),
+                        ))?;
                     let verifier_chain_id = verifier_chain_config.chain_id;
                     let prover_chain_to_verifier_address =
-                        Self::parse_chain_to_address_map(prover_chains, &chains);
-                    let verifier_addresses: Vec<VerifierConfig> = prover_chain_to_verifier_address
-                        .iter()
-                        .map(|(prover_chain_id, verifier_address)| VerifierConfig {
-                            verifier_chain_id,
-                            prover_chain_id: *prover_chain_id,
-                            verifier_address: *verifier_address,
-                        })
-                        .collect();
-                    verifier_addresses
-                })
-                .collect(),
-            escrows: Self::parse_chain_to_address_map(&addresses_config_raw.escrows, &chains),
+                        Self::parse_chain_to_address_map(prover_chains, &chains)?;
+                    let verifier_addresses_vec: Vec<VerifierConfig> =
+                        prover_chain_to_verifier_address
+                            .iter()
+                            .map(|(prover_chain_id, verifier_address)| VerifierConfig {
+                                verifier_chain_id,
+                                prover_chain_id: *prover_chain_id,
+                                verifier_address: *verifier_address,
+                            })
+                            .collect();
+                    verifier_addresses.extend(verifier_addresses_vec);
+                }
+                verifier_addresses
+            },
+            escrows: Self::parse_chain_to_address_map(&addresses_config_raw.escrows, &chains)?,
             swap_intent_fillers: Self::parse_chain_to_address_map(
                 &addresses_config_raw.swap_intent_fillers,
                 &chains,
-            ),
+            )?,
         };
 
-        let tokens: Vec<TokenConfig> = config
-            .tokens
-            .iter()
-            .flat_map(|(chain_name, tokens)| {
-                let chain_config = chains
-                    .iter()
-                    .find(|chain| &chain.name == chain_name)
-                    .unwrap();
-                tokens.iter().map(|token| TokenConfig {
-                    chain_id: chain_config.chain_id,
-                    address: token.address.parse::<Address>().unwrap(),
-                })
-            })
-            .collect();
-
-        let balancer_config_raw = config.balancer;
-        let batch_swap_steps_from_kai: HashMap<TokenConfig, Vec<BalancerPool>> =
-            balancer_config_raw
-                .batch_swap_steps_from_kai
+        let mut result_tokens = Vec::new();
+        for (chain_name, tokens) in &config.tokens {
+            let chain_config = chains
                 .iter()
-                .map(|(token_address, pools_addresses)| {
-                    (
-                        (tokens
-                            .iter()
-                            .find(|token_config| {
-                                token_config.address == token_address.parse::<Address>().unwrap()
-                            })
-                            .unwrap())
-                        .clone(),
-                        pools_addresses
-                            .iter()
-                            .map(|i| BalancerPool {
-                                id: i.parse::<H256>().unwrap(),
-                            })
-                            .collect(),
+                .find(|chain| &chain.name == chain_name)
+                .ok_or_else(|| {
+                    ConfigError::FieldNotFound(String::from("Token chain"), chain_name.to_string())
+                })?;
+
+            for token in tokens {
+                result_tokens.push(TokenConfig {
+                    chain_id: chain_config.chain_id,
+                    address: Self::parse_address(&token.address, "token_address")?,
+                });
+            }
+        }
+
+        let tokens: Vec<TokenConfig> = result_tokens;
+        let balancer_config_raw = config.balancer;
+        let mut batch_swap_steps_from_kai = HashMap::new();
+
+        for (token_address, pools_addresses) in &balancer_config_raw.batch_swap_steps_from_kai {
+            let token_address = Self::parse_address(token_address, "Balance token_address")?;
+            let token_config = tokens
+                .iter()
+                .find(|token_config| token_config.address == token_address)
+                .cloned()
+                .ok_or_else(|| {
+                    ConfigError::FieldNotFound(
+                        String::from("Token address"),
+                        token_address.to_string(),
                     )
-                })
-                .collect();
+                })?;
+
+            let mut pool_addresses = Vec::new();
+            for pool_address in pools_addresses.iter() {
+                let id = pool_address.parse::<H256>().map_err(|_| {
+                    ConfigError::FailedParseAddress(String::from("pool"), pool_address.to_string())
+                })?;
+
+                pool_addresses.push(BalancerPool { id });
+            }
+
+            batch_swap_steps_from_kai.insert(token_config.clone(), pool_addresses);
+        }
 
         Ok(Config {
             addresses,
             balancer: BalancerConfig {
                 batch_swap_steps_from_kai,
-                vault_address: balancer_config_raw
-                    .vault_address
-                    .parse::<Address>()
-                    .unwrap(),
-                interchain_liquidity_hub_address: balancer_config_raw
-                    .interchain_liquidity_hub_address
-                    .parse::<Address>()
-                    .unwrap(),
+                vault_address: Self::parse_address(
+                    &balancer_config_raw.vault_address,
+                    "vault_address",
+                )?,
+                interchain_liquidity_hub_address: Self::parse_address(
+                    &balancer_config_raw.interchain_liquidity_hub_address,
+                    "interchain_liquidity_hub_address",
+                )?,
             },
             chains,
             tokens,
@@ -141,37 +153,54 @@ impl Config {
     fn parse_chain_to_address_map(
         chain_to_address_map: &HashMap<String, String>,
         chains: &[ChainConfig],
-    ) -> HashMap<ChainId, Address> {
-        chain_to_address_map
-            .iter()
-            .map(|(chain_name, address)| {
-                let chain_config = chains
-                    .iter()
-                    .find(|chain| &chain.name == chain_name)
-                    .unwrap();
-                (chain_config.chain_id, address.parse::<Address>().unwrap())
-            })
-            .collect()
+    ) -> Result<HashMap<ChainId, Address>> {
+        let mut result_map = HashMap::new();
+
+        for (chain_name, address) in chain_to_address_map.iter() {
+            let chain_config = chains
+                .iter()
+                .find(|chain| &chain.name == chain_name)
+                .ok_or_else(|| {
+                    ConfigError::FieldNotFound(String::from("Chain"), chain_name.to_string())
+                })?;
+
+            let parsed_address = Self::parse_address(address, "chain_address")?;
+            result_map.insert(chain_config.chain_id, parsed_address);
+        }
+
+        Ok(result_map)
     }
 
-    fn create_chain_config(chain_raw: &ChainConfigRaw) -> ChainConfig {
-        let rpc_url = Self::parse_url(chain_raw.rpc_url.as_str());
-        let ws_url = Self::parse_url(chain_raw.ws_url.as_str());
-        ChainConfig {
+    fn create_chain_config(chain_raw: &ChainConfigRaw) -> Result<ChainConfig> {
+        let rpc_url = Self::parse_url(chain_raw.rpc_url.as_str())?;
+        let ws_url = Self::parse_url(chain_raw.ws_url.as_str())?;
+        Ok(ChainConfig {
             name: chain_raw.name.clone(),
             chain_id: chain_raw.chain_id,
             rpc_url,
             ws_url,
+        })
+    }
+
+    fn parse_url(url: &str) -> Result<String> {
+        if url.starts_with('$') {
+            Ok(
+                env::var(url.trim_start_matches('$')).context(ConfigError::FieldNotFound(
+                    String::from("URL from ENV variable"),
+                    url.to_string(),
+                ))?,
+            )
+        } else {
+            Ok(String::from(url))
         }
     }
 
-    fn parse_url(url: &str) -> String {
-        if url.starts_with('$') {
-            env::var(url.trim_start_matches('$'))
-                .context(format!("Unable to find ENV variable {}", url))
-                .unwrap()
-        } else {
-            String::from(url)
-        }
+    fn parse_address(address: &str, field_name: &str) -> Result<Address> {
+        address
+            .parse::<Address>()
+            .context(ConfigError::FailedParseAddress(
+                field_name.to_string(),
+                address.to_string(),
+            ))
     }
 }
