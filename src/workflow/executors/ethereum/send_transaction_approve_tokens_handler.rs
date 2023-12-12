@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use bindings_khalani::erc20::ERC20;
 
 use crate::config::balancer::BalancerConfig;
-use crate::config::chain::KHALANI_CHAIN_ID;
+use crate::config::chain::ChainId;
 use crate::connectors::Connector;
 use crate::ethereum::transaction::submit_transaction;
 use crate::inventory::Inventory;
@@ -39,13 +39,15 @@ impl ApproveTokensHandler for SendTransactionApproveTokensHandler {
         info!(?quoted_intent, "Approving tokens before the Vault trade");
         let kai_token = self
             .inventory
-            .find_token_by_symbol("KAI".into(), KHALANI_CHAIN_ID)?;
+            .find_token_by_symbol("KAI".into(), ChainId::Khalani)?;
 
         let spender = self.balancer_config.interchain_liquidity_hub_address;
-        let rpc_client = self.connector.get_rpc_client(KHALANI_CHAIN_ID)?;
+        let rpc_client = self.connector.get_rpc_client(ChainId::Khalani)?;
         let erc20 = ERC20::new(kai_token.address, rpc_client);
         let mut function = erc20.approve(spender, quoted_intent.kai_amount.base_units);
-        function.tx.set_chain_id(KHALANI_CHAIN_ID);
+        function
+            .tx
+            .set_chain_id(Into::<u32>::into(ChainId::Khalani));
         function.tx.set_gas_price(8);
         function.tx.set_gas(7000000);
         let receipt = submit_transaction(function).await?;

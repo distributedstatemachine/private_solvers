@@ -1,4 +1,4 @@
-use crate::config::chain::KHALANI_CHAIN_ID;
+use crate::config::chain::ChainId;
 use crate::connectors::RpcClient;
 use anyhow::{anyhow, Result};
 use ethers::abi::Detokenize;
@@ -12,9 +12,8 @@ pub async fn submit_transaction<D: Detokenize>(
     mut transaction: ContractCall<RpcClient, D>,
 ) -> Result<TransactionReceipt> {
     debug!(?transaction.tx, "Dispatching transaction");
-
     if let Some(chain_id) = transaction.tx.chain_id() {
-        if chain_id.as_u64() == KHALANI_CHAIN_ID {
+        if chain_id.as_u32() == Into::<u32>::into(ChainId::Khalani) {
             transaction.tx.set_gas_price(8);
             transaction.tx.set_gas(7000000);
         }

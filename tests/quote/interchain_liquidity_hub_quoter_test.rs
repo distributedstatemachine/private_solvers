@@ -4,8 +4,7 @@ use std::sync::Arc;
 use anyhow::{Context, Result};
 use ethers::types::U256;
 
-use khalani_solver::config::chain::FUJI_CHAIN_ID;
-use khalani_solver::config::chain::SEPOLIA_CHAIN_ID;
+use khalani_solver::config::chain::ChainId;
 use khalani_solver::inventory::Inventory;
 use khalani_solver::quote::intent_quoter::IntentQuoter;
 use khalani_solver::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
@@ -25,19 +24,26 @@ async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
     let quoter =
         InterchainLiquidityHubQuoter::new(connector, inventory.clone(), config.balancer.clone());
 
-    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), SEPOLIA_CHAIN_ID)?;
-    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), SEPOLIA_CHAIN_ID)?;
-    let usdc_fuji = inventory.find_token_by_symbol("USDC".into(), FUJI_CHAIN_ID)?;
-    let usdt_fuji = inventory.find_token_by_symbol("USDT".into(), FUJI_CHAIN_ID)?;
+    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia.into())?;
+    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), ChainId::Sepolia.into())?;
+    let usdc_fuji = inventory.find_token_by_symbol("USDC".into(), ChainId::Fuji.into())?;
+    let usdt_fuji = inventory.find_token_by_symbol("USDT".into(), ChainId::Fuji.into())?;
 
     let source_amount =
         U256::from_str_radix("1000000000", 10).context("Failed to parse source amount")?;
     let intent_swap_usdc_to_usdt_sepolia = SwapIntent {
         source_token: usdc_sepolia.address,
         destination_token: usdt_sepolia.address,
-        destination_chain_id: SEPOLIA_CHAIN_ID.try_into()?,
+        destination_chain_id: ChainId::Sepolia.into(),
         source_amount,
-        ..Default::default()
+
+        intent_id: Default::default(),
+        author: Default::default(),
+        signature: Default::default(),
+        source_permit_2: Default::default(),
+        deadline: Default::default(),
+        source_chain_id: ChainId::Fuji,
+        nonce: Default::default(),
     };
 
     let intent_swap_usdt_to_usdc_sepolia = SwapIntent {
@@ -49,14 +55,14 @@ async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
     let intent_swap_usdc_to_usdt_fuji = SwapIntent {
         source_token: usdc_fuji.address,
         destination_token: usdt_fuji.address,
-        destination_chain_id: FUJI_CHAIN_ID.try_into()?,
+        destination_chain_id: ChainId::Fuji.into(),
         ..intent_swap_usdc_to_usdt_sepolia.clone()
     };
 
     let intent_swap_usdt_to_usdc_fuji = SwapIntent {
         source_token: usdt_fuji.address,
         destination_token: usdc_fuji.address,
-        destination_chain_id: FUJI_CHAIN_ID.try_into()?,
+        destination_chain_id: ChainId::Fuji.into(),
         ..intent_swap_usdc_to_usdt_sepolia.clone()
     };
 

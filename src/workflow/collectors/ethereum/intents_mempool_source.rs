@@ -11,7 +11,7 @@ use futures::StreamExt;
 use std::time::Duration;
 use tracing::{debug, error, info};
 
-use crate::config::chain::KHALANI_CHAIN_ID;
+use crate::config::chain::ChainId;
 use crate::connectors::{Connector, RpcClient};
 use crate::types::swap_intent::SwapIntent;
 use crate::workflow::collectors::swap_intent_collector::SwapIntentSource;
@@ -24,7 +24,7 @@ pub struct IntentsMempoolSource {
 
 impl IntentsMempoolSource {
     pub fn new(connector: Arc<Connector>, intents_mempool_address: Address) -> Self {
-        let rpc_client = connector.get_rpc_client(KHALANI_CHAIN_ID).unwrap();
+        let rpc_client = connector.get_rpc_client(ChainId::Khalani).unwrap();
         let intents_mempool = IntentsMempool::new(intents_mempool_address, rpc_client.clone());
 
         Self {
@@ -87,12 +87,21 @@ impl SwapIntentSource for IntentsMempoolSource {
                 };
 
                 for event in events {
-                    let swap_intent: SwapIntent = event.intent.into();
-                    info!(?swap_intent, "New swap intent received");
-                    yield SwapIntent {
-                        intent_id: event.intent_id.into(),
-                        ..swap_intent
-                    };
+                    let swap_intent: Result<SwapIntent> = event.intent.try_into();
+                    match swap_intent {
+                        Ok(swap_intent) => {
+                            info!(?swap_intent, "New swap intent received");
+                            yield SwapIntent {
+                                intent_id: event.intent_id.into(),
+                                ..swap_intent
+                            };
+                        }
+                        Err(e) => {
+                            error!(?e, "Error parsing intent");
+                            continue;
+                        }
+                    }
+
                 }
 
                 previous_block_number = current_block_number + 1;

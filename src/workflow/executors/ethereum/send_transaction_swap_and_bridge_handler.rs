@@ -3,9 +3,8 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::config::balancer::BalancerConfig;
-use crate::config::chain::KHALANI_CHAIN_ID;
+use crate::config::chain::ChainId;
 use crate::connectors::{Connector, RpcClient};
-use crate::error::ChainError;
 use crate::ethereum::transaction::submit_transaction;
 use crate::inventory::token::Token;
 use crate::inventory::token_allowance_query::TokenAllowanceQuery;
@@ -47,8 +46,8 @@ impl SendTransactionSwapAndBridgeHandler {
         connector: Arc<Connector>,
         quoter: Arc<InterchainLiquidityHubQuoter>,
         inventory: Arc<Inventory>,
-    ) -> Result<Self, ChainError> {
-        let client = connector.get_rpc_client(KHALANI_CHAIN_ID)?;
+    ) -> Result<Self> {
+        let client = connector.get_rpc_client(ChainId::Khalani)?;
         let vault_contract = Vault::new(balancer_config.vault_address, client.clone());
         let interchain_liquidity_hub = InterchainLiquidityHubWrapper::new(
             balancer_config.interchain_liquidity_hub_address,
@@ -98,7 +97,7 @@ impl SendTransactionSwapAndBridgeHandler {
 
         let tokens = self.quoter.get_tokens(
             quoted_intent.swap_intent.destination_token,
-            quoted_intent.swap_intent.destination_chain_id.into(),
+            quoted_intent.swap_intent.destination_chain_id,
         )?;
 
         let assets = vec![
@@ -172,7 +171,7 @@ impl SendTransactionSwapAndBridgeHandler {
         }
 
         let mut withdraw_liquidity_function = self.interchain_liquidity_hub.withdraw_liquidity(
-            quoted_intent.swap_intent.destination_chain_id.into(),
+            Into::<u32>::into(quoted_intent.swap_intent.destination_chain_id).into(),
             sender,
             batch_swaps_liquidity_hub,
             assets,
@@ -181,7 +180,7 @@ impl SendTransactionSwapAndBridgeHandler {
         );
         withdraw_liquidity_function
             .tx
-            .set_chain_id(KHALANI_CHAIN_ID);
+            .set_chain_id(Into::<u32>::into(ChainId::Khalani));
         withdraw_liquidity_function.tx.set_gas_price(8);
         withdraw_liquidity_function.tx.set_gas(7000000);
 

@@ -3,7 +3,7 @@ pub mod token;
 pub mod token_allowance_query;
 pub mod token_balance_query;
 
-use crate::config::chain::{ChainId, KHALANI_CHAIN_ID};
+use crate::config::chain::ChainId;
 use crate::config::token::TokenConfig;
 use crate::config::Config;
 use crate::connectors::Connector;
@@ -75,7 +75,9 @@ impl Inventory {
         self.tokens
             .iter()
             .find(|&i| i.symbol == symbol && i.chain_id == chain_id)
-            .ok_or_else(|| TokenError::UnsupportedMirrorToken(symbol.to_string(), chain_id).into())
+            .ok_or_else(|| {
+                TokenError::UnsupportedMirrorToken(symbol.to_string(), chain_id.into()).into()
+            })
     }
 
     pub fn find_token_by_symbol_partial_match(
@@ -89,7 +91,9 @@ impl Inventory {
                 i.symbol.matches(&symbol).collect::<Vec<&str>>().len() == 1
                     && i.chain_id == chain_id
             })
-            .ok_or_else(|| TokenError::UnsupportedMirrorToken(symbol.to_string(), chain_id).into())
+            .ok_or_else(|| {
+                TokenError::UnsupportedMirrorToken(symbol.to_string(), chain_id.into()).into()
+            })
     }
 
     pub fn find_mirror_token(
@@ -108,13 +112,13 @@ impl Inventory {
             .chains
             .iter()
             .find(|chain| chain.chain_id == spoke_chain_id)
-            .ok_or(ChainError::ChainNotFound(spoke_chain_id))?;
+            .ok_or(ChainError::ChainNotFound(spoke_chain_id.into()))?;
         let mut mirror_token_symbol: String = generalized_token_symbol.to_string();
         mirror_token_symbol.push('.');
         mirror_token_symbol.push_str(&spoke_chain.name);
 
         let mirror_token =
-            self.find_token_by_symbol(mirror_token_symbol.clone(), KHALANI_CHAIN_ID)?;
+            self.find_token_by_symbol(mirror_token_symbol.clone(), ChainId::Khalani)?;
 
         Ok(mirror_token)
     }

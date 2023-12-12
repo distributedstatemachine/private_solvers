@@ -1,11 +1,33 @@
+use alloy_primitives::private::derive_more::Display;
+use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 
-pub type ChainId = u64;
+#[derive(Display, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum ChainId {
+    Sepolia = 11155111,
+    Fuji = 43113,
+    Khalani = 10012,
+}
 
-// TODO: create an enum, use 'strum' crate?
-pub const SEPOLIA_CHAIN_ID: ChainId = 11155111;
-pub const FUJI_CHAIN_ID: ChainId = 43113;
-pub const KHALANI_CHAIN_ID: ChainId = 10012;
+impl From<ChainId> for u32 {
+    fn from(chain_id_enum: ChainId) -> Self {
+        chain_id_enum as u32
+    }
+}
+
+impl TryFrom<u32> for ChainId {
+    type Error = anyhow::Error;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        // TODO: 'strum' crate may reduce this boilerplate.
+        match value {
+            11155111 => Ok(ChainId::Sepolia),
+            43113 => Ok(ChainId::Fuji),
+            10012 => Ok(ChainId::Khalani),
+            _ => Err(anyhow!("Unknown chain ID {value}")),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct ChainConfig {
@@ -18,7 +40,7 @@ pub struct ChainConfig {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ChainConfigRaw {
     pub name: String,
-    pub chain_id: u64,
+    pub chain_id: u32,
     // TODO: parse from ENV or a secret file.
     pub rpc_url: String,
     pub ws_url: String,

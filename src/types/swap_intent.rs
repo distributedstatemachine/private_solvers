@@ -1,15 +1,15 @@
+use crate::config::chain::ChainId;
 use crate::types::intent_id::IntentId;
 use ethers::types::{Address, Bytes, U256};
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SwapIntent {
     pub intent_id: IntentId,
 
     pub author: Address,
     pub signature: Bytes,
-    // TODO: use ChainId type.
-    pub source_chain_id: u32,
-    pub destination_chain_id: u32,
+    pub source_chain_id: ChainId,
+    pub destination_chain_id: ChainId,
     pub source_token: Address,
     pub destination_token: Address,
     pub source_amount: U256,
@@ -18,23 +18,27 @@ pub struct SwapIntent {
     pub nonce: U256,
 }
 
-impl From<bindings_khalani::shared_types::SwapIntent> for SwapIntent {
-    fn from(value: bindings_khalani::abstract_request_processor::SwapIntent) -> Self {
-        SwapIntent {
+impl TryFrom<bindings_khalani::shared_types::SwapIntent> for SwapIntent {
+    type Error = anyhow::Error;
+
+    fn try_from(
+        value: bindings_khalani::abstract_request_processor::SwapIntent,
+    ) -> Result<Self, Self::Error> {
+        Ok(SwapIntent {
             // TODO: create a function to purely calculate the intent ID.
             intent_id: Default::default(),
 
             author: value.author,
             signature: value.signature,
-            source_chain_id: value.source_chain_id,
-            destination_chain_id: value.destination_chain_id,
+            source_chain_id: value.source_chain_id.try_into()?,
+            destination_chain_id: value.destination_chain_id.try_into()?,
             source_token: value.source_token,
             destination_token: value.destination_token,
             source_amount: value.source_amount,
             source_permit_2: value.source_permit_2,
             deadline: value.deadline,
             nonce: value.nonce,
-        }
+        })
     }
 }
 
@@ -44,8 +48,8 @@ impl From<SwapIntent> for bindings_khalani::shared_types::SwapIntent {
         Self {
             author: value.author,
             signature: value.signature,
-            source_chain_id: value.source_chain_id,
-            destination_chain_id: value.destination_chain_id,
+            source_chain_id: value.source_chain_id.into(),
+            destination_chain_id: value.destination_chain_id.into(),
             source_token: value.source_token,
             destination_token: value.destination_token,
             source_amount: value.source_amount,

@@ -12,7 +12,7 @@ pub enum ConfigError {
     #[error("Failed to parse private key")]
     FailedParsePrivateKey(),
     #[error("{0} contract address not found for chain ID: {1}")]
-    ContractAddressNotFound(String, u64),
+    ContractAddressNotFound(String, u32),
 }
 
 #[derive(Debug, Error)]
@@ -22,15 +22,15 @@ pub enum ChainError {
     #[error("Failed to create a WebSocket client for chain {0}")]
     FailedCreateWebsocket(String),
     #[error("RPC client not found for chain ID {0}")]
-    ClientNotFound(u64),
+    ClientNotFound(u32),
     #[error("Can not find chain for spoke chain id {0}")]
-    ChainNotFound(u64),
+    ChainNotFound(u32),
 }
 
 #[derive(Debug, Error)]
 pub enum TokenError {
     #[error("Unsupported mirror token with symbol {0} and chain id: {1}")]
-    UnsupportedMirrorToken(String, u64),
+    UnsupportedMirrorToken(String, u32),
     #[error("Unsupported spoke chain token with address {0}")]
     UnsupportedSpokeChainToken(H160),
 }

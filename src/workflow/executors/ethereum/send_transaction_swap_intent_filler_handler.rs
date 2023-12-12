@@ -64,7 +64,7 @@ impl SendTransactionSwapIntentFillerHandler {
         &self,
         quoted_intent: &QuotedIntent,
     ) -> Result<ContractCall<RpcClient, ()>> {
-        let destination_chain_id = quoted_intent.swap_intent.destination_chain_id.into();
+        let destination_chain_id = quoted_intent.swap_intent.destination_chain_id;
         let rpc_client = self.connector.get_rpc_client(destination_chain_id)?;
         let swap_intent_filler_address = self
             .addresses_config
@@ -73,7 +73,7 @@ impl SendTransactionSwapIntentFillerHandler {
             .ok_or_else(|| {
                 ConfigError::ContractAddressNotFound(
                     String::from("Swap intent filler"),
-                    destination_chain_id,
+                    destination_chain_id.into(),
                 )
             })?;
         let swap_intent_filler = SwapIntentFiller::new(*swap_intent_filler_address, rpc_client);
@@ -83,7 +83,7 @@ impl SendTransactionSwapIntentFillerHandler {
             solver_address,
             quoted_intent.destination_amount.base_units,
         );
-        call.tx.set_chain_id(destination_chain_id);
+        call.tx.set_chain_id(destination_chain_id as u64);
         Ok(call)
     }
 }

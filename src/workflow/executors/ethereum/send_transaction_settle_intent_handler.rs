@@ -7,7 +7,7 @@ use ethers::contract::ContractCall;
 use tracing::info;
 
 use crate::config::addresses::AddressesConfig;
-use crate::config::chain::KHALANI_CHAIN_ID;
+use crate::config::chain::ChainId;
 use crate::connectors::{Connector, RpcClient};
 use crate::error::ChainError;
 use crate::ethereum::transaction::submit_transaction;
@@ -53,7 +53,7 @@ impl SendTransactionSettleIntentHandler {
         &self,
         swap_intent_settlement_data: &SwapIntentSettlementData,
     ) -> Result<ContractCall<RpcClient, ()>, ChainError> {
-        let rpc_client = self.connector.get_rpc_client(KHALANI_CHAIN_ID)?;
+        let rpc_client = self.connector.get_rpc_client(ChainId::Khalani)?;
         let settlement_reactor =
             SettlementReactor::new(self.addresses_config.settlement_reactor_address, rpc_client);
         let mut call = settlement_reactor.settle(
@@ -66,7 +66,7 @@ impl SendTransactionSettleIntentHandler {
             swap_intent_settlement_data.fill_timestamp,
             swap_intent_settlement_data.fill_amount,
         );
-        call.tx.set_chain_id(KHALANI_CHAIN_ID);
+        call.tx.set_chain_id(Into::<u32>::into(ChainId::Khalani));
         Ok(call)
     }
 }

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::config::balancer::{BalancerConfig, BalancerPool};
-use crate::config::chain::{ChainId, KHALANI_CHAIN_ID};
+use crate::config::chain::ChainId;
 use crate::connectors::{Connector, RpcClient};
 use crate::inventory::amount::Amount;
 use crate::inventory::Inventory;
@@ -30,7 +30,7 @@ impl InterchainLiquidityHubQuoter {
         inventory: Arc<Inventory>,
         balancer_config: BalancerConfig,
     ) -> Self {
-        let client = connector.get_rpc_client(KHALANI_CHAIN_ID).unwrap();
+        let client = connector.get_rpc_client(ChainId::Khalani).unwrap();
         let vault_contract = Vault::new(balancer_config.vault_address, client.clone());
 
         Self {
@@ -110,10 +110,10 @@ impl InterchainLiquidityHubQuoter {
 
         let kai_token = self
             .inventory
-            .find_token_by_symbol("KAI".into(), KHALANI_CHAIN_ID)?;
+            .find_token_by_symbol("KAI".into(), ChainId::Khalani)?;
         let kln_token = self
             .inventory
-            .find_token_by_symbol_partial_match(kln_token_symbol, KHALANI_CHAIN_ID)?;
+            .find_token_by_symbol_partial_match(kln_token_symbol, ChainId::Khalani)?;
 
         Ok(BalancerSwapTokensInvolved {
             destination_mirror_token: destination_mirror_token.clone(),
@@ -131,7 +131,7 @@ impl IntentQuoter for InterchainLiquidityHubQuoter {
 
         let tokens = self.get_tokens(
             swap_intent.destination_token,
-            swap_intent.destination_chain_id.into(),
+            swap_intent.destination_chain_id,
         )?;
 
         let assets = vec![

@@ -176,7 +176,7 @@ impl Config {
         let ws_url = Self::parse_url(chain_raw.ws_url.as_str())?;
         Ok(ChainConfig {
             name: chain_raw.name.clone(),
-            chain_id: chain_raw.chain_id,
+            chain_id: chain_raw.chain_id.try_into()?,
             rpc_url,
             ws_url,
         })

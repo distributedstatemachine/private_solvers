@@ -30,7 +30,7 @@ impl Connector {
         self.rpc_clients
             .get(&chain_id)
             .cloned()
-            .ok_or(ChainError::ClientNotFound(chain_id))
+            .ok_or(ChainError::ClientNotFound(chain_id.into()))
     }
 
     pub fn get_ws_client(&self, chain_id: ChainId) -> Option<Arc<WsClient>> {
@@ -66,8 +66,8 @@ impl Connector {
     ) -> Result<Arc<RpcClient>> {
         let client = Provider::<Http>::try_from(chain_config.rpc_url.clone())
             .context(ChainError::FailedCreateClient(chain_config.name.clone()))?;
-        let chain_id = client.get_chainid().await?.as_u64();
-        if chain_id != chain_config.chain_id {
+        let chain_id = client.get_chainid().await?.as_u32();
+        if chain_id != Into::<u32>::into(chain_config.chain_id) {
             return Err(anyhow!(
                 "Chain {} has chain ID '{}' but the configuration set '{}'",
                 chain_config.name,

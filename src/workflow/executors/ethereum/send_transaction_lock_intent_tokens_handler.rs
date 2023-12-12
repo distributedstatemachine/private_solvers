@@ -49,18 +49,18 @@ impl SendTransactionLockIntentTokensHandler {
         &self,
         swap_intent: &SwapIntent,
     ) -> Result<ContractCall<RpcClient, ()>> {
-        let source_chain_id = swap_intent.source_chain_id.into();
+        let source_chain_id = swap_intent.source_chain_id;
         let rpc_client = self.connector.get_rpc_client(source_chain_id)?;
         let escrow_address = self
             .addresses_config
             .escrows
             .get(&source_chain_id)
             .ok_or_else(|| {
-                ConfigError::ContractAddressNotFound(String::from("Escrow"), source_chain_id)
+                ConfigError::ContractAddressNotFound(String::from("Escrow"), source_chain_id.into())
             })?;
         let escrow = Escrow::new(*escrow_address, rpc_client);
         let mut call = escrow.lock_tokens(swap_intent.clone().into());
-        call.tx.set_chain_id(source_chain_id);
+        call.tx.set_chain_id(Into::<u32>::into(source_chain_id));
         Ok(call)
     }
 }

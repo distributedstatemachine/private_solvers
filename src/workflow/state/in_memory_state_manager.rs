@@ -35,12 +35,9 @@ impl StateManager for InMemoryStateManager {
         self.intents.values().cloned().collect()
     }
 
-    fn create_intent_state(&mut self, intent_id: IntentId, swap_intent: SwapIntent) -> IntentId {
-        let intent_state = IntentState {
-            intent_id,
-            swap_intent,
-            ..IntentState::default()
-        };
+    fn create_intent_state(&mut self, swap_intent: SwapIntent) -> IntentId {
+        let intent_id = swap_intent.intent_id;
+        let intent_state = IntentState::new(swap_intent);
         self.intents.insert(intent_id, intent_state);
         intent_id
     }

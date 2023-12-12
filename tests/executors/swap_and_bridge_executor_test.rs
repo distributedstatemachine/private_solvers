@@ -5,8 +5,7 @@ use anyhow::Result;
 use artemis_core::types::Executor;
 use ethers::types::U256;
 
-use khalani_solver::config::chain::KHALANI_CHAIN_ID;
-use khalani_solver::config::chain::SEPOLIA_CHAIN_ID;
+use khalani_solver::config::chain::ChainId;
 use khalani_solver::inventory::token_allowance_query::TokenAllowanceQuery;
 use khalani_solver::inventory::Inventory;
 use khalani_solver::quote::intent_quoter::IntentQuoter;
@@ -39,25 +38,31 @@ async fn test_swap_and_bridge_preview() -> Result<()> {
         connector.clone(),
         quoter.clone(),
         inventory.clone(),
-    )
-    .unwrap();
+    )?;
 
-    let kai_token = inventory.find_token_by_symbol("KAI".into(), KHALANI_CHAIN_ID)?;
+    let kai_token = inventory.find_token_by_symbol("KAI".into(), ChainId::Khalani)?;
 
-    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), SEPOLIA_CHAIN_ID)?;
-    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), SEPOLIA_CHAIN_ID)?;
+    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia)?;
+    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), ChainId::Sepolia)?;
 
     let usdt_sepolia_mirror_token =
-        inventory.find_token_by_symbol("USDT.sepolia".into(), KHALANI_CHAIN_ID)?;
+        inventory.find_token_by_symbol("USDT.sepolia".into(), ChainId::Khalani)?;
 
     let sender = connector.get_address();
     let source_amount = U256::from_str_radix("1000000000", 10).unwrap();
     let intent_swap_usdc_to_usdt_sepolia = SwapIntent {
         source_token: usdc_sepolia.address,
         destination_token: usdt_sepolia.address,
-        destination_chain_id: SEPOLIA_CHAIN_ID.try_into()?,
+        destination_chain_id: ChainId::Sepolia.into(),
         source_amount,
-        ..Default::default()
+
+        intent_id: Default::default(),
+        author: Default::default(),
+        deadline: Default::default(),
+        nonce: Default::default(),
+        source_chain_id: ChainId::Fuji,
+        signature: Default::default(),
+        source_permit_2: Default::default(),
     };
 
     let quoted_intent = quoter
@@ -93,8 +98,8 @@ async fn test_swap_and_bridge_preview() -> Result<()> {
 
     let expected_range = U256::from(900000000u64)..U256::from(1100000000u64);
 
-    assert!(preview.len() == 1);
-    assert!(preview[0].token_address == usdt_sepolia_mirror_token.address);
+    assert_eq!(preview.len(), 1);
+    assert_eq!(preview[0].token_address, usdt_sepolia_mirror_token.address);
     assert_in_range(preview[0].amount, expected_range.clone());
 
     Ok(())
@@ -123,16 +128,23 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
     .unwrap();
     let executor = SwapAndBridgeExecutor::new(handler);
 
-    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), SEPOLIA_CHAIN_ID)?;
-    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), SEPOLIA_CHAIN_ID)?;
+    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia.into())?;
+    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), ChainId::Sepolia.into())?;
 
     let source_amount = U256::from_str_radix("1000000000", 10).unwrap();
     let intent_swap_usdc_to_usdt_sepolia = SwapIntent {
         source_token: usdc_sepolia.address,
         destination_token: usdt_sepolia.address,
-        destination_chain_id: SEPOLIA_CHAIN_ID as u32,
+        destination_chain_id: ChainId::Sepolia.into(),
         source_amount,
-        ..Default::default()
+
+        intent_id: Default::default(),
+        author: Default::default(),
+        deadline: Default::default(),
+        nonce: Default::default(),
+        source_chain_id: ChainId::Fuji,
+        signature: Default::default(),
+        source_permit_2: Default::default(),
     };
 
     let quoted_intent = quoter

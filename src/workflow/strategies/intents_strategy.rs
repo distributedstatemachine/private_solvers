@@ -46,11 +46,10 @@ where
         match event {
             Event::NewSwapIntent(swap_intent) => {
                 info!(?swap_intent, "Received new swap intent");
-                let intent_id = swap_intent.intent_id;
                 self.state_manager
                     .lock()
                     .await
-                    .create_intent_state(intent_id, swap_intent.clone());
+                    .create_intent_state(swap_intent.clone());
                 info!(?swap_intent, "Quoting the swap intent");
                 match self.intent_quoter.quote_intent(swap_intent.clone()).await {
                     Ok(quoted_intent) => {

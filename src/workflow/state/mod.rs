@@ -8,7 +8,7 @@ use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerHan
 pub mod in_memory_state_manager;
 pub mod state_manager;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct IntentState {
     pub intent_id: IntentId,
     pub swap_intent: SwapIntent,
@@ -22,6 +22,18 @@ pub struct IntentState {
 }
 
 impl IntentState {
+    pub fn new(swap_intent: SwapIntent) -> Self {
+        IntentState {
+            intent_id: swap_intent.intent_id,
+            swap_intent,
+            quoted_intent: None,
+            lock_intent_tokens_handler_result: None,
+            filler_handler_result: None,
+            is_proved_that_filled_on_destination_chain: false,
+            is_proved_that_tokens_locked_on_source_chain: false,
+        }
+    }
+
     pub fn get_intent_id(&self) -> IntentId {
         self.intent_id
     }
