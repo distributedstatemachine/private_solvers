@@ -1,20 +1,17 @@
 use std::sync::Arc;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use artemis_core::engine::Engine;
-use clap::Parser;
-use ethers::signers::{LocalWallet, Signer};
 use tracing::info;
 
-use inventory::Inventory;
-use workflow::action::Action;
-use workflow::event::Event;
-
-use crate::config::Config;
 use crate::connectors::Connector;
 use crate::diagnostics::logs::configure_logs;
 use crate::workflow::engine::configure_engine;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
+use config::args::Args;
+use inventory::Inventory;
+use workflow::action::Action;
+use workflow::event::Event;
 
 pub mod config;
 pub mod connectors;
@@ -27,33 +24,11 @@ pub mod workflow;
 
 pub mod diagnostics;
 
-#[derive(Parser, Debug)]
-pub struct Args {
-    // TODO: move to the config file too.
-    /// Private key for sending txs.
-    #[arg(long)]
-    pub private_key: String,
-
-    #[arg(long)]
-    pub config_file: String,
-}
-
 #[tokio::main]
 async fn main() -> Result<()> {
     configure_logs();
 
-    let args = Args::parse();
-
-    let config =
-        Config::read_config(args.config_file.as_str()).context("Failed to read config file")?;
-    info!(?config, "Config");
-
-    let wallet: LocalWallet = args
-        .private_key
-        .parse::<LocalWallet>()
-        .expect("Failed to parse private key");
-    let address = wallet.address();
-    info!(?address, "Solver address");
+    let (config, wallet) = Args::get_config_and_wallet()?;
 
     let state_manager = InMemoryStateManager::new();
 
