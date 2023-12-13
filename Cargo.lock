@@ -734,7 +734,7 @@ name = "cross-chain-market-maker"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "khalani-solver",
+ "solver-common",
  "tokio",
  "tracing",
 ]
@@ -2020,7 +2020,7 @@ name = "intentbook-matchmaker"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "khalani-solver",
+ "solver-common",
  "tokio",
  "tracing",
 ]
@@ -2275,28 +2275,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f6d5ed8676d904364de097082f4e7d240b571b67989ced0240f08b7f966f940"
 dependencies = [
  "cpufeatures",
-]
-
-[[package]]
-name = "khalani-solver"
-version = "0.1.0"
-dependencies = [
- "alloy-primitives",
- "anyhow",
- "artemis-core",
- "async-stream",
- "async-trait",
- "bindings-balancer",
- "bindings-khalani",
- "clap",
- "ethers",
- "futures",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -3878,6 +3856,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "solver-common"
+version = "0.1.0"
+dependencies = [
+ "alloy-primitives",
+ "anyhow",
+ "artemis-core",
+ "async-stream",
+ "async-trait",
+ "bindings-khalani",
+ "clap",
+ "ethers",
+ "futures",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "spin"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3904,7 +3903,7 @@ name = "spoke-chain-caller"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "khalani-solver",
+ "solver-common",
  "tokio",
  "tracing",
 ]
@@ -3986,10 +3985,23 @@ dependencies = [
 name = "swap-intent-settler"
 version = "0.1.0"
 dependencies = [
+ "alloy-primitives",
  "anyhow",
- "khalani-solver",
+ "artemis-core",
+ "async-stream",
+ "async-trait",
+ "bindings-balancer",
+ "bindings-khalani",
+ "clap",
+ "ethers",
+ "futures",
+ "serde",
+ "serde_json",
+ "solver-common",
+ "thiserror",
  "tokio",
  "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

@@ -1,11 +1,10 @@
 [package]
-name = "swap-intent-settler"
-version.workspace = true
+name = "solver-common"
 edition.workspace = true
+publish.workspace = true
+version.workspace = true
 
 [dependencies]
-solver-common = { path = "../solver-common" }
-bindings-balancer = { path = "../crates/bindings-balancer" }
 bindings-khalani = { path = "../crates/bindings-khalani" }
 
 artemis-core.workspace = true

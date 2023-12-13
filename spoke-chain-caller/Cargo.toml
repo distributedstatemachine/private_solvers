@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-khalani-solver = { path = "../" }
+solver-common = { path = "../solver-common" }
 
 tokio.workspace = true
 anyhow.workspace = true
