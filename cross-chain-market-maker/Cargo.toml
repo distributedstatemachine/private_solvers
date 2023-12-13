@@ -1,0 +1,11 @@
+[package]
+name = "cross-chain-market-maker"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+khalani-solver = { path = "../" }
+
+tokio.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

@@ -1,0 +1,11 @@
+[package]
+name = "swap-intent-settler"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+khalani-solver = { path = "../" }
+
+tokio.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
