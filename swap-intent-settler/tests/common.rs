@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use ethers::prelude::LocalWallet;
 use solver_common::config::Config;
 use solver_common::connectors::Connector;
+use std::env;
 use std::path::Path;
 
 // https://sepolia.etherscan.io/address/0x18F814fA6CB21cC51ae0C5594418766F17DFb6A9
@@ -21,11 +22,9 @@ pub async fn create_connector() -> Result<Connector> {
 }
 
 pub fn create_e2e_config() -> Result<Config> {
-    let config_path = if Path::new("../../.local.config.json").exists() {
-        ".local.config.json"
-    } else {
-        "./config/config.json"
-    };
-    Config::read_config(config_path)
+    let config_path =
+        env::var("CONFIG_FILE").unwrap_or_else(|_| "../config/config.json".to_string());
+
+    Config::read_config(&config_path)
         .context(format!("Failed to read config from file: {}", config_path))
 }

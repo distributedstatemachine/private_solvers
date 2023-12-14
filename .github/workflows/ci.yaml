@@ -2,9 +2,7 @@ name: CI (Test , Docker , Publish)
 
 on:
   push:
-    branches: [master]
   pull_request:
-    branches: [master]
 
 env:
   SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
@@ -12,6 +10,7 @@ env:
   FUJI_RPC_URL: ${{ secrets.FUJI_RPC_URL }}
   FUJI_WS_URL: ${{ secrets.FUJI_WS_URL }}
   CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+  CONFIG_FILE : ${{ github.workspace }}/config/config.json
 
 jobs:
   test:
@@ -22,6 +21,10 @@ jobs:
         with:
           toolchain: stable
           override: true
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
         with:
@@ -32,15 +35,13 @@ jobs:
         with:
           command: clippy
           args: -- -D warnings
-      - name: Run cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
+
 
 
   docker:
     needs: test
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.base_ref == 'master'
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -56,16 +57,3 @@ jobs:
           push: true
           tags: ghcr.io/${{github.repository}}:latest
           
-  # publish:
-  #   needs: docker
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         override: true
-  #     - uses: actions-rs/cargo@v1
-  #       with:
-  #         command: publish
-  #         args: --token ${{ secrets.CRATES_IO_TOKEN }}
