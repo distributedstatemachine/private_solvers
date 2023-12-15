@@ -6,6 +6,9 @@ use solver_common::inventory::Inventory;
 use std::sync::Arc;
 use tracing::info;
 
+pub mod types;
+pub mod workflow;
+
 #[tokio::main]
 async fn main() -> Result<()> {
     configure_logs();
