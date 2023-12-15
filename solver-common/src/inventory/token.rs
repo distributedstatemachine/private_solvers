@@ -5,7 +5,7 @@ use std::ops::Mul;
 use anyhow::Result;
 use ethers::types::{Address, U256};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Token {
     pub chain_id: ChainId,
     pub address: Address,

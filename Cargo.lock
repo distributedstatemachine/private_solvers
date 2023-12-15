@@ -733,10 +733,23 @@ dependencies = [
 name = "cross-chain-market-maker"
 version = "0.1.0"
 dependencies = [
+ "alloy-primitives",
  "anyhow",
+ "artemis-core",
+ "async-stream",
+ "async-trait",
+ "bindings-balancer",
+ "bindings-khalani",
+ "clap",
+ "ethers",
+ "futures",
+ "serde",
+ "serde_json",
  "solver-common",
+ "thiserror",
  "tokio",
  "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

@@ -1,7 +1,7 @@
 use ethers::types::U256;
 use ethers::utils::format_units;
 use std::fmt::{self, Display, Formatter};
-use std::ops::Add;
+use std::ops::{Add, Mul};
 
 pub type Decimals = u8;
 
@@ -28,6 +28,18 @@ impl Add for Amount {
         Amount {
             base_units: self.base_units + rhs.base_units,
             decimals: self.decimals,
+        }
+    }
+}
+
+impl Mul for Amount {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        assert_eq!(self.decimals, rhs.decimals);
+        Amount {
+            base_units: self.base_units * rhs.base_units,
+            decimals: self.decimals * 2,
         }
     }
 }
@@ -83,6 +95,43 @@ mod tests {
         };
 
         let _result = amount1 + amount2;
+    }
+
+    #[test]
+    fn test_amount_mul() {
+        let amount1 = Amount {
+            base_units: U256::from_dec_str("1000").unwrap(),
+            decimals: 2,
+        };
+
+        let amount2 = Amount {
+            base_units: U256::from_dec_str("2000").unwrap(),
+            decimals: 2,
+        };
+
+        let expected_product = Amount {
+            base_units: U256::from_dec_str("2000000").unwrap(),
+            decimals: 4,
+        };
+
+        let result = amount1 * amount2;
+        assert_eq!(result, expected_product);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_amount_multiplication_different_decimals() {
+        let amount1 = Amount {
+            base_units: U256::from_dec_str("1000").unwrap(),
+            decimals: 2,
+        };
+
+        let amount2 = Amount {
+            base_units: U256::from_dec_str("2000").unwrap(),
+            decimals: 3,
+        };
+
+        let _result = amount1 * amount2;
     }
 
     #[test]

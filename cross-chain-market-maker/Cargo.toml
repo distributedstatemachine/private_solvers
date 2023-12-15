@@ -5,7 +5,20 @@ edition.workspace = true
 
 [dependencies]
 solver-common = { path = "../solver-common" }
+bindings-balancer = { path = "../crates/bindings-balancer" }
+bindings-khalani = { path = "../crates/bindings-khalani" }
 
+artemis-core.workspace = true
 tokio.workspace = true
+clap.workspace = true
+ethers.workspace = true
+async-trait.workspace = true
 anyhow.workspace = true
+alloy-primitives.workspace = true
+futures.workspace = true
 tracing.workspace = true
+tracing-subscriber.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+async-stream.workspace = true
+thiserror.workspace = true

@@ -3,3 +3,4 @@
 .local.config.json
 crates/bindings-khalani/Cargo.lock
 crates/bindings-balancer/Cargo.lock
+.vscode
