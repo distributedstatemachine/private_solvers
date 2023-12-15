@@ -31,7 +31,7 @@ impl<E: BidIntentExecutor> BidIntentExecutorImpl<E> {
             Box::new(ActionConfirmationCollector::new(confirmation_receiver));
         let bid_intent_confirmation_collector: Box<dyn Collector<Event>> = Box::new(
             CollectorMap::new(bid_intent_confirmation_collector, |event| {
-                Event::BidIntentConfirmed(event)
+                Event::BidIntentConfirmed()
             }),
         );
         (
@@ -45,24 +45,14 @@ impl<E: BidIntentExecutor> BidIntentExecutorImpl<E> {
 }
 
 #[async_trait]
-impl<E: BidIntentExecutor + Sync + Send> Executor<Event, Action> for BidIntentExecutorImpl<E> {
-    async fn execute(&self, event: &Event) -> Result<Action> {
-        match event {
-            Event::SpokeChainCall(spoke_chain_call) => {
-                if some_condition {
-                    let bid_intent_executor_result = self.executor.bid_intent(spoke_chain_call.clone()).await?;
-                    self.confirmation_sender
-                        .send(bid_intent_executor_result)
-                        .await?;
-                    Ok(Action::BidIntentConfirmed(bid_intent_executor_result.spoke_chain_call))
-                } else {
-                    Ok(Action::NoAction)
-                }
+impl<E: BidIntentExecutor + Sync + Send> Executor<Action> for BidIntentExecutorImpl<E> {
+    async fn execute(&self, action: Action) -> Result<()> {
+            if let Action::SpokeChainCall(spoke_chain_call) = action {
+                let bid_intent_executor_result = self.executor.bid_intent(spoke_chain_call.clone()).await?;
+                self.confirmation_sender
+                    .send(bid_intent_executor_result)
+                    .await?;
             }
-            _ => {
-                // Handle other event types or return an appropriate action
-                Ok(Action::NoAction)
-            }
-        }
+            Ok(())
     }
 }

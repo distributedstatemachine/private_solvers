@@ -31,7 +31,7 @@ impl<H: MatchIntentHandler> MatchIntentExecutor<H> {
             Box::new(ActionConfirmationCollector::new(confirmation_receiver));
         let action_confirmation_collector: Box<dyn Collector<Event>> = Box::new(
             CollectorMap::new(action_confirmation_collector, |intent| {
-                Event::IntentMatched(intent)
+                Event::IntentMatched()
             }),
         );
         (
@@ -47,7 +47,7 @@ impl<H: MatchIntentHandler> MatchIntentExecutor<H> {
 #[async_trait]
 impl<H: MatchIntentHandler + Sync + Send> Executor<Action> for MatchIntentExecutor<H> {
     async fn execute(&self, action: Action) -> Result<()> {
-        if let Action::MatchIntentOnSpokeChain(spoke_chain_call) = action {
+        if let Action::MatchIntent(spoke_chain_call) = action {
             let match_intent_handler_result = self.handler.match_intent(spoke_chain_call).await?;
             self.confirmation_sender
                 .send(match_intent_handler_result)
