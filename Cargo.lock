@@ -3903,6 +3903,11 @@ name = "spoke-chain-caller"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "artemis-core",
+ "async-stream",
+ "async-trait",
+ "ethers",
+ "futures",
  "solver-common",
  "tokio",
  "tracing",

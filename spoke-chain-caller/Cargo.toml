@@ -6,7 +6,11 @@ edition.workspace = true
 [dependencies]
 solver-common = { path = "../solver-common" }
 
+artemis-core.workspace = true
 tokio.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
-
+ethers.workspace = true
+async-trait.workspace = true
+async-stream.workspace = true
+futures.workspace = true
