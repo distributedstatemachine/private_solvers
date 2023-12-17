@@ -10,6 +10,7 @@ pub struct AddressesConfigRaw {
     pub escrows: HashMap<String, String>,
     pub verifiers: HashMap<String, HashMap<String, String>>,
     pub swap_intent_fillers: HashMap<String, String>,
+    pub intentbook_address: String,
 }
 
 #[derive(Debug, Clone)]
@@ -26,4 +27,5 @@ pub struct AddressesConfig {
     pub escrows: HashMap<ChainId, Address>,
     pub verifiers: Vec<VerifierConfig>,
     pub swap_intent_fillers: HashMap<ChainId, Address>,
+    pub intentbook_address: Address,
 }

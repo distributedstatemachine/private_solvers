@@ -85,6 +85,10 @@ impl Config {
                 &addresses_config_raw.swap_intent_fillers,
                 &chains,
             )?,
+            intentbook_address: Self::parse_address(
+                &addresses_config_raw.intentbook_address,
+                "intentbook_address",
+            )?
         };
 
         let mut result_tokens = Vec::new();
