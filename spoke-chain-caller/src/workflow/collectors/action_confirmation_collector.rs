@@ -12,6 +12,7 @@ impl<C> ActionConfirmationCollector<C> {
     pub fn new(confirmation_receiver: Receiver<C>) -> Self {
         Self {
             confirmation_receiver: Mutex::new(confirmation_receiver),
+        }
     }
 }
 
