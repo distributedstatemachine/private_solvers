@@ -30,5 +30,6 @@ pub struct AddressesConfig {
     pub swap_intent_fillers: HashMap<ChainId, Address>,
     // TODO: each intentbook has its own address. Add a struct IntentbookAddresses for them.
     pub intentbook_address: Address,
+    // TODO: this executor is different on each chain. Use HashMap.
     pub spoke_chain_executor_address: Address,
 }

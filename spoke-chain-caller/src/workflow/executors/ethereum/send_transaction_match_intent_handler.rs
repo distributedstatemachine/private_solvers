@@ -58,7 +58,7 @@ impl SendTransactionMatchIntentHandler {
         let intentbook = SpokeChainCallIntentBook::new(intentbook_address, rpc_client);
         // TODO: encode intent bid.
         let intent_bid = IntentBid { bid: Bytes::new() };
-        let mut call = intentbook.match_intent(spoke_chain_call.clone().into(), intent_bid);
+        let mut call = intentbook.match_intent(spoke_chain_call.intent_id.into(), intent_bid);
         call.tx
             .set_chain_id(Into::<u32>::into(spoke_chain_call.chain_id));
         Ok(call)

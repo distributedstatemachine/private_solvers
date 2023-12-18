@@ -38,11 +38,19 @@ where
         return match event {
             Event::NewSpokeChainCall(spoke_chain_call) => {
                 info!(?spoke_chain_call, "New Spoke Chain Call intent");
-                vec![Action::MatchIntent()]
+                self.state_manager
+                    .lock()
+                    .await
+                    .create_intent_state(spoke_chain_call.clone());
+                vec![Action::MatchIntent(spoke_chain_call)]
             }
             Event::IntentMatched(spoke_chain_call) => {
-                info!(?spoke_chain_call, "New Spoke Chain Call intent");
-                vec![Action::CallSpoke()]
+                info!(?spoke_chain_call, "Spoke Chain Call matched");
+                vec![Action::CallSpoke(spoke_chain_call.spoke_chain_call)]
+            }
+            Event::CallSpokeConfirmed(call_spoke_handler_result) => {
+                info!(?call_spoke_handler_result, "Spoke Chain Call confirmed");
+                vec![]
             }
         };
     }

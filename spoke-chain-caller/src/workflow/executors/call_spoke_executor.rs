@@ -1,11 +1,11 @@
 use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::workflow::action::Action;
-use crate::workflow::collectors::action_confirmation_collector::ActionConfirmationCollector;
 use crate::workflow::event::Event;
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorMap, Executor};
 use async_trait::async_trait;
 use ethers::types::TxHash;
+use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Sender};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -20,23 +20,21 @@ pub trait CallSpokeHandler {
 }
 
 pub struct CallSpokeExecutor<E: CallSpokeHandler> {
-    executor: E,
+    handler: E,
     confirmation_sender: Sender<CallSpokeHandlerResult>,
 }
 
-impl<E: CallSpokeHandler> CallSpokeExecutor<E> {
-    pub fn new(executor: E) -> (Self, Box<dyn Collector<Event>>) {
+impl<H: CallSpokeHandler> CallSpokeExecutor<H> {
+    pub fn new(handler: H) -> (Self, Box<dyn Collector<Event>>) {
         let (confirmation_sender, confirmation_receiver) = channel(512);
         let call_spoke_confirmation_collector =
             Box::new(ActionConfirmationCollector::new(confirmation_receiver));
         let call_spoke_confirmation_collector: Box<dyn Collector<Event>> = Box::new(
-            CollectorMap::new(call_spoke_confirmation_collector, |event| {
-                Event::CallSpokeConfirmed()
-            }),
+            CollectorMap::new(call_spoke_confirmation_collector, Event::CallSpokeConfirmed),
         );
         (
             CallSpokeExecutor {
-                executor,
+                handler,
                 confirmation_sender,
             },
             call_spoke_confirmation_collector,
@@ -47,12 +45,13 @@ impl<E: CallSpokeHandler> CallSpokeExecutor<E> {
 #[async_trait]
 impl<E: CallSpokeHandler + Sync + Send> Executor<Action> for CallSpokeExecutor<E> {
     async fn execute(&self, action: Action) -> Result<()> {
-            if let Action::CallSpoke(spoke_chain_call) = action {
-                let call_spoke_executor_result = self.executor.call_spoke(spoke_chain_call.clone()).await?;
-                self.confirmation_sender
-                    .send(call_spoke_executor_result)
-                    .await?;
-            }
-            Ok(())
+        if let Action::CallSpoke(spoke_chain_call) = action {
+            let call_spoke_executor_result =
+                self.handler.call_spoke(spoke_chain_call.clone()).await?;
+            self.confirmation_sender
+                .send(call_spoke_executor_result)
+                .await?;
+        }
+        Ok(())
     }
 }

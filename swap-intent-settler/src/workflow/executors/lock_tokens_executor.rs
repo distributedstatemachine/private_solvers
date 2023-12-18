@@ -1,11 +1,11 @@
 use crate::types::swap_intent::SwapIntent;
 use crate::workflow::action::Action;
-use crate::workflow::collectors::action_confirmation_collector::ActionConfirmationCollector;
 use crate::workflow::event::Event;
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorMap, Executor};
 use async_trait::async_trait;
 use ethers::types::TxHash;
+use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Sender};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
