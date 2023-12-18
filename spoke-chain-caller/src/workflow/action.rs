@@ -5,4 +5,5 @@ pub enum Action {
     SpokeChainCall(),
     BidIntent(),
     MatchIntent(),
+    CallSpoke(),
 }

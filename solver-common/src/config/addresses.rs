@@ -11,6 +11,7 @@ pub struct AddressesConfigRaw {
     pub verifiers: HashMap<String, HashMap<String, String>>,
     pub swap_intent_fillers: HashMap<String, String>,
     pub intentbook_address: String,
+    pub spoke_chain_executor_address: String
 }
 
 #[derive(Debug, Clone)]
@@ -28,4 +29,5 @@ pub struct AddressesConfig {
     pub verifiers: Vec<VerifierConfig>,
     pub swap_intent_fillers: HashMap<ChainId, Address>,
     pub intentbook_address: Address,
+    pub spoke_chain_executor_address: Address
 }

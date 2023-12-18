@@ -6,5 +6,6 @@ pub enum Event {
     NewSpokeChainCall(SpokeChainCall),
     IntentMatch(SpokeChainCall),
     IntentMatched(),
-    BidIntentConfirmed()
+    BidIntentConfirmed(),
+    CallSpokeConfirmed()
 }

@@ -47,12 +47,12 @@ where
                 info!(?quoted_intent, "Intent was bidded and ready to be matched");
                 return vec![Action::MatchIntent()];
             }
-            //TO-DO: call spoke chain contract via `SpokeChainCallExecutor`
             Event::IntentMatched(locked_tokens_intent) => {
                 info!(
                     ?locked_tokens_intent,
                     "Intent was matched, calling spoke chain contract"
                 );
+                return vec![Action::CallSpoke()];
             }
         }
         return Vec::default();

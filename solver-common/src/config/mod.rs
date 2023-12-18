@@ -88,6 +88,10 @@ impl Config {
             intentbook_address: Self::parse_address(
                 &addresses_config_raw.intentbook_address,
                 "intentbook_address",
+            )?,
+            spoke_chain_executor_address: Self::parse_address(
+                &addresses_config_raw.spoke_chain_executor_address,
+                "spoke_chain_executor_address",
             )?
         };
 
