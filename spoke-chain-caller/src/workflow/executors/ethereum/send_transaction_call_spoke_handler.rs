@@ -10,6 +10,7 @@ use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::workflow::executors::call_spoke_executor::{CallSpokeHandler, CallSpokeHandlerResult};
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::connectors::{Connector, RpcClient};
+use solver_common::error::ConfigError;
 use solver_common::ethereum::transaction::submit_transaction;
 
 pub struct SendTransactionCallSpokeHandler {
@@ -51,9 +52,18 @@ impl SendTransactionCallSpokeHandler {
         spoke_chain_call: &SpokeChainCall,
     ) -> Result<ContractCall<RpcClient, ()>> {
         let rpc_client = self.connector.get_rpc_client(spoke_chain_call.chain_id)?;
-        let spoke_chain_executor_address = self.addresses_config.spoke_chain_executor_address;
+        let spoke_chain_executor_address = self
+            .addresses_config
+            .spoke_chain_executor_addresses
+            .get(&spoke_chain_call.chain_id)
+            .ok_or_else(|| {
+                ConfigError::ContractAddressNotFound(
+                    String::from("SpokeChainExecutor"),
+                    spoke_chain_call.chain_id.into(),
+                )
+            })?;
         let spoke_chain_executor =
-            SpokeChainExecutor::new(spoke_chain_executor_address, rpc_client);
+            SpokeChainExecutor::new(*spoke_chain_executor_address, rpc_client);
         let mut call = spoke_chain_executor.call_spoke(
             spoke_chain_call.intent_id.into(),
             spoke_chain_call.contract_to_call,

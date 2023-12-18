@@ -15,6 +15,10 @@
     "swap_intent_fillers": {
       "sepolia": "0xE8C8bf42BF612022BA012C67C8276c927CB77398",
       "fuji": "0x39de5Be710360aFBbB663036B5fb046585d9dbb3"
+    },
+    "spoke_chain_executors": {
+      "sepolia": "0x0000000000000000000000000000000000000000",
+      "fuji": "0x0000000000000000000000000000000000000000"
     }
   },
   "balancer": {

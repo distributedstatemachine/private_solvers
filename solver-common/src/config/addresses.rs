@@ -11,7 +11,7 @@ pub struct AddressesConfigRaw {
     pub verifiers: HashMap<String, HashMap<String, String>>,
     pub swap_intent_fillers: HashMap<String, String>,
     pub intentbook_address: String,
-    pub spoke_chain_executor_address: String,
+    pub spoke_chain_executors: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone)]
@@ -30,6 +30,5 @@ pub struct AddressesConfig {
     pub swap_intent_fillers: HashMap<ChainId, Address>,
     // TODO: each intentbook has its own address. Add a struct IntentbookAddresses for them.
     pub intentbook_address: Address,
-    // TODO: this executor is different on each chain. Use HashMap.
-    pub spoke_chain_executor_address: Address,
+    pub spoke_chain_executor_addresses: HashMap<ChainId, Address>,
 }

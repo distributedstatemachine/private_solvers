@@ -89,10 +89,10 @@ impl Config {
                 &addresses_config_raw.intentbook_address,
                 "intentbook_address",
             )?,
-            spoke_chain_executor_address: Self::parse_address(
-                &addresses_config_raw.spoke_chain_executor_address,
-                "spoke_chain_executor_address",
-            )?
+            spoke_chain_executor_addresses: Self::parse_chain_to_address_map(
+                &addresses_config_raw.spoke_chain_executors,
+                &chains,
+            )?,
         };
 
         let mut result_tokens = Vec::new();
