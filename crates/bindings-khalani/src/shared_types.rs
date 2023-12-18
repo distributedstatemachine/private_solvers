@@ -124,6 +124,39 @@ pub struct TokenPermissions {
     pub token: ::ethers::core::types::Address,
     pub amount: ::ethers::core::types::U256,
 }
+///`Intent(bytes,bytes)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct Intent {
+    pub order: ::ethers::core::types::Bytes,
+    pub sig: ::ethers::core::types::Bytes,
+}
+///`IntentBid(bytes)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct IntentBid {
+    pub bid: ::ethers::core::types::Bytes,
+}
 ///`FuzzSelector(address,bytes4[])`
 #[derive(
     Clone,

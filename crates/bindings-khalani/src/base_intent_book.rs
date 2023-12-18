@@ -1,0 +1,869 @@
+pub use base_intent_book::*;
+/// This module was auto-generated with ethers-rs Abigen.
+/// More information at: <https://github.com/gakonst/ethers-rs>
+#[allow(
+    clippy::enum_variant_names,
+    clippy::too_many_arguments,
+    clippy::upper_case_acronyms,
+    clippy::type_complexity,
+    dead_code,
+    non_camel_case_types,
+)]
+pub mod base_intent_book {
+    pub use super::super::shared_types::*;
+    #[allow(deprecated)]
+    fn __abi() -> ::ethers::core::abi::Abi {
+        ::ethers::core::abi::ethabi::Contract {
+            constructor: ::core::option::Option::None,
+            functions: ::core::convert::From::from([
+                (
+                    ::std::borrow::ToOwned::to_owned("cancelIntent"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("cancelIntent"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes32"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("intents"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("intents"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes32"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("status"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(8usize),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned(
+                                            "enum BaseIntentBook.IntentStatus",
+                                        ),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("intentBidId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes32"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::View,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("matchIntent"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("matchIntent"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes32"),
+                                    ),
+                                },
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("intentBid"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![::ethers::core::abi::ethabi::ParamType::Bytes],
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned(
+                                            "struct IntentBookLib.IntentBid",
+                                        ),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("placeIntent"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("placeIntent"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("intent"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                        ],
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned(
+                                            "struct IntentBookLib.Intent",
+                                        ),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes32"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("settleIntent"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned("settleIntent"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bytes32"),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+            ]),
+            events: ::core::convert::From::from([
+                (
+                    ::std::borrow::ToOwned::to_owned("IntentBidReceived"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned("IntentBidReceived"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentBidId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentBid"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![::ethers::core::abi::ethabi::ParamType::Bytes],
+                                    ),
+                                    indexed: false,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("IntentCancelled"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned("IntentCancelled"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("IntentCreated"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned("IntentCreated"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intent"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                        ],
+                                    ),
+                                    indexed: false,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("IntentMatch"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned("IntentMatch"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentBidId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("IntentSettled"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned("IntentSettled"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentBidId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+            ]),
+            errors: ::std::collections::BTreeMap::new(),
+            receive: false,
+            fallback: false,
+        }
+    }
+    ///The parsed JSON ABI of the contract.
+    pub static BASEINTENTBOOK_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(
+        __abi,
+    );
+    pub struct BaseIntentBook<M>(::ethers::contract::Contract<M>);
+    impl<M> ::core::clone::Clone for BaseIntentBook<M> {
+        fn clone(&self) -> Self {
+            Self(::core::clone::Clone::clone(&self.0))
+        }
+    }
+    impl<M> ::core::ops::Deref for BaseIntentBook<M> {
+        type Target = ::ethers::contract::Contract<M>;
+        fn deref(&self) -> &Self::Target {
+            &self.0
+        }
+    }
+    impl<M> ::core::ops::DerefMut for BaseIntentBook<M> {
+        fn deref_mut(&mut self) -> &mut Self::Target {
+            &mut self.0
+        }
+    }
+    impl<M> ::core::fmt::Debug for BaseIntentBook<M> {
+        fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+            f.debug_tuple(::core::stringify!(BaseIntentBook))
+                .field(&self.address())
+                .finish()
+        }
+    }
+    impl<M: ::ethers::providers::Middleware> BaseIntentBook<M> {
+        /// Creates a new contract instance with the specified `ethers` client at
+        /// `address`. The contract derefs to a `ethers::Contract` object.
+        pub fn new<T: Into<::ethers::core::types::Address>>(
+            address: T,
+            client: ::std::sync::Arc<M>,
+        ) -> Self {
+            Self(
+                ::ethers::contract::Contract::new(
+                    address.into(),
+                    BASEINTENTBOOK_ABI.clone(),
+                    client,
+                ),
+            )
+        }
+        ///Calls the contract's `cancelIntent` (0xd55f960d) function
+        pub fn cancel_intent(
+            &self,
+            intent_id: [u8; 32],
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([213, 95, 150, 13], intent_id)
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `intents` (0x9021578a) function
+        pub fn intents(
+            &self,
+            p0: [u8; 32],
+        ) -> ::ethers::contract::builders::ContractCall<M, (u8, [u8; 32])> {
+            self.0
+                .method_hash([144, 33, 87, 138], p0)
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `matchIntent` (0x72b876eb) function
+        pub fn match_intent(
+            &self,
+            intent_id: [u8; 32],
+            intent_bid: IntentBid,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([114, 184, 118, 235], (intent_id, intent_bid))
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `placeIntent` (0x4af2364e) function
+        pub fn place_intent(
+            &self,
+            intent: Intent,
+        ) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
+            self.0
+                .method_hash([74, 242, 54, 78], (intent,))
+                .expect("method not found (this should never happen)")
+        }
+        ///Calls the contract's `settleIntent` (0x7bf8bb88) function
+        pub fn settle_intent(
+            &self,
+            intent_id: [u8; 32],
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([123, 248, 187, 136], intent_id)
+                .expect("method not found (this should never happen)")
+        }
+        ///Gets the contract's `IntentBidReceived` event
+        pub fn intent_bid_received_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            IntentBidReceivedFilter,
+        > {
+            self.0.event()
+        }
+        ///Gets the contract's `IntentCancelled` event
+        pub fn intent_cancelled_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            IntentCancelledFilter,
+        > {
+            self.0.event()
+        }
+        ///Gets the contract's `IntentCreated` event
+        pub fn intent_created_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            IntentCreatedFilter,
+        > {
+            self.0.event()
+        }
+        ///Gets the contract's `IntentMatch` event
+        pub fn intent_match_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            IntentMatchFilter,
+        > {
+            self.0.event()
+        }
+        ///Gets the contract's `IntentSettled` event
+        pub fn intent_settled_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            IntentSettledFilter,
+        > {
+            self.0.event()
+        }
+        /// Returns an `Event` builder for all the events of this contract.
+        pub fn events(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            BaseIntentBookEvents,
+        > {
+            self.0.event_with_filter(::core::default::Default::default())
+        }
+    }
+    impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
+    for BaseIntentBook<M> {
+        fn from(contract: ::ethers::contract::Contract<M>) -> Self {
+            Self::new(contract.address(), contract.client())
+        }
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(
+        name = "IntentBidReceived",
+        abi = "IntentBidReceived(bytes32,bytes32,(bytes))"
+    )]
+    pub struct IntentBidReceivedFilter {
+        #[ethevent(indexed)]
+        pub intent_id: [u8; 32],
+        #[ethevent(indexed)]
+        pub intent_bid_id: [u8; 32],
+        pub intent_bid: IntentBid,
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(name = "IntentCancelled", abi = "IntentCancelled(bytes32)")]
+    pub struct IntentCancelledFilter {
+        #[ethevent(indexed)]
+        pub intent_id: [u8; 32],
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(name = "IntentCreated", abi = "IntentCreated(bytes32,(bytes,bytes))")]
+    pub struct IntentCreatedFilter {
+        #[ethevent(indexed)]
+        pub intent_id: [u8; 32],
+        pub intent: Intent,
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(name = "IntentMatch", abi = "IntentMatch(bytes32,bytes32)")]
+    pub struct IntentMatchFilter {
+        #[ethevent(indexed)]
+        pub intent_id: [u8; 32],
+        #[ethevent(indexed)]
+        pub intent_bid_id: [u8; 32],
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethevent(name = "IntentSettled", abi = "IntentSettled(bytes32,bytes32)")]
+    pub struct IntentSettledFilter {
+        #[ethevent(indexed)]
+        pub intent_id: [u8; 32],
+        #[ethevent(indexed)]
+        pub intent_bid_id: [u8; 32],
+    }
+    ///Container type for all of the contract's events
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        serde::Serialize,
+        serde::Deserialize,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub enum BaseIntentBookEvents {
+        IntentBidReceivedFilter(IntentBidReceivedFilter),
+        IntentCancelledFilter(IntentCancelledFilter),
+        IntentCreatedFilter(IntentCreatedFilter),
+        IntentMatchFilter(IntentMatchFilter),
+        IntentSettledFilter(IntentSettledFilter),
+    }
+    impl ::ethers::contract::EthLogDecode for BaseIntentBookEvents {
+        fn decode_log(
+            log: &::ethers::core::abi::RawLog,
+        ) -> ::core::result::Result<Self, ::ethers::core::abi::Error> {
+            if let Ok(decoded) = IntentBidReceivedFilter::decode_log(log) {
+                return Ok(BaseIntentBookEvents::IntentBidReceivedFilter(decoded));
+            }
+            if let Ok(decoded) = IntentCancelledFilter::decode_log(log) {
+                return Ok(BaseIntentBookEvents::IntentCancelledFilter(decoded));
+            }
+            if let Ok(decoded) = IntentCreatedFilter::decode_log(log) {
+                return Ok(BaseIntentBookEvents::IntentCreatedFilter(decoded));
+            }
+            if let Ok(decoded) = IntentMatchFilter::decode_log(log) {
+                return Ok(BaseIntentBookEvents::IntentMatchFilter(decoded));
+            }
+            if let Ok(decoded) = IntentSettledFilter::decode_log(log) {
+                return Ok(BaseIntentBookEvents::IntentSettledFilter(decoded));
+            }
+            Err(::ethers::core::abi::Error::InvalidData)
+        }
+    }
+    impl ::core::fmt::Display for BaseIntentBookEvents {
+        fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+            match self {
+                Self::IntentBidReceivedFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::IntentCancelledFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::IntentCreatedFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+                Self::IntentMatchFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::IntentSettledFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
+            }
+        }
+    }
+    impl ::core::convert::From<IntentBidReceivedFilter> for BaseIntentBookEvents {
+        fn from(value: IntentBidReceivedFilter) -> Self {
+            Self::IntentBidReceivedFilter(value)
+        }
+    }
+    impl ::core::convert::From<IntentCancelledFilter> for BaseIntentBookEvents {
+        fn from(value: IntentCancelledFilter) -> Self {
+            Self::IntentCancelledFilter(value)
+        }
+    }
+    impl ::core::convert::From<IntentCreatedFilter> for BaseIntentBookEvents {
+        fn from(value: IntentCreatedFilter) -> Self {
+            Self::IntentCreatedFilter(value)
+        }
+    }
+    impl ::core::convert::From<IntentMatchFilter> for BaseIntentBookEvents {
+        fn from(value: IntentMatchFilter) -> Self {
+            Self::IntentMatchFilter(value)
+        }
+    }
+    impl ::core::convert::From<IntentSettledFilter> for BaseIntentBookEvents {
+        fn from(value: IntentSettledFilter) -> Self {
+            Self::IntentSettledFilter(value)
+        }
+    }
+    ///Container type for all input parameters for the `cancelIntent` function with signature `cancelIntent(bytes32)` and selector `0xd55f960d`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "cancelIntent", abi = "cancelIntent(bytes32)")]
+    pub struct CancelIntentCall {
+        pub intent_id: [u8; 32],
+    }
+    ///Container type for all input parameters for the `intents` function with signature `intents(bytes32)` and selector `0x9021578a`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "intents", abi = "intents(bytes32)")]
+    pub struct IntentsCall(pub [u8; 32]);
+    ///Container type for all input parameters for the `matchIntent` function with signature `matchIntent(bytes32,(bytes))` and selector `0x72b876eb`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "matchIntent", abi = "matchIntent(bytes32,(bytes))")]
+    pub struct MatchIntentCall {
+        pub intent_id: [u8; 32],
+        pub intent_bid: IntentBid,
+    }
+    ///Container type for all input parameters for the `placeIntent` function with signature `placeIntent((bytes,bytes))` and selector `0x4af2364e`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "placeIntent", abi = "placeIntent((bytes,bytes))")]
+    pub struct PlaceIntentCall {
+        pub intent: Intent,
+    }
+    ///Container type for all input parameters for the `settleIntent` function with signature `settleIntent(bytes32)` and selector `0x7bf8bb88`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(name = "settleIntent", abi = "settleIntent(bytes32)")]
+    pub struct SettleIntentCall {
+        pub intent_id: [u8; 32],
+    }
+    ///Container type for all of the contract's call
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        serde::Serialize,
+        serde::Deserialize,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub enum BaseIntentBookCalls {
+        CancelIntent(CancelIntentCall),
+        Intents(IntentsCall),
+        MatchIntent(MatchIntentCall),
+        PlaceIntent(PlaceIntentCall),
+        SettleIntent(SettleIntentCall),
+    }
+    impl ::ethers::core::abi::AbiDecode for BaseIntentBookCalls {
+        fn decode(
+            data: impl AsRef<[u8]>,
+        ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
+            let data = data.as_ref();
+            if let Ok(decoded) = <CancelIntentCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::CancelIntent(decoded));
+            }
+            if let Ok(decoded) = <IntentsCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::Intents(decoded));
+            }
+            if let Ok(decoded) = <MatchIntentCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::MatchIntent(decoded));
+            }
+            if let Ok(decoded) = <PlaceIntentCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::PlaceIntent(decoded));
+            }
+            if let Ok(decoded) = <SettleIntentCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::SettleIntent(decoded));
+            }
+            Err(::ethers::core::abi::Error::InvalidData.into())
+        }
+    }
+    impl ::ethers::core::abi::AbiEncode for BaseIntentBookCalls {
+        fn encode(self) -> Vec<u8> {
+            match self {
+                Self::CancelIntent(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::Intents(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::MatchIntent(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::PlaceIntent(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+                Self::SettleIntent(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
+            }
+        }
+    }
+    impl ::core::fmt::Display for BaseIntentBookCalls {
+        fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+            match self {
+                Self::CancelIntent(element) => ::core::fmt::Display::fmt(element, f),
+                Self::Intents(element) => ::core::fmt::Display::fmt(element, f),
+                Self::MatchIntent(element) => ::core::fmt::Display::fmt(element, f),
+                Self::PlaceIntent(element) => ::core::fmt::Display::fmt(element, f),
+                Self::SettleIntent(element) => ::core::fmt::Display::fmt(element, f),
+            }
+        }
+    }
+    impl ::core::convert::From<CancelIntentCall> for BaseIntentBookCalls {
+        fn from(value: CancelIntentCall) -> Self {
+            Self::CancelIntent(value)
+        }
+    }
+    impl ::core::convert::From<IntentsCall> for BaseIntentBookCalls {
+        fn from(value: IntentsCall) -> Self {
+            Self::Intents(value)
+        }
+    }
+    impl ::core::convert::From<MatchIntentCall> for BaseIntentBookCalls {
+        fn from(value: MatchIntentCall) -> Self {
+            Self::MatchIntent(value)
+        }
+    }
+    impl ::core::convert::From<PlaceIntentCall> for BaseIntentBookCalls {
+        fn from(value: PlaceIntentCall) -> Self {
+            Self::PlaceIntent(value)
+        }
+    }
+    impl ::core::convert::From<SettleIntentCall> for BaseIntentBookCalls {
+        fn from(value: SettleIntentCall) -> Self {
+            Self::SettleIntent(value)
+        }
+    }
+    ///Container type for all return fields from the `intents` function with signature `intents(bytes32)` and selector `0x9021578a`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct IntentsReturn {
+        pub status: u8,
+        pub intent_bid_id: [u8; 32],
+    }
+    ///Container type for all return fields from the `placeIntent` function with signature `placeIntent((bytes,bytes))` and selector `0x4af2364e`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct PlaceIntentReturn {
+        pub intent_id: [u8; 32],
+    }
+}
