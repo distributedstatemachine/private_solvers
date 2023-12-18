@@ -24,8 +24,13 @@ pub fn configure_engine(
     // Set up SpokeChainCall specific intent source.
     let state_manager = Arc::new(Mutex::new(state_manager));
 
-    let spoke_chain_call_intent_source =
-        SpokeChainCallIntentbookSource::new(connector.clone(), config.addresses.intentbook_address);
+    let spoke_chain_call_intent_source = SpokeChainCallIntentbookSource::new(
+        connector.clone(),
+        config
+            .addresses
+            .intentbook_addresses
+            .spoke_chain_call_intentbook,
+    );
 
     let send_transaction_match_intent_handler =
         SendTransactionMatchIntentHandler::new(config.addresses.clone(), connector.clone());

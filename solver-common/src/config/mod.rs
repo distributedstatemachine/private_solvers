@@ -9,7 +9,9 @@ use ethers::types::{Address, H256};
 
 // TODO: read config from the JSON files
 
-use crate::config::addresses::{AddressesConfig, AddressesConfigRaw, VerifierConfig};
+use crate::config::addresses::{
+    AddressesConfig, AddressesConfigRaw, IntentbookAddresses, VerifierConfig,
+};
 use crate::config::balancer::BalancerPool;
 use crate::config::chain::{ChainConfig, ChainConfigRaw, ChainId};
 use crate::config::token::{TokenConfig, TokenConfigRaw};
@@ -85,10 +87,26 @@ impl Config {
                 &addresses_config_raw.swap_intent_fillers,
                 &chains,
             )?,
-            intentbook_address: Self::parse_address(
-                &addresses_config_raw.intentbook_address,
-                "intentbook_address",
-            )?,
+            intentbook_addresses: IntentbookAddresses {
+                limit_order_intentbook: Self::parse_address(
+                    &addresses_config_raw
+                        .intentbook_addresses
+                        .limit_order_intentbook,
+                    "limit_order_intentbook",
+                )?,
+                spoke_chain_call_intentbook: Self::parse_address(
+                    &addresses_config_raw
+                        .intentbook_addresses
+                        .spoke_chain_call_intentbook,
+                    "spoke_chain_call_intentbook",
+                )?,
+                swap_intent_intentbook: Self::parse_address(
+                    &addresses_config_raw
+                        .intentbook_addresses
+                        .swap_intent_intentbook,
+                    "swap_intent_intentbook",
+                )?,
+            },
             spoke_chain_executor_addresses: Self::parse_chain_to_address_map(
                 &addresses_config_raw.spoke_chain_executors,
                 &chains,

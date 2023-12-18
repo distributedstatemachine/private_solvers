@@ -54,8 +54,11 @@ impl SendTransactionMatchIntentHandler {
         spoke_chain_call: &SpokeChainCall,
     ) -> Result<ContractCall<RpcClient, ()>> {
         let rpc_client = self.connector.get_rpc_client(spoke_chain_call.chain_id)?;
-        let intentbook_address = self.addresses_config.intentbook_address;
-        let intentbook = SpokeChainCallIntentBook::new(intentbook_address, rpc_client);
+        let intentbook_address = self.addresses_config.intentbook_addresses.clone();
+        let intentbook = SpokeChainCallIntentBook::new(
+            intentbook_address.spoke_chain_call_intentbook,
+            rpc_client,
+        );
         // TODO: encode intent bid.
         let intent_bid = IntentBid { bid: Bytes::new() };
         let mut call = intentbook.match_intent(spoke_chain_call.intent_id.into(), intent_bid);
