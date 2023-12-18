@@ -2020,7 +2020,14 @@ name = "intentbook-matchmaker"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "artemis-core",
+ "async-stream",
+ "async-trait",
+ "bindings-khalani",
+ "ethers",
+ "futures",
  "solver-common",
+ "spoke-chain-caller",
  "tokio",
  "tracing",
 ]

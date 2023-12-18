@@ -4,6 +4,7 @@ use solver_common::config::args::Args;
 use solver_common::connectors::Connector;
 use solver_common::diagnostics::logs::configure_logs;
 use solver_common::inventory::Inventory;
+use solver_common::workflow::run_engine;
 use std::sync::Arc;
 use tracing::info;
 
@@ -36,12 +37,4 @@ async fn main() -> Result<()> {
     run_engine(engine).await;
 
     Ok(())
-}
-
-async fn run_engine(engine: Engine<Event, Action>) {
-    if let Ok(mut set) = engine.run().await {
-        while let Some(res) = set.join_next().await {
-            info!("Result: {:?}", res);
-        }
-    }
 }

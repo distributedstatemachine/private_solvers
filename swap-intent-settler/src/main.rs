@@ -1,18 +1,15 @@
 use anyhow::Result;
-use artemis_core::engine::Engine;
 use solver_common::config::args::Args;
 use solver_common::connectors::Connector;
 use solver_common::diagnostics::logs::configure_logs;
 use solver_common::inventory::Inventory;
+use solver_common::workflow::run_engine;
 use std::sync::Arc;
 use tracing::info;
 
 pub mod quote;
 pub mod types;
 pub mod workflow;
-
-use workflow::action::Action;
-use workflow::event::Event;
 
 use workflow::engine::configure_engine;
 use workflow::state::in_memory_state_manager::InMemoryStateManager;
@@ -38,12 +35,4 @@ async fn main() -> Result<()> {
     run_engine(engine).await;
 
     Ok(())
-}
-
-async fn run_engine(engine: Engine<Event, Action>) {
-    if let Ok(mut set) = engine.run().await {
-        while let Some(res) = set.join_next().await {
-            info!("Result: {:?}", res);
-        }
-    }
 }
