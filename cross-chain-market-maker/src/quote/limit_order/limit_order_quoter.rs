@@ -17,24 +17,24 @@ use tracing::info;
 
 pub struct LimitOrderIntentQuoter {
     inventory: Arc<Inventory>,
-    intents_mempool: AddressesConfig,
-    intents_mempool_contract: IntentsMempool<RpcClient>,
+    intents_book: AddressesConfig,
+    intents_book_contract: IntentsMempool<RpcClient>,
 }
 
 impl LimitOrderIntentQuoter {
     pub fn new(
         connector: Arc<Connector>,
         inventory: Arc<Inventory>,
-        intents_mempool: AddressesConfig,
+        intents_book: AddressesConfig,
     ) -> Self {
         let client = connector.get_rpc_client(ChainId::Khalani).unwrap();
-        let intents_mempool_contract =
-            IntentsMempool::new(intents_mempool.intents_mempool_address, client.clone());
+        let intents_book_contract =
+            IntentsMempool::new(intents_book.intents_mempool_address, client.clone());
 
         Self {
-            intents_mempool,
+            intents_book,
             inventory,
-            intents_mempool_contract,
+            intents_book_contract,
         }
     }
 }
@@ -84,7 +84,7 @@ mod tests {
         let wallet = Wallet::new(&mut OsRng);
         let connector = Arc::new(Connector::new(config.clone(), wallet).await.unwrap());
         let inventory = Arc::new(Inventory::new(config, connector).await.unwrap());
-        let intents_mempool = AddressesConfig {
+        let intents_book = AddressesConfig {
             intents_mempool_address: "0x0000000000000000000000000000000000000000"
                 .parse()
                 .unwrap(),
@@ -96,7 +96,7 @@ mod tests {
             swap_intent_fillers: HashMap::new(),
         };
 
-        let quoter = LimitOrderIntentQuoter::new(connector, inventory, intents_mempool);
+        let quoter = LimitOrderIntentQuoter::new(connector, inventory, intents_book);
         let token = Token {
             chain_id: ChainId::Khalani,
             address: "0x00000000000000000000000000000000000000021"

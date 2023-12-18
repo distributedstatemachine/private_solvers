@@ -18,17 +18,17 @@ use crate::workflow::collectors::limit_order_intent_collector::LimitOrderIntentS
 pub struct IntentsMempoolSource {
     rpc_client: Arc<RpcClient>,
     intents_mempool_address: Address,
-    intents_mempool: IntentsMempool<RpcClient>,
+    intents_book: IntentsMempool<RpcClient>,
 }
 
 impl IntentsMempoolSource {
     pub fn new(connector: Arc<Connector>, intents_mempool_address: Address) -> Self {
         let rpc_client = connector.get_rpc_client(ChainId::Khalani).unwrap();
-        let intents_mempool = IntentsMempool::new(intents_mempool_address, rpc_client.clone());
+        let intents_book = IntentsMempool::new(intents_mempool_address, rpc_client.clone());
 
         Self {
             rpc_client,
-            intents_mempool,
+            intents_book,
             intents_mempool_address,
         }
     }
@@ -40,7 +40,7 @@ impl EventSource for IntentsMempoolSource {
     type EventResult = LimitOrderIntent;
 
     fn create_event_filter(&self) -> ContractEvent<Arc<RpcClient>, RpcClient, Self::EventFilter> {
-        self.intents_mempool
+        self.intents_book
             .intent_created_filter()
             .address(ValueOrArray::Value(self.intents_mempool_address))
     }
@@ -60,7 +60,7 @@ impl LimitOrderIntentSource for IntentsMempoolSource {
         &self,
     ) -> Result<CollectorStream<'_, LimitOrderIntent>> {
         let event_fetcher = EventFetcher::new(
-            String::from("IntentsMempool"),
+            String::from("IntentsBook"),
             self.rpc_client.clone(),
             self.clone(),
         );

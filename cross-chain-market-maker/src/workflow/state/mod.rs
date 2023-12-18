@@ -1,7 +1,7 @@
 use crate::quote::quoted_intent::QuotedIntent;
 use crate::types::intent_id::IntentId;
 use crate::types::limit_order_intent::LimitOrderIntent;
-use crate::workflow::executors::lock_tokens_executor::LockIntentTokensHandlerResult;
+use crate::workflow::executors::post_limit_order_executor::PostLimitOrderHandlerResult;
 use crate::workflow::executors::settle_intent_executor::SwapIntentSettlementData;
 use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerHandlerResult;
 
@@ -14,7 +14,7 @@ pub struct IntentState {
     pub limit_order_intent: LimitOrderIntent,
     pub quoted_intent: Option<QuotedIntent>,
 
-    pub lock_intent_tokens_handler_result: Option<LockIntentTokensHandlerResult>,
+    pub lock_intent_tokens_handler_result: Option<PostLimitOrderHandlerResult>,
     pub filler_handler_result: Option<SwapIntentFillerHandlerResult>,
 
     pub is_proved_that_tokens_locked_on_source_chain: bool,

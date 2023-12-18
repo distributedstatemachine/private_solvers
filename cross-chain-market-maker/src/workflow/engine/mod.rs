@@ -1,16 +1,10 @@
 use std::sync::Arc;
 
-// use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
-use crate::workflow::collectors::ethereum::intents_mempool_source::IntentsMempoolSource;
-// use crate::workflow::collectors::proofs::gmp_verifier_proof_source::GmpEventVerifierProofSource;
-// use crate::workflow::collectors::proofs::proofs_collector::ProofsCollector;
+use crate::workflow::collectors::ethereum::intents_book_source::IntentsMempoolSource;
 use crate::workflow::collectors::limit_order_intent_collector::LimitOrderIntentCollector;
 use crate::workflow::event::Event;
-// use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
-// use crate::workflow::executors::ethereum::send_transaction_settle_intent_handler::SendTransactionSettleIntentHandler;
-// use crate::workflow::executors::ethereum::send_transaction_limit_order_intent_filler_handler::SendTransactionSwapIntentFillerHandler;
-use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
+use crate::workflow::executors::post_limit_order_executor::PostLimitOrderExecutor;
 use crate::workflow::executors::settle_intent_executor::SettleIntentExecutor;
 use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerExecutor;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
@@ -41,7 +35,7 @@ pub fn configure_engine(
     //     config.balancer.clone(),
     // );
     // let swap_intent_filler_handler =
-    //     SendTransactionSwapIntentFillerHandler::new(config.addresses.clone(), connector.clone());
+    //     SendTransactionPostLimitOrderHandler::new(config.addresses.clone(), connector.clone());
 
     let state_manager = Arc::new(Mutex::new(state_manager));
 
