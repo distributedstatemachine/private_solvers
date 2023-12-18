@@ -23,7 +23,7 @@ impl<S: SpokeChainCallSource> SpokeChainCallCollector<S> {
 impl<S: SpokeChainCallSource + Sync + Send> Collector<Event> for SpokeChainCallCollector<S> {
     async fn get_event_stream(&self) -> Result<CollectorStream<'_, Event>> {
         let intents_stream = self.0.get_new_spoke_chain_call_stream().await?;
-        let intents_stream = intents_stream.map(Event::IntentMatch);
+        let intents_stream = intents_stream.map(Event::NewSpokeChainCall);
         Ok(Box::pin(intents_stream))
     }
 }

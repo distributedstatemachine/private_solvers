@@ -89,13 +89,13 @@ impl SpokeChainCallSource for IntentbookSource {
                 };
 
                 for event in events {
-                    let swap_intent: Result<SpokeChainCall> = event.intent.try_into();
-                    match swap_intent {
-                        Ok(swap_intent) => {
-                            info!(?swap_intent, "New spoke chain called event received");
+                    let spoke_chain_call: Result<SpokeChainCall> = event.intent.try_into();
+                    match spoke_chain_call {
+                        Ok(spoke_chain_call) => {
+                            info!(?spoke_chain_call, "New spoke chain called event received");
                             yield SpokeChainCall {
                                 intent_id: event.intent_id.into(),
-                                ..swap_intent
+                                ..spoke_chain_call
                             };
                         }
                         Err(e) => {

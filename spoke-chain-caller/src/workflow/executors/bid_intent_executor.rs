@@ -19,12 +19,12 @@ pub trait BidIntentHandler {
     async fn bid_intent(&self, spoke_chain_call: SpokeChainCall) -> Result<BidIntentExecutorResult>;
 }
 
-pub struct BidIntentExecutorImpl<E: BidIntentHandler> {
+pub struct BidIntentExecutor<E: BidIntentHandler> {
     executor: E,
     confirmation_sender: Sender<BidIntentExecutorResult>,
 }
 
-impl<E: BidIntentHandler> BidIntentExecutorImpl<E> {
+impl<E: BidIntentHandler> BidIntentExecutor<E> {
     pub fn new(executor: E) -> (Self, Box<dyn Collector<Event>>) {
         let (confirmation_sender, confirmation_receiver) = channel(512);
         let bid_intent_confirmation_collector =
@@ -35,7 +35,7 @@ impl<E: BidIntentHandler> BidIntentExecutorImpl<E> {
             }),
         );
         (
-            BidIntentExecutorImpl {
+            BidIntentExecutor {
                 executor,
                 confirmation_sender,
             },
@@ -45,9 +45,9 @@ impl<E: BidIntentHandler> BidIntentExecutorImpl<E> {
 }
 
 #[async_trait]
-impl<E: BidIntentHandler + Sync + Send> Executor<Action> for BidIntentExecutorImpl<E> {
+impl<E: BidIntentHandler + Sync + Send> Executor<Action> for BidIntentExecutor<E> {
     async fn execute(&self, action: Action) -> Result<()> {
-            if let Action::SpokeChainCall(spoke_chain_call) = action {
+            if let Action::BidIntent(spoke_chain_call) = action {
                 let bid_intent_executor_result = self.executor.bid_intent(spoke_chain_call.clone()).await?;
                 self.confirmation_sender
                     .send(bid_intent_executor_result)

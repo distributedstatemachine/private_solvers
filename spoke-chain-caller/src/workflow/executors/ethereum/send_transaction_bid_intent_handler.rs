@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use async_trait::async_trait;
-use bindings_khalani::escrow::Escrow;
+use bindings_khalani::intentbook::Intentbook;
 use ethers::contract::ContractCall;
 use tracing::info;
 
@@ -12,7 +12,6 @@ use crate::workflow::executors::bid_intent_executor::{
 };
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::connectors::{Connector, RpcClient};
-use solver_common::error::ConfigError;
 use solver_common::ethereum::transaction::submit_transaction;
 
 pub struct SendTransactionBidIntentHandler {
