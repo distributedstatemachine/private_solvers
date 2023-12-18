@@ -5,7 +5,5 @@ use crate::types::spoke_chain_call::SpokeChainCall;
 pub enum Event {
     NewSpokeChainCall(SpokeChainCall),
     IntentMatch(SpokeChainCall),
-    IntentMatched(),
-    BidIntentConfirmed(),
-    CallSpokeConfirmed()
+    CallSpokeConfirmed(),
 }

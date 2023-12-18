@@ -3906,6 +3906,7 @@ dependencies = [
  "artemis-core",
  "async-stream",
  "async-trait",
+ "bindings-khalani",
  "ethers",
  "futures",
  "solver-common",

@@ -2,8 +2,10 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use async_trait::async_trait;
-use bindings_khalani::intentbook::Intentbook;
+use bindings_khalani::shared_types::IntentBid;
+use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCallIntentBook;
 use ethers::contract::ContractCall;
+use ethers::types::Bytes;
 use tracing::info;
 
 use crate::types::spoke_chain_call::SpokeChainCall;
@@ -30,7 +32,10 @@ impl SendTransactionMatchIntentHandler {
 
 #[async_trait]
 impl MatchIntentHandler for SendTransactionMatchIntentHandler {
-    async fn match_intent(&self, spoke_chain_call: SpokeChainCall) -> Result<MatchIntentHandlerResult> {
+    async fn match_intent(
+        &self,
+        spoke_chain_call: SpokeChainCall,
+    ) -> Result<MatchIntentHandlerResult> {
         info!(?spoke_chain_call, "Matching intent");
         let transaction = self.build_bid_intent_tx(&spoke_chain_call)?;
         let receipt = submit_transaction(transaction).await?;
@@ -48,14 +53,14 @@ impl SendTransactionMatchIntentHandler {
         &self,
         spoke_chain_call: &SpokeChainCall,
     ) -> Result<ContractCall<RpcClient, ()>> {
-        let source_chain_id = spoke_chain_call.source_chain_id;
-        let rpc_client = self.connector.get_rpc_client(source_chain_id)?;
-        let intentbook_address = self
-            .addresses_config
-            .intentbook_address;
-        let intentbook = Intentbook::new(intentbook_address, rpc_client);
-        let mut call = intentbook.match_intent(spoke_chain_call.clone().into());
-        call.tx.set_chain_id(Into::<u32>::into(source_chain_id));
+        let rpc_client = self.connector.get_rpc_client(spoke_chain_call.chain_id)?;
+        let intentbook_address = self.addresses_config.intentbook_address;
+        let intentbook = SpokeChainCallIntentBook::new(intentbook_address, rpc_client);
+        // TODO: encode intent bid.
+        let intent_bid = IntentBid { bid: Bytes::new() };
+        let mut call = intentbook.match_intent(spoke_chain_call.clone().into(), intent_bid);
+        call.tx
+            .set_chain_id(Into::<u32>::into(spoke_chain_call.chain_id));
         Ok(call)
     }
 }

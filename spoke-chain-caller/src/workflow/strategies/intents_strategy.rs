@@ -5,7 +5,7 @@ use anyhow::Result;
 use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use futures::lock::Mutex;
-use tracing::{info};
+use tracing::info;
 
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
@@ -20,9 +20,7 @@ where
     S: StateManager + Sync + Send,
 {
     pub fn new(state_manager: Arc<Mutex<S>>) -> Self {
-        Self {
-            state_manager,
-        }
+        Self { state_manager }
     }
 }
 
@@ -37,24 +35,15 @@ where
     }
 
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
-        match event {
-            Event::NewSpokeChainCall(swap_intent) => {
-                info!(?swap_intent, "Bidding the intent");
-                return vec![Action::BidIntent()];
+        return match event {
+            Event::NewSpokeChainCall(spoke_chain_call) => {
+                info!(?spoke_chain_call, "New Spoke Chain Call intent");
+                vec![Action::MatchIntent()]
             }
-            //TO-DO: it should be collector of IntentMatch events
-            Event::BidIntentConfirmed(quoted_intent) => {
-                info!(?quoted_intent, "Intent was bidded and ready to be matched");
-                return vec![Action::MatchIntent()];
+            Event::IntentMatched(spoke_chain_call) => {
+                info!(?spoke_chain_call, "New Spoke Chain Call intent");
+                vec![Action::CallSpoke()]
             }
-            Event::IntentMatched(locked_tokens_intent) => {
-                info!(
-                    ?locked_tokens_intent,
-                    "Intent was matched, calling spoke chain contract"
-                );
-                return vec![Action::CallSpoke()];
-            }
-        }
-        return Vec::default();
+        };
     }
 }
