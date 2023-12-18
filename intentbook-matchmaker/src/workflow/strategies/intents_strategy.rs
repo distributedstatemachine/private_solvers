@@ -8,6 +8,7 @@ use tracing::{info, warn};
 
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
+use crate::workflow::executors::settle_intent_executor::IntentSettlementData;
 use crate::workflow::state::state_manager::StateManager;
 
 pub struct IntentsStrategy<S: StateManager> {
@@ -51,6 +52,24 @@ where
                     .await
                     .update_intent_state(intent_id, |intent| intent.is_matched = true);
                 if intent.is_none() {
+                    warn!(?intent_id, "Unknown intent ID")
+                }
+                vec![]
+            }
+            Event::ProvedSpokeChainCall(intent_id) => {
+                info!(?intent_id, "SpokeChainCall intent is proved");
+                let intent = self
+                    .state_manager
+                    .lock()
+                    .await
+                    .update_intent_state(intent_id, |intent| intent.is_spoke_chain_called = true);
+
+                if let Some(intent_state) = intent {
+                    if intent_state.is_ready_to_settle() {
+                        info!(?intent_id, "Intent ready to be settled");
+                        return vec![Action::Settle(IntentSettlementData { intent_id })];
+                    }
+                } else {
                     warn!(?intent_id, "Unknown intent ID")
                 }
                 vec![]

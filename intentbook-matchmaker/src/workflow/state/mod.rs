@@ -7,6 +7,9 @@ pub mod state_manager;
 pub struct IntentState {
     pub intent: Intent,
     pub is_matched: bool,
+
+    // TODO: this flag only applies to SpokeChainCall intent. Refactor structs and move it there.
+    pub is_spoke_chain_called: bool,
 }
 
 impl IntentState {
@@ -14,10 +17,14 @@ impl IntentState {
         IntentState {
             intent,
             is_matched: false,
+            is_spoke_chain_called: false,
         }
     }
 
     pub fn is_ready_to_settle(&self) -> bool {
-        true
+        match &self.intent {
+            &Intent::SpokeChainCall(..) => self.is_spoke_chain_called,
+            _ => false,
+        }
     }
 }

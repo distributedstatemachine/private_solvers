@@ -6,4 +6,6 @@ use crate::types::IntentId;
 pub enum Event {
     NewIntent(Intent),
     NewMatchedIntent(IntentId),
+
+    ProvedSpokeChainCall(IntentId),
 }
