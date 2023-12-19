@@ -9,6 +9,7 @@ use solver_common::types::intent_id::IntentId;
 pub enum Event {
     NewSwapIntent(SwapIntent),
     IntentQuoted(QuotedIntent),
+    IntentPlaced(),
 
     TokensLockedOnSourceChain(LockIntentTokensHandlerResult),
     IntentFilledOnDestination(SwapIntentFillerHandlerResult),

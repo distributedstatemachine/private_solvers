@@ -147,6 +147,7 @@ where
                     }
                 }
             }
+            Event::IntentPlaced() => {}
         }
         return Vec::default();
     }
