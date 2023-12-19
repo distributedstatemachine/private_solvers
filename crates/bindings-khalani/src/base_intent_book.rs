@@ -271,41 +271,6 @@ pub mod base_intent_book {
             ]),
             events: ::core::convert::From::from([
                 (
-                    ::std::borrow::ToOwned::to_owned("IntentBidReceived"),
-                    ::std::vec![
-                        ::ethers::core::abi::ethabi::Event {
-                            name: ::std::borrow::ToOwned::to_owned("IntentBidReceived"),
-                            inputs: ::std::vec![
-                                ::ethers::core::abi::ethabi::EventParam {
-                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
-                                        32usize,
-                                    ),
-                                    indexed: true,
-                                },
-                                ::ethers::core::abi::ethabi::EventParam {
-                                    name: ::std::borrow::ToOwned::to_owned("intentBidId"),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
-                                        32usize,
-                                    ),
-                                    indexed: true,
-                                },
-                                ::ethers::core::abi::ethabi::EventParam {
-                                    name: ::std::borrow::ToOwned::to_owned("intentBid"),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
-                                        ::std::vec![
-                                            ::ethers::core::abi::ethabi::ParamType::FixedBytes(32usize),
-                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
-                                        ],
-                                    ),
-                                    indexed: false,
-                                },
-                            ],
-                            anonymous: false,
-                        },
-                    ],
-                ),
-                (
                     ::std::borrow::ToOwned::to_owned("IntentCancelled"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Event {
@@ -370,6 +335,16 @@ pub mod base_intent_book {
                                         32usize,
                                     ),
                                     indexed: true,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentBid"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![
+                                            ::ethers::core::abi::ethabi::ParamType::FixedBytes(32usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                        ],
+                                    ),
+                                    indexed: false,
                                 },
                             ],
                             anonymous: false,
@@ -555,16 +530,6 @@ pub mod base_intent_book {
                 .method_hash([123, 248, 187, 136], intent_id)
                 .expect("method not found (this should never happen)")
         }
-        ///Gets the contract's `IntentBidReceived` event
-        pub fn intent_bid_received_filter(
-            &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            IntentBidReceivedFilter,
-        > {
-            self.0.event()
-        }
         ///Gets the contract's `IntentCancelled` event
         pub fn intent_cancelled_filter(
             &self,
@@ -644,29 +609,6 @@ pub mod base_intent_book {
         Eq,
         Hash
     )]
-    #[ethevent(
-        name = "IntentBidReceived",
-        abi = "IntentBidReceived(bytes32,bytes32,(bytes32,bytes))"
-    )]
-    pub struct IntentBidReceivedFilter {
-        #[ethevent(indexed)]
-        pub intent_id: [u8; 32],
-        #[ethevent(indexed)]
-        pub intent_bid_id: [u8; 32],
-        pub intent_bid: IntentBid,
-    }
-    #[derive(
-        Clone,
-        ::ethers::contract::EthEvent,
-        ::ethers::contract::EthDisplay,
-        serde::Serialize,
-        serde::Deserialize,
-        Default,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash
-    )]
     #[ethevent(name = "IntentCancelled", abi = "IntentCancelled(bytes32)")]
     pub struct IntentCancelledFilter {
         #[ethevent(indexed)]
@@ -702,12 +644,16 @@ pub mod base_intent_book {
         Eq,
         Hash
     )]
-    #[ethevent(name = "IntentMatch", abi = "IntentMatch(bytes32,bytes32)")]
+    #[ethevent(
+        name = "IntentMatch",
+        abi = "IntentMatch(bytes32,bytes32,(bytes32,bytes))"
+    )]
     pub struct IntentMatchFilter {
         #[ethevent(indexed)]
         pub intent_id: [u8; 32],
         #[ethevent(indexed)]
         pub intent_bid_id: [u8; 32],
+        pub intent_bid: IntentBid,
     }
     #[derive(
         Clone,
@@ -762,7 +708,6 @@ pub mod base_intent_book {
         Hash
     )]
     pub enum BaseIntentBookEvents {
-        IntentBidReceivedFilter(IntentBidReceivedFilter),
         IntentCancelledFilter(IntentCancelledFilter),
         IntentCreatedFilter(IntentCreatedFilter),
         IntentMatchFilter(IntentMatchFilter),
@@ -773,9 +718,6 @@ pub mod base_intent_book {
         fn decode_log(
             log: &::ethers::core::abi::RawLog,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::Error> {
-            if let Ok(decoded) = IntentBidReceivedFilter::decode_log(log) {
-                return Ok(BaseIntentBookEvents::IntentBidReceivedFilter(decoded));
-            }
             if let Ok(decoded) = IntentCancelledFilter::decode_log(log) {
                 return Ok(BaseIntentBookEvents::IntentCancelledFilter(decoded));
             }
@@ -797,9 +739,6 @@ pub mod base_intent_book {
     impl ::core::fmt::Display for BaseIntentBookEvents {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
-                Self::IntentBidReceivedFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
                 Self::IntentCancelledFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
@@ -814,11 +753,6 @@ pub mod base_intent_book {
                     ::core::fmt::Display::fmt(element, f)
                 }
             }
-        }
-    }
-    impl ::core::convert::From<IntentBidReceivedFilter> for BaseIntentBookEvents {
-        fn from(value: IntentBidReceivedFilter) -> Self {
-            Self::IntentBidReceivedFilter(value)
         }
     }
     impl ::core::convert::From<IntentCancelledFilter> for BaseIntentBookEvents {
