@@ -1,14 +1,14 @@
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
-
-use crate::workflow::event::Event;
 use futures::stream::StreamExt;
-use solver_common::types::intent_id::IntentId;
+
+use crate::types::intent_bid::IntentBid;
+use crate::workflow::event::Event;
 
 #[async_trait]
 pub trait MatchedIntentsSource {
-    async fn get_matched_intents_source(&self) -> Result<CollectorStream<'_, IntentId>>;
+    async fn get_matched_intents_source(&self) -> Result<CollectorStream<'_, IntentBid>>;
 }
 
 pub struct MatchedIntentCollector<S: MatchedIntentsSource>(S);

@@ -44,13 +44,16 @@ where
                     .create_intent_state(intent.clone());
                 vec![]
             }
-            Event::NewMatchedIntent(intent_id) => {
+            Event::NewMatchedIntent(intent_bid) => {
+                let intent_id = intent_bid.intent_id();
                 info!(?intent_id, "Intent matched");
                 let intent = self
                     .state_manager
                     .lock()
                     .await
-                    .update_intent_state(intent_id, |intent| intent.is_matched = true);
+                    .update_intent_state(intent_id, |intent| {
+                        intent.matched_bid = Some(intent_bid.clone())
+                    });
                 if intent.is_none() {
                     warn!(?intent_id, "Unknown intent ID")
                 }

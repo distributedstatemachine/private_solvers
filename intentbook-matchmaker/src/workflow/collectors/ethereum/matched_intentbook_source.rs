@@ -12,8 +12,9 @@ use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
 
+use crate::types::intent_bid::IntentBid;
 use crate::workflow::collectors::matched_intent_collector::MatchedIntentsSource;
-use solver_common::types::intent_id::IntentId;
+use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 
 #[derive(Debug, Clone)]
 pub struct MatchedIntentbookIntentSource {
@@ -38,7 +39,7 @@ impl MatchedIntentbookIntentSource {
 #[async_trait]
 impl EventSource for MatchedIntentbookIntentSource {
     type EventFilter = IntentMatchFilter;
-    type EventResult = IntentId;
+    type EventResult = IntentBid;
 
     fn create_event_filter(&self) -> ContractEvent<Arc<RpcClient>, RpcClient, Self::EventFilter> {
         self.intentbook
@@ -47,13 +48,26 @@ impl EventSource for MatchedIntentbookIntentSource {
     }
 
     fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>> {
-        Some(Ok(IntentId::from(event.intent_id)))
+        let intent_id: IntentId = event.intent_id.into();
+        let intent_bid_id: IntentBidId = event.intent_bid_id.into();
+        let with_intent_id: WithIntentIdAndBidId<bindings_khalani::base_intent_book::IntentBid> =
+            (intent_id, intent_bid_id, event.intent_bid);
+
+        if let Ok(spoke_chain_call_bid) = with_intent_id.clone().try_into() {
+            return Some(Ok(IntentBid::SpokeChainCallBid(spoke_chain_call_bid)));
+        }
+
+        if let Ok(swap_intent_bid) = with_intent_id.clone().try_into() {
+            return Some(Ok(IntentBid::SwapIntentBid(swap_intent_bid)));
+        }
+
+        None
     }
 }
 
 #[async_trait]
 impl MatchedIntentsSource for MatchedIntentbookIntentSource {
-    async fn get_matched_intents_source(&self) -> Result<CollectorStream<'_, IntentId>> {
+    async fn get_matched_intents_source(&self) -> Result<CollectorStream<'_, IntentBid>> {
         let event_fetcher = EventFetcher::new(
             format!("Intentbook (Matched) {}", self.intentbook_address),
             self.rpc_client.clone(),
