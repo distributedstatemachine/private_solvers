@@ -3,9 +3,10 @@ use std::sync::Arc;
 use anyhow::Result;
 use artemis_core::types::CollectorStream;
 use async_trait::async_trait;
-use bindings_khalani::intents_mempool::{IntentCreatedFilter, IntentsMempool};
+use bindings_khalani::limit_order_intent_book::{IntentCreatedFilter, LimitOrderIntentBook};
 use ethers::contract::Event as ContractEvent;
-use ethers::types::{Address, ValueOrArray};
+use ethers::types::ValueOrArray;
+use solver_common::config::addresses::IntentbookAddresses;
 
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
@@ -15,34 +16,35 @@ use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::workflow::collectors::limit_order_intent_collector::LimitOrderIntentSource;
 
 #[derive(Debug, Clone)]
-pub struct IntentsMempoolSource {
+pub struct LimitOrderIntentbookSource {
     rpc_client: Arc<RpcClient>,
-    intents_mempool_address: Address,
-    intents_book: IntentsMempool<RpcClient>,
+    limit_order_intentbook: LimitOrderIntentBook<RpcClient>,
 }
 
-impl IntentsMempoolSource {
-    pub fn new(connector: Arc<Connector>, intents_mempool_address: Address) -> Self {
+impl LimitOrderIntentbookSource {
+    pub fn new(connector: Arc<Connector>, intentbook_addresses: IntentbookAddresses) -> Self {
         let rpc_client = connector.get_rpc_client(ChainId::Khalani).unwrap();
-        let intents_book = IntentsMempool::new(intents_mempool_address, rpc_client.clone());
+        let limit_order_intentbook = LimitOrderIntentBook::new(
+            intentbook_addresses.limit_order_intentbook,
+            rpc_client.clone(),
+        );
 
         Self {
             rpc_client,
-            intents_book,
-            intents_mempool_address,
+            limit_order_intentbook,
         }
     }
 }
 
 #[async_trait]
-impl EventSource for IntentsMempoolSource {
+impl EventSource for LimitOrderIntentbookSource {
     type EventFilter = IntentCreatedFilter;
     type EventResult = LimitOrderIntent;
 
     fn create_event_filter(&self) -> ContractEvent<Arc<RpcClient>, RpcClient, Self::EventFilter> {
-        self.intents_book
+        self.limit_order_intentbook
             .intent_created_filter()
-            .address(ValueOrArray::Value(self.intents_mempool_address))
+            .address(ValueOrArray::Value(self.limit_order_intentbook.address()))
     }
 
     fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
@@ -55,7 +57,7 @@ impl EventSource for IntentsMempoolSource {
 }
 
 #[async_trait]
-impl LimitOrderIntentSource for IntentsMempoolSource {
+impl LimitOrderIntentSource for LimitOrderIntentbookSource {
     async fn get_new_limit_order_intents_stream(
         &self,
     ) -> Result<CollectorStream<'_, LimitOrderIntent>> {
