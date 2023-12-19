@@ -19,9 +19,6 @@ use swap_intent_settler::workflow::executors::ethereum::send_transaction_approve
 use swap_intent_settler::workflow::executors::ethereum::send_transaction_swap_and_bridge_handler::SendTransactionSwapAndBridgeHandler;
 use swap_intent_settler::workflow::executors::swap_and_bridge_executor::SwapAndBridgeExecutor;
 
-use crate::common::create_connector;
-use crate::common::create_e2e_config;
-
 #[tokio::test]
 async fn test_swap_and_bridge_preview() -> Result<()> {
     let config = create_e2e_config().unwrap();
