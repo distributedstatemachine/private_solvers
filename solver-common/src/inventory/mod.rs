@@ -22,6 +22,7 @@ use std::sync::Arc;
 
 use self::token_allowance_query::TokenAllowanceQuery;
 
+#[derive(Debug)]
 pub struct Inventory {
     connector: Arc<Connector>,
     config: Config,

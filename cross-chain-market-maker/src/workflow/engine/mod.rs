@@ -18,10 +18,11 @@ pub fn configure_engine(
     config: &Config,
     state_manager: InMemoryStateManager,
     connector: Arc<Connector>,
-    _inventory: Arc<Inventory>,
+    inventory: Arc<Inventory>,
 ) -> Engine<Event, Action> {
     let intents_mempool_source = LimitOrderIntentbookSource::new(
         connector.clone(),
+        inventory.clone(),
         config.addresses.intentbook_addresses.clone(),
     );
 

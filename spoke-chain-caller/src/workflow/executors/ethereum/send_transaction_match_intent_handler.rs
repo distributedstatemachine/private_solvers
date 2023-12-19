@@ -3,7 +3,8 @@ use std::sync::Arc;
 use anyhow::Result;
 use async_trait::async_trait;
 use bindings_khalani::shared_types::IntentBid;
-use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCallIntentBook;
+use bindings_khalani::spoke_chain_call_intent_book::{SpokeChainCallBid, SpokeChainCallIntentBook};
+use ethers::abi::AbiEncode;
 use ethers::contract::ContractCall;
 use ethers::types::Bytes;
 use tracing::info;
@@ -59,9 +60,14 @@ impl SendTransactionMatchIntentHandler {
             intentbook_address.spoke_chain_call_intentbook,
             rpc_client,
         );
-        // TODO: encode intent bid.
-        let intent_bid = IntentBid { bid: Bytes::new() };
-        let mut call = intentbook.match_intent(spoke_chain_call.intent_id.into(), intent_bid);
+        let spoke_chain_call_bid = SpokeChainCallBid {
+            caller: self.connector.get_address(),
+        };
+        let intent_bid = IntentBid {
+            intent_id: spoke_chain_call.intent_id.into(),
+            bid: Bytes::from(spoke_chain_call_bid.encode()),
+        };
+        let mut call = intentbook.match_intent(intent_bid);
         call.tx
             .set_chain_id(Into::<u32>::into(spoke_chain_call.chain_id));
         Ok(call)

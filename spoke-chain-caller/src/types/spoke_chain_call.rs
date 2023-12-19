@@ -38,7 +38,7 @@ impl TryFrom<ContractIntent> for SpokeChainCall {
     type Error = anyhow::Error;
 
     fn try_from(value: ContractIntent) -> Result<Self, Self::Error> {
-        let spoke_chain_call = ContractIntent::decode(value.order)?;
+        let spoke_chain_call = ContractIntent::decode(value.intent)?;
         spoke_chain_call.try_into()
     }
 }

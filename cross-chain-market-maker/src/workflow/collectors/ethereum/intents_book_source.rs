@@ -11,6 +11,7 @@ use solver_common::config::addresses::IntentbookAddresses;
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
+use solver_common::inventory::Inventory;
 
 use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::workflow::collectors::limit_order_intent_collector::LimitOrderIntentSource;
@@ -18,11 +19,16 @@ use crate::workflow::collectors::limit_order_intent_collector::LimitOrderIntentS
 #[derive(Debug, Clone)]
 pub struct LimitOrderIntentbookSource {
     rpc_client: Arc<RpcClient>,
+    inventory: Arc<Inventory>,
     limit_order_intentbook: LimitOrderIntentBook<RpcClient>,
 }
 
 impl LimitOrderIntentbookSource {
-    pub fn new(connector: Arc<Connector>, intentbook_addresses: IntentbookAddresses) -> Self {
+    pub fn new(
+        connector: Arc<Connector>,
+        inventory: Arc<Inventory>,
+        intentbook_addresses: IntentbookAddresses,
+    ) -> Self {
         let rpc_client = connector.get_rpc_client(ChainId::Khalani).unwrap();
         let limit_order_intentbook = LimitOrderIntentBook::new(
             intentbook_addresses.limit_order_intentbook,
@@ -31,6 +37,7 @@ impl LimitOrderIntentbookSource {
 
         Self {
             rpc_client,
+            inventory,
             limit_order_intentbook,
         }
     }
@@ -48,7 +55,8 @@ impl EventSource for LimitOrderIntentbookSource {
     }
 
     fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        let limit_order_intent: LimitOrderIntent = event.intent.try_into()?;
+        let limit_order_intent: LimitOrderIntent =
+            (self.inventory.clone(), event.intent).try_into()?;
         Ok(LimitOrderIntent {
             intent_id: event.intent_id.into(),
             ..limit_order_intent
@@ -62,7 +70,7 @@ impl LimitOrderIntentSource for LimitOrderIntentbookSource {
         &self,
     ) -> Result<CollectorStream<'_, LimitOrderIntent>> {
         let event_fetcher = EventFetcher::new(
-            String::from("IntentsBook"),
+            String::from("LimitOrderIntentbook"),
             self.rpc_client.clone(),
             self.clone(),
         );

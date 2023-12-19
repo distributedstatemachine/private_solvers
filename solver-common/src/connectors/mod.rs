@@ -14,7 +14,7 @@ use crate::error::ChainError;
 pub type RpcClient = SignerMiddleware<NonceManagerMiddleware<Provider<Http>>, LocalWallet>;
 pub type WsClient = Provider<Ws>;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Connector {
     address: Address,
     rpc_clients: HashMap<ChainId, Arc<RpcClient>>,
