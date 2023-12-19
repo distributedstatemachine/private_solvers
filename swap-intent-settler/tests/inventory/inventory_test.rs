@@ -4,8 +4,7 @@ use anyhow::{anyhow, Result};
 
 use solver_common::inventory::token_balance_query::TokenBalanceQuery;
 use solver_common::inventory::Inventory;
-
-use crate::common::{create_connector, create_e2e_config};
+use solver_common::tests::connector::{create_connector, create_e2e_config};
 
 #[tokio::test]
 async fn test_inventory() -> Result<()> {

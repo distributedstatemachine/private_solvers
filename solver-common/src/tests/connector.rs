@@ -1,8 +1,9 @@
 use anyhow::{Context, Result};
 use ethers::prelude::LocalWallet;
-use solver_common::config::Config;
-use solver_common::connectors::Connector;
 use std::env;
+
+use crate::config::Config;
+use crate::connectors::Connector;
 
 // https://sepolia.etherscan.io/address/0x18F814fA6CB21cC51ae0C5594418766F17DFb6A9
 // https://testnet.snowtrace.io/address/0x18F814fA6CB21cC51ae0C5594418766F17DFb6A9

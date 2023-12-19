@@ -7,3 +7,4 @@ pub mod ethereum;
 pub mod inventory;
 pub mod types;
 pub mod workflow;
+pub mod tests;
