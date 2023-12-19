@@ -6,8 +6,7 @@ use solver_common::config::chain::ChainId;
 use std::sync::Arc;
 
 use solver_common::inventory::{amount::Amount, token::Token, Inventory};
-
-use crate::types::intent_id::IntentId;
+use solver_common::types::intent_id::IntentId;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LimitOrderIntent {

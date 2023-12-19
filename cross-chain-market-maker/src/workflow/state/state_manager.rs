@@ -1,6 +1,6 @@
-use crate::types::intent_id::IntentId;
 use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::workflow::state::IntentState;
+use solver_common::types::intent_id::IntentId;
 
 pub trait StateManager {
     fn update_state(&mut self, intent_id: IntentId, new_state: IntentState);

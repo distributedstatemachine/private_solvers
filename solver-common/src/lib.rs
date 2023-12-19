@@ -5,4 +5,5 @@ pub mod error;
 pub mod ethereum;
 
 pub mod inventory;
+pub mod types;
 pub mod workflow;

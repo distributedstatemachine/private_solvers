@@ -1,6 +1,6 @@
-use crate::types::intent_id::IntentId;
 use ethers::types::{Address, Bytes, U256};
 use solver_common::config::chain::ChainId;
+use solver_common::types::intent_id::IntentId;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SwapIntent {

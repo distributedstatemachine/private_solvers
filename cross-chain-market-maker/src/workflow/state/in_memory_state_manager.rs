@@ -1,9 +1,8 @@
-use std::collections::HashMap;
-
-use crate::types::intent_id::IntentId;
 use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::workflow::state::state_manager::StateManager;
 use crate::workflow::state::IntentState;
+use solver_common::types::intent_id::IntentId;
+use std::collections::HashMap;
 
 pub struct InMemoryStateManager {
     intents: HashMap<IntentId, IntentState>,

@@ -1,9 +1,9 @@
 use crate::quote::quoted_intent::QuotedIntent;
-use crate::types::intent_id::IntentId;
 use crate::types::swap_intent::SwapIntent;
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensHandlerResult;
 use crate::workflow::executors::settle_intent_executor::SwapIntentSettlementData;
 use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerHandlerResult;
+use solver_common::types::intent_id::IntentId;
 
 pub mod in_memory_state_manager;
 pub mod state_manager;

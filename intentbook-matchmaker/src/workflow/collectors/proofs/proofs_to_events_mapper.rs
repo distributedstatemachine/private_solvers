@@ -4,9 +4,9 @@ use tracing::debug;
 
 use crate::types::intent::Intent;
 use crate::types::proof_id::ProofId;
-use crate::types::IntentId;
 use crate::workflow::event::Event;
 use crate::workflow::state::IntentState;
+use solver_common::types::intent_id::IntentId;
 use spoke_chain_caller::types::spoke_chain_call::SpokeChainCall;
 
 #[derive(Default)]

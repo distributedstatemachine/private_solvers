@@ -12,8 +12,8 @@ use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
 
-use crate::types::IntentId;
 use crate::workflow::collectors::matched_intent_collector::MatchedIntentsSource;
+use solver_common::types::intent_id::IntentId;
 
 #[derive(Debug, Clone)]
 pub struct MatchedIntentbookIntentSource {

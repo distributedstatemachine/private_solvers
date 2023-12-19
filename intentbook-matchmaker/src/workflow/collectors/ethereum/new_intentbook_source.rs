@@ -13,8 +13,8 @@ use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
 use spoke_chain_caller::types::spoke_chain_call::SpokeChainCall;
 
-use crate::types::IntentId;
 use crate::workflow::collectors::new_intent_collector::NewIntentSource;
+use solver_common::types::intent_id::IntentId;
 
 #[derive(Debug, Clone)]
 pub struct NewIntentbookIntentSource {

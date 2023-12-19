@@ -2,8 +2,8 @@ use anyhow::Result;
 use artemis_core::types::Executor;
 use async_trait::async_trait;
 
-use crate::types::IntentId;
 use crate::workflow::action::Action;
+use solver_common::types::intent_id::IntentId;
 
 #[derive(Debug, Clone)]
 pub struct IntentSettlementData {

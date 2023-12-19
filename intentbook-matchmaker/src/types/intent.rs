@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use bindings_khalani::base_intent_book::Intent as ContractIntent;
+use solver_common::types::intent_id::IntentId;
 use spoke_chain_caller::types::spoke_chain_call::SpokeChainCall;
-use spoke_chain_caller::types::IntentId;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Intent {

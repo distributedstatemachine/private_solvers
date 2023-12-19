@@ -1,5 +1,5 @@
-use crate::types::intent_id::IntentId;
 use crate::types::limit_order_intent::LimitOrderIntent;
+use solver_common::types::intent_id::IntentId;
 
 pub mod in_memory_state_manager;
 pub mod state_manager;

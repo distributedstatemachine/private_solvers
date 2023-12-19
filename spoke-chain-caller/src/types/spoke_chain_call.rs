@@ -1,9 +1,9 @@
-use crate::types::IntentId;
 use bindings_khalani::spoke_chain_call_intent_book::Intent as ContractIntent;
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCall as ContractSpokeChainCall;
 use ethers::abi::AbiDecode;
 use ethers::types::{Address, Bytes, U256};
 use solver_common::config::chain::ChainId;
+use solver_common::types::intent_id::IntentId;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SpokeChainCall {
