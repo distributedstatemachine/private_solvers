@@ -17,12 +17,4 @@ impl IntentState {
             limit_order_intent,
         }
     }
-
-    pub fn get_intent_id(&self) -> IntentId {
-        self.intent_id
-    }
-
-    pub fn is_ready_to_settle(&self) -> bool {
-        false
-    }
 }

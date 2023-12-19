@@ -46,11 +46,7 @@ impl EventSource for IntentsMempoolSource {
     }
 
     fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        let swap_intent: SwapIntent = event.intent.try_into()?;
-        Ok(SwapIntent {
-            intent_id: event.intent_id.into(),
-            ..swap_intent
-        })
+        (event.intent_id.into(), event.intent).try_into()
     }
 }
 

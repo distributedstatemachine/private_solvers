@@ -6,7 +6,7 @@ use solver_common::config::chain::ChainId;
 use std::sync::Arc;
 
 use solver_common::inventory::{amount::Amount, token::Token, Inventory};
-use solver_common::types::intent_id::IntentId;
+use solver_common::types::intent_id::{IntentId, WithIntentId};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LimitOrderIntent {
@@ -19,11 +19,12 @@ pub struct LimitOrderIntent {
     pub price: U256,
 }
 
-impl TryFrom<(Arc<Inventory>, Intent)> for LimitOrderIntent {
+impl TryFrom<WithIntentId<(Arc<Inventory>, Intent)>> for LimitOrderIntent {
     type Error = anyhow::Error;
 
-    fn try_from(value: (Arc<Inventory>, Intent)) -> Result<Self, Self::Error> {
-        let (inventory, intent) = value;
+    fn try_from(value: WithIntentId<(Arc<Inventory>, Intent)>) -> Result<Self, Self::Error> {
+        let (intent_id, inventory_and_intent) = value;
+        let (inventory, intent) = inventory_and_intent;
         let limit_order =
             bindings_khalani::limit_order_intent_book::LimitOrder::decode(intent.intent)?;
         let token = inventory
@@ -36,7 +37,7 @@ impl TryFrom<(Arc<Inventory>, Intent)> for LimitOrderIntent {
                 limit_order.out_token
             ))?;
         Ok(Self {
-            intent_id: Default::default(),
+            intent_id,
             author: limit_order.author,
             signature: intent.signature,
             price: limit_order.price,

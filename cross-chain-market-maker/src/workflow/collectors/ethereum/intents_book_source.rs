@@ -55,12 +55,11 @@ impl EventSource for LimitOrderIntentbookSource {
     }
 
     fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        let limit_order_intent: LimitOrderIntent =
-            (self.inventory.clone(), event.intent).try_into()?;
-        Ok(LimitOrderIntent {
-            intent_id: event.intent_id.into(),
-            ..limit_order_intent
-        })
+        (
+            event.intent_id.into(),
+            (self.inventory.clone(), event.intent),
+        )
+            .try_into()
     }
 }
 

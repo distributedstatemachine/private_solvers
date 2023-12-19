@@ -1,11 +1,10 @@
 use ethers::types::{Address, Bytes, U256};
 use solver_common::config::chain::ChainId;
-use solver_common::types::intent_id::IntentId;
+use solver_common::types::intent_id::{IntentId, WithIntentId};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SwapIntent {
     pub intent_id: IntentId,
-
     pub author: Address,
     pub signature: Bytes,
     pub source_chain_id: ChainId,
@@ -18,16 +17,15 @@ pub struct SwapIntent {
     pub nonce: U256,
 }
 
-impl TryFrom<bindings_khalani::shared_types::SwapIntent> for SwapIntent {
+impl TryFrom<WithIntentId<bindings_khalani::shared_types::SwapIntent>> for SwapIntent {
     type Error = anyhow::Error;
 
     fn try_from(
-        value: bindings_khalani::abstract_request_processor::SwapIntent,
+        value: WithIntentId<bindings_khalani::shared_types::SwapIntent>,
     ) -> Result<Self, Self::Error> {
+        let (intent_id, value) = value;
         Ok(SwapIntent {
-            // TODO: create a function to purely calculate the intent ID.
-            intent_id: Default::default(),
-
+            intent_id,
             author: value.author,
             signature: value.signature,
             source_chain_id: value.source_chain_id.try_into()?,
@@ -42,7 +40,6 @@ impl TryFrom<bindings_khalani::shared_types::SwapIntent> for SwapIntent {
     }
 }
 
-// TODO: consider using a macros that would reduce this boilerplate.
 impl From<SwapIntent> for bindings_khalani::shared_types::SwapIntent {
     fn from(value: SwapIntent) -> Self {
         Self {

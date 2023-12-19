@@ -17,12 +17,4 @@ impl IntentState {
             spoke_chain_call: intent,
         }
     }
-
-    pub fn get_intent_id(&self) -> IntentId {
-        self.intent_id
-    }
-
-    pub fn is_ready_to_settle(&self) -> bool {
-        true
-    }
 }
