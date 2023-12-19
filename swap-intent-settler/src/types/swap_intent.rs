@@ -1,3 +1,6 @@
+use bindings_khalani::shared_types::Intent as ContractIntent;
+use bindings_khalani::shared_types::SwapIntent as ContractSwapIntent;
+use ethers::abi::AbiDecode;
 use ethers::types::{Address, Bytes, U256};
 use solver_common::config::chain::ChainId;
 use solver_common::types::intent_id::{IntentId, WithIntentId};
@@ -17,17 +20,16 @@ pub struct SwapIntent {
     pub nonce: U256,
 }
 
-impl TryFrom<WithIntentId<bindings_khalani::shared_types::SwapIntent>> for SwapIntent {
+impl TryFrom<WithIntentId<ContractIntent>> for SwapIntent {
     type Error = anyhow::Error;
 
-    fn try_from(
-        value: WithIntentId<bindings_khalani::shared_types::SwapIntent>,
-    ) -> Result<Self, Self::Error> {
-        let (intent_id, value) = value;
+    fn try_from(value: WithIntentId<ContractIntent>) -> Result<Self, Self::Error> {
+        let (intent_id, intent) = value;
+        let value: ContractSwapIntent = ContractSwapIntent::decode(intent.intent)?;
         Ok(SwapIntent {
             intent_id,
             author: value.author,
-            signature: value.signature,
+            signature: intent.signature,
             source_chain_id: value.source_chain_id.try_into()?,
             destination_chain_id: value.destination_chain_id.try_into()?,
             source_token: value.source_token,
@@ -40,7 +42,7 @@ impl TryFrom<WithIntentId<bindings_khalani::shared_types::SwapIntent>> for SwapI
     }
 }
 
-impl From<SwapIntent> for bindings_khalani::shared_types::SwapIntent {
+impl From<SwapIntent> for ContractSwapIntent {
     fn from(value: SwapIntent) -> Self {
         Self {
             author: value.author,

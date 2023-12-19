@@ -47,8 +47,8 @@ impl EventSource for GmpEventVerifierProofSource {
             .address(ValueOrArray::Value(self.verifier_config.verifier_address))
     }
 
-    fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        Ok(event.event_hash.into())
+    fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>> {
+        Some(Ok(event.event_hash.into()))
     }
 }
 

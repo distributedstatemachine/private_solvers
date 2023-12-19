@@ -18,7 +18,7 @@ pub trait EventSource {
     type EventResult;
 
     fn create_event_filter(&self) -> ContractEvent<Arc<RpcClient>, RpcClient, Self::EventFilter>;
-    fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult>;
+    fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>>;
 }
 
 pub struct EventFetcher<T> {
@@ -30,7 +30,7 @@ pub struct EventFetcher<T> {
 impl<'a, T> EventFetcher<T>
 where
     T: 'a + EventSource + Sized + Sync + Send,
-    T::EventFilter: EthLogDecode,
+    T::EventFilter: EthLogDecode + Debug + Clone,
     T::EventResult: 'a + Debug + Send,
 {
     pub fn new(indexer_name: String, rpc_client: Arc<RpcClient>, event_source: T) -> Self {
@@ -91,13 +91,17 @@ where
                 };
 
                 for event in events {
-                    match self.event_source.parse_event(event) {
-                        Ok(event) => {
+                    match self.event_source.parse_event(event.clone()) {
+                        Some(Ok(event)) => {
                             info!(?event, self.indexer_name, "New event indexed");
                             yield event
                         }
-                        Err(e) => {
+                        Some(Err(e)) => {
                             error!(?e, self.indexer_name, "Error parsing event");
+                            continue;
+                        }
+                        None => {
+                            info!(?event, self.indexer_name, "Skipping intent");
                             continue;
                         }
                     }

@@ -28,8 +28,10 @@ pub fn configure_engine(
     inventory: Arc<Inventory>,
 ) -> Engine<Event, Action> {
     // Set up Ethereum specific clients.
-    let intents_mempool_source =
-        IntentsMempoolSource::new(connector.clone(), config.addresses.intents_mempool_address);
+    let intents_mempool_source = IntentsMempoolSource::new(
+        connector.clone(),
+        config.addresses.intentbook_addresses.clone(),
+    );
     let gmp_event_verifier_sources: Vec<GmpEventVerifierProofSource> = config
         .addresses
         .verifiers

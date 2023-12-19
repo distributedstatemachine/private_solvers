@@ -11,10 +11,9 @@ use crate::types::intent::Intent;
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
-use spoke_chain_caller::types::spoke_chain_call::SpokeChainCall;
 
 use crate::workflow::collectors::new_intent_collector::NewIntentSource;
-use solver_common::types::intent_id::IntentId;
+use solver_common::types::intent_id::{IntentId, WithIntentId};
 
 #[derive(Debug, Clone)]
 pub struct NewIntentbookIntentSource {
@@ -47,16 +46,20 @@ impl EventSource for NewIntentbookIntentSource {
             .address(ValueOrArray::Value(self.intentbook_address))
     }
 
-    fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        let intent_id: IntentId = IntentId::from(event.intent_id);
-        event.intent.try_into().map(|intent| match intent {
-            Intent::SpokeChainCall(intent) => Intent::SpokeChainCall(SpokeChainCall {
-                intent_id,
-                ..intent
-            }),
-            Intent::LimitOrder(_) => Intent::LimitOrder(intent_id),
-            Intent::SwapIntent(_) => Intent::LimitOrder(intent_id),
-        })
+    fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>> {
+        let intent_id: IntentId = event.intent_id.into();
+        let with_intent_id: WithIntentId<bindings_khalani::base_intent_book::Intent> =
+            (intent_id, event.intent);
+
+        if let Ok(spoke_chain_caller) = with_intent_id.clone().try_into() {
+            return Some(Ok(Intent::SpokeChainCall(spoke_chain_caller)));
+        }
+
+        if let Ok(swap_intent) = with_intent_id.clone().try_into() {
+            return Some(Ok(Intent::SwapIntent(swap_intent)));
+        }
+
+        None
     }
 }
 

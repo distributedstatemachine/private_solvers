@@ -1,4 +1,3 @@
-use bindings_khalani::spoke_chain_call_intent_book::Intent as ContractIntent;
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCall as ContractSpokeChainCall;
 use ethers::abi::AbiDecode;
 use ethers::types::{Address, Bytes, U256};
@@ -16,11 +15,14 @@ pub struct SpokeChainCall {
     pub amount: U256,
 }
 
-impl TryFrom<WithIntentId<ContractSpokeChainCall>> for SpokeChainCall {
+impl TryFrom<WithIntentId<bindings_khalani::base_intent_book::Intent>> for SpokeChainCall {
     type Error = anyhow::Error;
 
-    fn try_from(value: WithIntentId<ContractSpokeChainCall>) -> Result<Self, Self::Error> {
+    fn try_from(
+        value: WithIntentId<bindings_khalani::base_intent_book::Intent>,
+    ) -> Result<Self, Self::Error> {
         let (intent_id, value) = value;
+        let value: ContractSpokeChainCall = ContractSpokeChainCall::decode(value.intent)?;
         Ok(SpokeChainCall {
             intent_id,
             author: value.author,
@@ -30,14 +32,5 @@ impl TryFrom<WithIntentId<ContractSpokeChainCall>> for SpokeChainCall {
             token: value.token,
             amount: value.amount,
         })
-    }
-}
-
-impl TryFrom<ContractIntent> for SpokeChainCall {
-    type Error = anyhow::Error;
-
-    fn try_from(value: ContractIntent) -> Result<Self, Self::Error> {
-        let spoke_chain_call = ContractIntent::decode(value.intent)?;
-        spoke_chain_call.try_into()
     }
 }

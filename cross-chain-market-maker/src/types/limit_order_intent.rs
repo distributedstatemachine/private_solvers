@@ -1,5 +1,7 @@
 use anyhow::anyhow;
-use bindings_khalani::limit_order_intent_book::Intent;
+use bindings_khalani::limit_order_intent_book::{
+    Intent as ContractIntent, LimitOrder as ContractLimitOrder,
+};
 use ethers::abi::{AbiDecode, AbiEncode};
 use ethers::types::{Address, Bytes, U256};
 use solver_common::config::chain::ChainId;
@@ -19,14 +21,15 @@ pub struct LimitOrderIntent {
     pub price: U256,
 }
 
-impl TryFrom<WithIntentId<(Arc<Inventory>, Intent)>> for LimitOrderIntent {
+impl TryFrom<WithIntentId<(Arc<Inventory>, ContractIntent)>> for LimitOrderIntent {
     type Error = anyhow::Error;
 
-    fn try_from(value: WithIntentId<(Arc<Inventory>, Intent)>) -> Result<Self, Self::Error> {
+    fn try_from(
+        value: WithIntentId<(Arc<Inventory>, ContractIntent)>,
+    ) -> Result<Self, Self::Error> {
         let (intent_id, inventory_and_intent) = value;
         let (inventory, intent) = inventory_and_intent;
-        let limit_order =
-            bindings_khalani::limit_order_intent_book::LimitOrder::decode(intent.intent)?;
+        let limit_order = ContractLimitOrder::decode(intent.intent)?;
         let token = inventory
             .find_token_by_address(limit_order.token, ChainId::Khalani)
             .ok_or(anyhow!("Unknown LimitOrder token {}", limit_order.token))?;
@@ -48,7 +51,7 @@ impl TryFrom<WithIntentId<(Arc<Inventory>, Intent)>> for LimitOrderIntent {
     }
 }
 
-impl From<LimitOrderIntent> for bindings_khalani::limit_order_intent_book::LimitOrder {
+impl From<LimitOrderIntent> for ContractLimitOrder {
     fn from(value: LimitOrderIntent) -> Self {
         Self {
             author: value.author,
@@ -60,10 +63,9 @@ impl From<LimitOrderIntent> for bindings_khalani::limit_order_intent_book::Limit
     }
 }
 
-impl From<LimitOrderIntent> for Intent {
+impl From<LimitOrderIntent> for ContractIntent {
     fn from(value: LimitOrderIntent) -> Self {
-        let limit_order: bindings_khalani::limit_order_intent_book::LimitOrder =
-            value.clone().into();
+        let limit_order: ContractLimitOrder = value.clone().into();
         Self {
             intent: Bytes::from(limit_order.encode()),
             signature: value.signature.clone(),

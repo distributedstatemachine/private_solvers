@@ -54,12 +54,14 @@ impl EventSource for LimitOrderIntentbookSource {
             .address(ValueOrArray::Value(self.limit_order_intentbook.address()))
     }
 
-    fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        (
-            event.intent_id.into(),
-            (self.inventory.clone(), event.intent),
+    fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>> {
+        Some(
+            (
+                event.intent_id.into(),
+                (self.inventory.clone(), event.intent),
+            )
+                .try_into(),
         )
-            .try_into()
     }
 }
 

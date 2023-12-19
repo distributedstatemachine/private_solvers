@@ -46,8 +46,8 @@ impl EventSource for MatchedIntentbookIntentSource {
             .address(ValueOrArray::Value(self.intentbook_address))
     }
 
-    fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        Ok(IntentId::from(event.intent_id))
+    fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>> {
+        Some(Ok(IntentId::from(event.intent_id)))
     }
 }
 

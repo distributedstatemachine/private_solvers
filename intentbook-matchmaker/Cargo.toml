@@ -6,6 +6,8 @@ edition.workspace = true
 [dependencies]
 solver-common = { path = "../solver-common" }
 spoke-chain-caller = { path = "../spoke-chain-caller" }
+cross-chain-market-maker = { path = "../cross-chain-market-maker" }
+swap-intent-settler = { path = "../swap-intent-settler" }
 bindings-khalani = { path = "../crates/bindings-khalani" }
 
 tokio.workspace = true

@@ -2037,10 +2037,12 @@ dependencies = [
  "async-stream",
  "async-trait",
  "bindings-khalani",
+ "cross-chain-market-maker",
  "ethers",
  "futures",
  "solver-common",
  "spoke-chain-caller",
+ "swap-intent-settler",
  "tokio",
  "tracing",
 ]

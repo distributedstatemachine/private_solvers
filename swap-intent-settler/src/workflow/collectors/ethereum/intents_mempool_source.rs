@@ -3,9 +3,10 @@ use std::sync::Arc;
 use anyhow::Result;
 use artemis_core::types::CollectorStream;
 use async_trait::async_trait;
-use bindings_khalani::intents_mempool::{IntentCreatedFilter, IntentsMempool};
+use bindings_khalani::base_intent_book::{BaseIntentBook, IntentCreatedFilter};
 use ethers::contract::Event as ContractEvent;
-use ethers::types::{Address, ValueOrArray};
+use ethers::types::ValueOrArray;
+use solver_common::config::addresses::IntentbookAddresses;
 
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
@@ -17,19 +18,20 @@ use crate::workflow::collectors::swap_intent_collector::SwapIntentSource;
 #[derive(Debug, Clone)]
 pub struct IntentsMempoolSource {
     rpc_client: Arc<RpcClient>,
-    intents_mempool_address: Address,
-    intents_mempool: IntentsMempool<RpcClient>,
+    intentbook: BaseIntentBook<RpcClient>,
 }
 
 impl IntentsMempoolSource {
-    pub fn new(connector: Arc<Connector>, intents_mempool_address: Address) -> Self {
+    pub fn new(connector: Arc<Connector>, intentbook_addresses: IntentbookAddresses) -> Self {
         let rpc_client = connector.get_rpc_client(ChainId::Khalani).unwrap();
-        let intents_mempool = IntentsMempool::new(intents_mempool_address, rpc_client.clone());
+        let intentbook = BaseIntentBook::new(
+            intentbook_addresses.limit_order_intentbook,
+            rpc_client.clone(),
+        );
 
         Self {
             rpc_client,
-            intents_mempool,
-            intents_mempool_address,
+            intentbook,
         }
     }
 }
@@ -40,13 +42,13 @@ impl EventSource for IntentsMempoolSource {
     type EventResult = SwapIntent;
 
     fn create_event_filter(&self) -> ContractEvent<Arc<RpcClient>, RpcClient, Self::EventFilter> {
-        self.intents_mempool
+        self.intentbook
             .intent_created_filter()
-            .address(ValueOrArray::Value(self.intents_mempool_address))
+            .address(ValueOrArray::Value(self.intentbook.address()))
     }
 
-    fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        (event.intent_id.into(), event.intent).try_into()
+    fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>> {
+        Some((event.intent_id.into(), event.intent).try_into())
     }
 }
 

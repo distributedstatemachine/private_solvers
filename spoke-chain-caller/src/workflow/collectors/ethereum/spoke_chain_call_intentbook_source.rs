@@ -47,12 +47,8 @@ impl EventSource for SpokeChainCallIntentbookSource {
             .address(ValueOrArray::Value(self.intentbook_address))
     }
 
-    fn parse_event(&self, event: Self::EventFilter) -> Result<Self::EventResult> {
-        let swap_intent: SpokeChainCall = event.intent.try_into()?;
-        Ok(SpokeChainCall {
-            intent_id: event.intent_id.into(),
-            ..swap_intent
-        })
+    fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>> {
+        Some((event.intent_id.into(), event.intent).try_into())
     }
 }
 
