@@ -19,9 +19,13 @@
     "spoke_chain_executors": {
       "sepolia": "0x0000000000000000000000000000000000000000",
       "fuji": "0x0000000000000000000000000000000000000000"
+    },
+    "intentbook_addresses": {
+      "limit_order_intentbook": "0x0000000000000000000000000000000000000000",
+      "spoke_chain_call_intentbook": "0x0000000000000000000000000000000000000000",
+      "swap_intent_intentbook": "0x0000000000000000000000000000000000000000"
     }
   },
-  "intents_book_address": "0x580d2aa4231E4C2EFfb3A43D3b778cd956C875bf",
   "balancer": {
     "vault_address": "0x580d2aa4231E4C2EFfb3A43D3b778cd956C875bf",
     "interchain_liquidity_hub_address": "0xAe3bcdBAb70ED1244FbEe1b39FE6D49d98d4c2BC",
