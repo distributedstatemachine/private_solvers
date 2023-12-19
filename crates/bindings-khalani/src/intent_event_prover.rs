@@ -39,6 +39,39 @@ pub mod intent_event_prover {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("registerSpokeCalledEvent"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "registerSpokeCalledEvent",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("_event"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![
+                                            ::ethers::core::abi::ethabi::ParamType::Address,
+                                            ::ethers::core::abi::ethabi::ParamType::FixedBytes(32usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Address,
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                            ::ethers::core::abi::ethabi::ParamType::Address,
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                        ],
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned(
+                                            "struct SpokeChainCallEventLibrary.SpokeCalled",
+                                        ),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("registerSwapIntentFilledEvent"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -184,6 +217,15 @@ pub mod intent_event_prover {
                 .method_hash([214, 107, 34, 200], event_hash)
                 .expect("method not found (this should never happen)")
         }
+        ///Calls the contract's `registerSpokeCalledEvent` (0x4c69854b) function
+        pub fn register_spoke_called_event(
+            &self,
+            event: SpokeCalled,
+        ) -> ::ethers::contract::builders::ContractCall<M, ()> {
+            self.0
+                .method_hash([76, 105, 133, 75], (event,))
+                .expect("method not found (this should never happen)")
+        }
         ///Calls the contract's `registerSwapIntentFilledEvent` (0x7eb620a7) function
         pub fn register_swap_intent_filled_event(
             &self,
@@ -234,6 +276,26 @@ pub mod intent_event_prover {
     #[ethcall(name = "registerEvent", abi = "registerEvent(bytes32)")]
     pub struct RegisterEventCall {
         pub event_hash: [u8; 32],
+    }
+    ///Container type for all input parameters for the `registerSpokeCalledEvent` function with signature `registerSpokeCalledEvent((address,bytes32,address,bytes,address,uint256))` and selector `0x4c69854b`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "registerSpokeCalledEvent",
+        abi = "registerSpokeCalledEvent((address,bytes32,address,bytes,address,uint256))"
+    )]
+    pub struct RegisterSpokeCalledEventCall {
+        pub event: SpokeCalled,
     }
     ///Container type for all input parameters for the `registerSwapIntentFilledEvent` function with signature `registerSwapIntentFilledEvent((bytes32,address,uint256,uint256))` and selector `0x7eb620a7`
     #[derive(
@@ -308,6 +370,7 @@ pub mod intent_event_prover {
     )]
     pub enum IntentEventProverCalls {
         RegisterEvent(RegisterEventCall),
+        RegisterSpokeCalledEvent(RegisterSpokeCalledEventCall),
         RegisterSwapIntentFilledEvent(RegisterSwapIntentFilledEventCall),
         RegisterSwapIntentTokenBurnEvent(RegisterSwapIntentTokenBurnEventCall),
         RegisterSwapIntentTokenLockEvent(RegisterSwapIntentTokenLockEventCall),
@@ -321,6 +384,11 @@ pub mod intent_event_prover {
                 data,
             ) {
                 return Ok(Self::RegisterEvent(decoded));
+            }
+            if let Ok(decoded) = <RegisterSpokeCalledEventCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::RegisterSpokeCalledEvent(decoded));
             }
             if let Ok(decoded) = <RegisterSwapIntentFilledEventCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
@@ -346,6 +414,9 @@ pub mod intent_event_prover {
                 Self::RegisterEvent(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
+                Self::RegisterSpokeCalledEvent(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::RegisterSwapIntentFilledEvent(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -362,6 +433,9 @@ pub mod intent_event_prover {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
                 Self::RegisterEvent(element) => ::core::fmt::Display::fmt(element, f),
+                Self::RegisterSpokeCalledEvent(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::RegisterSwapIntentFilledEvent(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
@@ -377,6 +451,11 @@ pub mod intent_event_prover {
     impl ::core::convert::From<RegisterEventCall> for IntentEventProverCalls {
         fn from(value: RegisterEventCall) -> Self {
             Self::RegisterEvent(value)
+        }
+    }
+    impl ::core::convert::From<RegisterSpokeCalledEventCall> for IntentEventProverCalls {
+        fn from(value: RegisterSpokeCalledEventCall) -> Self {
+            Self::RegisterSpokeCalledEvent(value)
         }
     }
     impl ::core::convert::From<RegisterSwapIntentFilledEventCall>

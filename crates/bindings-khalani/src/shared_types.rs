@@ -138,10 +138,10 @@ pub struct TokenPermissions {
     Hash
 )]
 pub struct Intent {
-    pub order: ::ethers::core::types::Bytes,
-    pub sig: ::ethers::core::types::Bytes,
+    pub intent: ::ethers::core::types::Bytes,
+    pub signature: ::ethers::core::types::Bytes,
 }
-///`IntentBid(bytes)`
+///`IntentBid(bytes32,bytes)`
 #[derive(
     Clone,
     ::ethers::contract::EthAbiType,
@@ -155,7 +155,29 @@ pub struct Intent {
     Hash
 )]
 pub struct IntentBid {
+    pub intent_id: [u8; 32],
     pub bid: ::ethers::core::types::Bytes,
+}
+///`SpokeCalled(address,bytes32,address,bytes,address,uint256)`
+#[derive(
+    Clone,
+    ::ethers::contract::EthAbiType,
+    ::ethers::contract::EthAbiCodec,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash
+)]
+pub struct SpokeCalled {
+    pub caller: ::ethers::core::types::Address,
+    pub spoke_chain_call_intent_id: [u8; 32],
+    pub contract_to_call: ::ethers::core::types::Address,
+    pub call_data: ::ethers::core::types::Bytes,
+    pub token: ::ethers::core::types::Address,
+    pub amount: ::ethers::core::types::U256,
 }
 ///`FuzzSelector(address,bytes4[])`
 #[derive(

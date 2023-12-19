@@ -47,6 +47,47 @@ pub mod intent_event_verifier {
                     ],
                 ),
                 (
+                    ::std::borrow::ToOwned::to_owned("verifySpokeCalledEvent"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Function {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "verifySpokeCalledEvent",
+                            ),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::borrow::ToOwned::to_owned("event_"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
+                                        ::std::vec![
+                                            ::ethers::core::abi::ethabi::ParamType::Address,
+                                            ::ethers::core::abi::ethabi::ParamType::FixedBytes(32usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Address,
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                            ::ethers::core::abi::ethabi::ParamType::Address,
+                                            ::ethers::core::abi::ethabi::ParamType::Uint(256usize),
+                                        ],
+                                    ),
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned(
+                                            "struct SpokeChainCallEventLibrary.SpokeCalled",
+                                        ),
+                                    ),
+                                },
+                            ],
+                            outputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::Param {
+                                    name: ::std::string::String::new(),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::Bool,
+                                    internal_type: ::core::option::Option::Some(
+                                        ::std::borrow::ToOwned::to_owned("bool"),
+                                    ),
+                                },
+                            ],
+                            constant: ::core::option::Option::None,
+                            state_mutability: ::ethers::core::abi::ethabi::StateMutability::NonPayable,
+                        },
+                    ],
+                ),
+                (
                     ::std::borrow::ToOwned::to_owned("verifySwapIntentFilledEvent"),
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Function {
@@ -216,6 +257,15 @@ pub mod intent_event_verifier {
                 .method_hash([117, 227, 102, 22], event_hash)
                 .expect("method not found (this should never happen)")
         }
+        ///Calls the contract's `verifySpokeCalledEvent` (0xa8e8fe59) function
+        pub fn verify_spoke_called_event(
+            &self,
+            event: SpokeCalled,
+        ) -> ::ethers::contract::builders::ContractCall<M, bool> {
+            self.0
+                .method_hash([168, 232, 254, 89], (event,))
+                .expect("method not found (this should never happen)")
+        }
         ///Calls the contract's `verifySwapIntentFilledEvent` (0xeb8e712d) function
         pub fn verify_swap_intent_filled_event(
             &self,
@@ -266,6 +316,26 @@ pub mod intent_event_verifier {
     #[ethcall(name = "verify", abi = "verify(bytes32)")]
     pub struct VerifyCall {
         pub event_hash: [u8; 32],
+    }
+    ///Container type for all input parameters for the `verifySpokeCalledEvent` function with signature `verifySpokeCalledEvent((address,bytes32,address,bytes,address,uint256))` and selector `0xa8e8fe59`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthCall,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    #[ethcall(
+        name = "verifySpokeCalledEvent",
+        abi = "verifySpokeCalledEvent((address,bytes32,address,bytes,address,uint256))"
+    )]
+    pub struct VerifySpokeCalledEventCall {
+        pub event: SpokeCalled,
     }
     ///Container type for all input parameters for the `verifySwapIntentFilledEvent` function with signature `verifySwapIntentFilledEvent((bytes32,address,uint256,uint256))` and selector `0xeb8e712d`
     #[derive(
@@ -340,6 +410,7 @@ pub mod intent_event_verifier {
     )]
     pub enum IntentEventVerifierCalls {
         Verify(VerifyCall),
+        VerifySpokeCalledEvent(VerifySpokeCalledEventCall),
         VerifySwapIntentFilledEvent(VerifySwapIntentFilledEventCall),
         VerifySwapIntentTokenBurnEvent(VerifySwapIntentTokenBurnEventCall),
         VerifySwapIntentTokenLockEvent(VerifySwapIntentTokenLockEventCall),
@@ -353,6 +424,11 @@ pub mod intent_event_verifier {
                 data,
             ) {
                 return Ok(Self::Verify(decoded));
+            }
+            if let Ok(decoded) = <VerifySpokeCalledEventCall as ::ethers::core::abi::AbiDecode>::decode(
+                data,
+            ) {
+                return Ok(Self::VerifySpokeCalledEvent(decoded));
             }
             if let Ok(decoded) = <VerifySwapIntentFilledEventCall as ::ethers::core::abi::AbiDecode>::decode(
                 data,
@@ -376,6 +452,9 @@ pub mod intent_event_verifier {
         fn encode(self) -> Vec<u8> {
             match self {
                 Self::Verify(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::VerifySpokeCalledEvent(element) => {
+                    ::ethers::core::abi::AbiEncode::encode(element)
+                }
                 Self::VerifySwapIntentFilledEvent(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -392,6 +471,9 @@ pub mod intent_event_verifier {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
                 Self::Verify(element) => ::core::fmt::Display::fmt(element, f),
+                Self::VerifySpokeCalledEvent(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::VerifySwapIntentFilledEvent(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
@@ -407,6 +489,11 @@ pub mod intent_event_verifier {
     impl ::core::convert::From<VerifyCall> for IntentEventVerifierCalls {
         fn from(value: VerifyCall) -> Self {
             Self::Verify(value)
+        }
+    }
+    impl ::core::convert::From<VerifySpokeCalledEventCall> for IntentEventVerifierCalls {
+        fn from(value: VerifySpokeCalledEventCall) -> Self {
+            Self::VerifySpokeCalledEvent(value)
         }
     }
     impl ::core::convert::From<VerifySwapIntentFilledEventCall>
@@ -441,6 +528,20 @@ pub mod intent_event_verifier {
         Hash
     )]
     pub struct VerifyReturn(pub bool);
+    ///Container type for all return fields from the `verifySpokeCalledEvent` function with signature `verifySpokeCalledEvent((address,bytes32,address,bytes,address,uint256))` and selector `0xa8e8fe59`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct VerifySpokeCalledEventReturn(pub bool);
     ///Container type for all return fields from the `verifySwapIntentFilledEvent` function with signature `verifySwapIntentFilledEvent((bytes32,address,uint256,uint256))` and selector `0xeb8e712d`
     #[derive(
         Clone,

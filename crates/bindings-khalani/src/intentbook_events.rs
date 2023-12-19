@@ -40,7 +40,10 @@ pub mod intentbook_events {
                                 ::ethers::core::abi::ethabi::EventParam {
                                     name: ::std::borrow::ToOwned::to_owned("intentBid"),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Tuple(
-                                        ::std::vec![::ethers::core::abi::ethabi::ParamType::Bytes],
+                                        ::std::vec![
+                                            ::ethers::core::abi::ethabi::ParamType::FixedBytes(32usize),
+                                            ::ethers::core::abi::ethabi::ParamType::Bytes,
+                                        ],
                                     ),
                                     indexed: false,
                                 },
@@ -100,6 +103,33 @@ pub mod intentbook_events {
                     ::std::vec![
                         ::ethers::core::abi::ethabi::Event {
                             name: ::std::borrow::ToOwned::to_owned("IntentMatch"),
+                            inputs: ::std::vec![
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                                ::ethers::core::abi::ethabi::EventParam {
+                                    name: ::std::borrow::ToOwned::to_owned("intentBidId"),
+                                    kind: ::ethers::core::abi::ethabi::ParamType::FixedBytes(
+                                        32usize,
+                                    ),
+                                    indexed: true,
+                                },
+                            ],
+                            anonymous: false,
+                        },
+                    ],
+                ),
+                (
+                    ::std::borrow::ToOwned::to_owned("IntentPartiallySettled"),
+                    ::std::vec![
+                        ::ethers::core::abi::ethabi::Event {
+                            name: ::std::borrow::ToOwned::to_owned(
+                                "IntentPartiallySettled",
+                            ),
                             inputs: ::std::vec![
                                 ::ethers::core::abi::ethabi::EventParam {
                                     name: ::std::borrow::ToOwned::to_owned("intentId"),
@@ -234,6 +264,16 @@ pub mod intentbook_events {
         > {
             self.0.event()
         }
+        ///Gets the contract's `IntentPartiallySettled` event
+        pub fn intent_partially_settled_filter(
+            &self,
+        ) -> ::ethers::contract::builders::Event<
+            ::std::sync::Arc<M>,
+            M,
+            IntentPartiallySettledFilter,
+        > {
+            self.0.event()
+        }
         ///Gets the contract's `IntentSettled` event
         pub fn intent_settled_filter(
             &self,
@@ -275,7 +315,7 @@ pub mod intentbook_events {
     )]
     #[ethevent(
         name = "IntentBidReceived",
-        abi = "IntentBidReceived(bytes32,bytes32,(bytes))"
+        abi = "IntentBidReceived(bytes32,bytes32,(bytes32,bytes))"
     )]
     pub struct IntentBidReceivedFilter {
         #[ethevent(indexed)]
@@ -350,6 +390,28 @@ pub mod intentbook_events {
         Eq,
         Hash
     )]
+    #[ethevent(
+        name = "IntentPartiallySettled",
+        abi = "IntentPartiallySettled(bytes32,bytes32)"
+    )]
+    pub struct IntentPartiallySettledFilter {
+        #[ethevent(indexed)]
+        pub intent_id: [u8; 32],
+        #[ethevent(indexed)]
+        pub intent_bid_id: [u8; 32],
+    }
+    #[derive(
+        Clone,
+        ::ethers::contract::EthEvent,
+        ::ethers::contract::EthDisplay,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
     #[ethevent(name = "IntentSettled", abi = "IntentSettled(bytes32,bytes32)")]
     pub struct IntentSettledFilter {
         #[ethevent(indexed)]
@@ -373,6 +435,7 @@ pub mod intentbook_events {
         IntentCancelledFilter(IntentCancelledFilter),
         IntentCreatedFilter(IntentCreatedFilter),
         IntentMatchFilter(IntentMatchFilter),
+        IntentPartiallySettledFilter(IntentPartiallySettledFilter),
         IntentSettledFilter(IntentSettledFilter),
     }
     impl ::ethers::contract::EthLogDecode for IntentbookEventsEvents {
@@ -390,6 +453,9 @@ pub mod intentbook_events {
             }
             if let Ok(decoded) = IntentMatchFilter::decode_log(log) {
                 return Ok(IntentbookEventsEvents::IntentMatchFilter(decoded));
+            }
+            if let Ok(decoded) = IntentPartiallySettledFilter::decode_log(log) {
+                return Ok(IntentbookEventsEvents::IntentPartiallySettledFilter(decoded));
             }
             if let Ok(decoded) = IntentSettledFilter::decode_log(log) {
                 return Ok(IntentbookEventsEvents::IntentSettledFilter(decoded));
@@ -410,6 +476,9 @@ pub mod intentbook_events {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::IntentMatchFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::IntentPartiallySettledFilter(element) => {
+                    ::core::fmt::Display::fmt(element, f)
+                }
                 Self::IntentSettledFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
@@ -434,6 +503,11 @@ pub mod intentbook_events {
     impl ::core::convert::From<IntentMatchFilter> for IntentbookEventsEvents {
         fn from(value: IntentMatchFilter) -> Self {
             Self::IntentMatchFilter(value)
+        }
+    }
+    impl ::core::convert::From<IntentPartiallySettledFilter> for IntentbookEventsEvents {
+        fn from(value: IntentPartiallySettledFilter) -> Self {
+            Self::IntentPartiallySettledFilter(value)
         }
     }
     impl ::core::convert::From<IntentSettledFilter> for IntentbookEventsEvents {

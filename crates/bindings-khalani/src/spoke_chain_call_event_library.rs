@@ -1,4 +1,4 @@
-pub use intent_book_lib::*;
+pub use spoke_chain_call_event_library::*;
 /// This module was auto-generated with ethers-rs Abigen.
 /// More information at: <https://github.com/gakonst/ethers-rs>
 #[allow(
@@ -9,7 +9,7 @@ pub use intent_book_lib::*;
     dead_code,
     non_camel_case_types,
 )]
-pub mod intent_book_lib {
+pub mod spoke_chain_call_event_library {
     #[allow(deprecated)]
     fn __abi() -> ::ethers::core::abi::Abi {
         ::ethers::core::abi::ethabi::Contract {
@@ -22,46 +22,46 @@ pub mod intent_book_lib {
         }
     }
     ///The parsed JSON ABI of the contract.
-    pub static INTENTBOOKLIB_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(
-        __abi,
-    );
+    pub static SPOKECHAINCALLEVENTLIBRARY_ABI: ::ethers::contract::Lazy<
+        ::ethers::core::abi::Abi,
+    > = ::ethers::contract::Lazy::new(__abi);
     #[rustfmt::skip]
-    const __BYTECODE: &[u8] = b"`V`7`\x0B\x82\x82\x829\x80Q`\0\x1A`s\x14`*WcNH{q`\xE0\x1B`\0R`\0`\x04R`$`\0\xFD[0`\0R`s\x81S\x82\x81\xF3\xFEs\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 g\x98\xE7\xF2\x81\xEES\xD7\x92?\x05\xE7\xBF\xC4|\x98\xDD\xEC\x11\xF7L\x08\xB4\xBD5(/\n\"\xD0>EdsolcC\0\x08\x13\x003";
+    const __BYTECODE: &[u8] = b"`V`7`\x0B\x82\x82\x829\x80Q`\0\x1A`s\x14`*WcNH{q`\xE0\x1B`\0R`\0`\x04R`$`\0\xFD[0`\0R`s\x81S\x82\x81\xF3\xFEs\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 \x05\x01\xAE\xB1\xA1\xFB\xC7\x84Zy\xDD\xF14\x88\xBE\xEC;X\xE8:n\xA0\x17\xC7cm\x95\xF6\xC4\xCD\xCE\xFEdsolcC\0\x08\x13\x003";
     /// The bytecode of the contract.
-    pub static INTENTBOOKLIB_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
+    pub static SPOKECHAINCALLEVENTLIBRARY_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __BYTECODE,
     );
     #[rustfmt::skip]
-    const __DEPLOYED_BYTECODE: &[u8] = b"s\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 g\x98\xE7\xF2\x81\xEES\xD7\x92?\x05\xE7\xBF\xC4|\x98\xDD\xEC\x11\xF7L\x08\xB4\xBD5(/\n\"\xD0>EdsolcC\0\x08\x13\x003";
+    const __DEPLOYED_BYTECODE: &[u8] = b"s\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x000\x14`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 \x05\x01\xAE\xB1\xA1\xFB\xC7\x84Zy\xDD\xF14\x88\xBE\xEC;X\xE8:n\xA0\x17\xC7cm\x95\xF6\xC4\xCD\xCE\xFEdsolcC\0\x08\x13\x003";
     /// The deployed bytecode of the contract.
-    pub static INTENTBOOKLIB_DEPLOYED_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
+    pub static SPOKECHAINCALLEVENTLIBRARY_DEPLOYED_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __DEPLOYED_BYTECODE,
     );
-    pub struct IntentBookLib<M>(::ethers::contract::Contract<M>);
-    impl<M> ::core::clone::Clone for IntentBookLib<M> {
+    pub struct SpokeChainCallEventLibrary<M>(::ethers::contract::Contract<M>);
+    impl<M> ::core::clone::Clone for SpokeChainCallEventLibrary<M> {
         fn clone(&self) -> Self {
             Self(::core::clone::Clone::clone(&self.0))
         }
     }
-    impl<M> ::core::ops::Deref for IntentBookLib<M> {
+    impl<M> ::core::ops::Deref for SpokeChainCallEventLibrary<M> {
         type Target = ::ethers::contract::Contract<M>;
         fn deref(&self) -> &Self::Target {
             &self.0
         }
     }
-    impl<M> ::core::ops::DerefMut for IntentBookLib<M> {
+    impl<M> ::core::ops::DerefMut for SpokeChainCallEventLibrary<M> {
         fn deref_mut(&mut self) -> &mut Self::Target {
             &mut self.0
         }
     }
-    impl<M> ::core::fmt::Debug for IntentBookLib<M> {
+    impl<M> ::core::fmt::Debug for SpokeChainCallEventLibrary<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(::core::stringify!(IntentBookLib))
+            f.debug_tuple(::core::stringify!(SpokeChainCallEventLibrary))
                 .field(&self.address())
                 .finish()
         }
     }
-    impl<M: ::ethers::providers::Middleware> IntentBookLib<M> {
+    impl<M: ::ethers::providers::Middleware> SpokeChainCallEventLibrary<M> {
         /// Creates a new contract instance with the specified `ethers` client at
         /// `address`. The contract derefs to a `ethers::Contract` object.
         pub fn new<T: Into<::ethers::core::types::Address>>(
@@ -71,7 +71,7 @@ pub mod intent_book_lib {
             Self(
                 ::ethers::contract::Contract::new(
                     address.into(),
-                    INTENTBOOKLIB_ABI.clone(),
+                    SPOKECHAINCALLEVENTLIBRARY_ABI.clone(),
                     client,
                 ),
             )
@@ -107,8 +107,8 @@ pub mod intent_book_lib {
             ::ethers::contract::ContractError<M>,
         > {
             let factory = ::ethers::contract::ContractFactory::new(
-                INTENTBOOKLIB_ABI.clone(),
-                INTENTBOOKLIB_BYTECODE.clone().into(),
+                SPOKECHAINCALLEVENTLIBRARY_ABI.clone(),
+                SPOKECHAINCALLEVENTLIBRARY_BYTECODE.clone().into(),
                 client,
             );
             let deployer = factory.deploy(constructor_args)?;
@@ -117,7 +117,7 @@ pub mod intent_book_lib {
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for IntentBookLib<M> {
+    for SpokeChainCallEventLibrary<M> {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
