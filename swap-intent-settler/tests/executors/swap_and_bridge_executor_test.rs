@@ -10,9 +10,9 @@ use solver_common::inventory::token_allowance_query::TokenAllowanceQuery;
 use solver_common::inventory::Inventory;
 use solver_common::tests::connector::{create_connector, create_e2e_config};
 
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use swap_intent_settler::quote::intent_quoter::IntentQuoter;
 use swap_intent_settler::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
-use swap_intent_settler::types::swap_intent::SwapIntent;
 use swap_intent_settler::workflow::action::Action;
 use swap_intent_settler::workflow::executors::approve_tokens_executor::ApproveTokensExecutor;
 use swap_intent_settler::workflow::executors::ethereum::send_transaction_approve_tokens_handler::SendTransactionApproveTokensHandler;
