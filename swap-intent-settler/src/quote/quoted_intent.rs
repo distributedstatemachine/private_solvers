@@ -1,4 +1,4 @@
-use crate::types::swap_intent::SwapIntent;
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::inventory::amount::Amount;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

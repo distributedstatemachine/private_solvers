@@ -7,8 +7,8 @@ use ethers::contract::ContractCall;
 use ethers::types::Address;
 use tracing::info;
 
-use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::workflow::executors::call_spoke_executor::{CallSpokeHandler, CallSpokeHandlerResult};
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::error::ConfigError;

@@ -12,8 +12,8 @@ use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
 
-use crate::types::swap_intent::SwapIntent;
 use crate::workflow::collectors::swap_intent_collector::SwapIntentSource;
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 
 #[derive(Debug, Clone)]
 pub struct IntentsMempoolSource {

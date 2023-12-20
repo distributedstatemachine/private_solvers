@@ -4,12 +4,12 @@ use std::sync::Arc;
 use anyhow::{Context, Result};
 use ethers::types::U256;
 
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::config::chain::ChainId;
 use solver_common::inventory::Inventory;
 use solver_common::tests::connector::{create_connector, create_e2e_config};
 use swap_intent_settler::quote::intent_quoter::IntentQuoter;
 use swap_intent_settler::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
-use swap_intent_settler::types::swap_intent::SwapIntent;
 
 // TODO: Remove ignore directive once intent quoter is fixed. Currently it would return the default values for quotes , 0
 #[tokio::test]

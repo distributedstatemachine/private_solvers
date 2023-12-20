@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 solver-common = { path = "../solver-common" }
+intentbook-matchmaker = { path = "../intentbook-matchmaker" }
 bindings-khalani = { path = "../crates/bindings-khalani" }
 
 artemis-core.workspace = true

@@ -1,5 +1,5 @@
-use crate::types::swap_intent::SwapIntent;
 use crate::workflow::state::IntentState;
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::types::intent_id::IntentId;
 
 pub trait StateManager {

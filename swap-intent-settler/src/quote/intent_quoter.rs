@@ -1,7 +1,7 @@
 use crate::quote::quoted_intent::QuotedIntent;
-use crate::types::swap_intent::SwapIntent;
 use anyhow::Result;
 use async_trait::async_trait;
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 
 #[async_trait]
 pub trait IntentQuoter {

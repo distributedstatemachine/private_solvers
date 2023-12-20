@@ -13,8 +13,8 @@ use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
 use solver_common::inventory::Inventory;
 
-use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::workflow::collectors::limit_order_intent_collector::LimitOrderIntentSource;
+use intentbook_matchmaker::types::limit_order_intent::LimitOrderIntent;
 
 #[derive(Debug, Clone)]
 pub struct LimitOrderIntentbookSource {

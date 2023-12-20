@@ -2,9 +2,9 @@ use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
 
-use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::workflow::event::Event;
 use futures::stream::StreamExt;
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 
 #[async_trait]
 pub trait SpokeChainCallSource {

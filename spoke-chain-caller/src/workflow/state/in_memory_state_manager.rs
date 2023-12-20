@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::workflow::state::state_manager::StateManager;
 use crate::workflow::state::IntentState;
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::types::intent_id::IntentId;
 
 pub struct InMemoryStateManager {

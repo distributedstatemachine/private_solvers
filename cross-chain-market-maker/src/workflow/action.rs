@@ -1,4 +1,4 @@
-use crate::types::limit_order_intent::LimitOrderIntent;
+use intentbook_matchmaker::types::limit_order_intent::LimitOrderIntent;
 
 /// Core Action enum.
 #[derive(Debug, Clone)]

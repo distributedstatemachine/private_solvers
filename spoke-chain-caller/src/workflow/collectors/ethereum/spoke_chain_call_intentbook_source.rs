@@ -13,8 +13,8 @@ use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
 
-use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::workflow::collectors::spoke_chain_call_collector::SpokeChainCallSource;
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 
 #[derive(Debug, Clone)]
 pub struct SpokeChainCallIntentbookSource {

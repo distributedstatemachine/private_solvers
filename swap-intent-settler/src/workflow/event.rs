@@ -1,7 +1,7 @@
 use crate::quote::quoted_intent::QuotedIntent;
-use crate::types::swap_intent::SwapIntent;
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensHandlerResult;
 use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerHandlerResult;
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::types::intent_id::IntentId;
 
 /// Core Event enum.

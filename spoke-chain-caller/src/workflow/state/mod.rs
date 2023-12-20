@@ -1,4 +1,4 @@
-use crate::types::spoke_chain_call::SpokeChainCall;
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::types::intent_id::IntentId;
 
 pub mod in_memory_state_manager;

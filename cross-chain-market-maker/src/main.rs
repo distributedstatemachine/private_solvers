@@ -11,7 +11,6 @@ use solver_common::workflow::run_engine;
 use workflow::engine::configure_engine;
 use workflow::state::in_memory_state_manager::InMemoryStateManager;
 
-pub mod types;
 pub mod workflow;
 
 #[tokio::main]

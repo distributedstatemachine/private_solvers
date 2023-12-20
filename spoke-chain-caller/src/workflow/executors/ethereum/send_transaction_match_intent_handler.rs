@@ -9,10 +9,10 @@ use ethers::contract::ContractCall;
 use ethers::types::Bytes;
 use tracing::info;
 
-use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::workflow::executors::match_intent_executor::{
     MatchIntentHandler, MatchIntentHandlerResult,
 };
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::transaction::submit_transaction;

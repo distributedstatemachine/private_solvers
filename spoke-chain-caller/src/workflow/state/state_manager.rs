@@ -1,5 +1,5 @@
-use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::workflow::state::IntentState;
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::types::intent_id::IntentId;
 
 pub trait StateManager {

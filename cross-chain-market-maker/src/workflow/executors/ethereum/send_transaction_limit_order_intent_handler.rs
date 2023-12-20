@@ -11,10 +11,10 @@ use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::transaction::submit_transaction;
 
-use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::workflow::executors::post_limit_order_executor::{
     PostLimitOrderHandler, PostLimitOrderHandlerResult,
 };
+use intentbook_matchmaker::types::limit_order_intent::LimitOrderIntent;
 
 pub struct SendTransactionPostLimitOrderHandler {
     connector: Arc<Connector>,

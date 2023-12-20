@@ -1,6 +1,6 @@
-use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::workflow::state::state_manager::StateManager;
 use crate::workflow::state::IntentState;
+use intentbook_matchmaker::types::limit_order_intent::LimitOrderIntent;
 use solver_common::types::intent_id::IntentId;
 use std::collections::HashMap;
 

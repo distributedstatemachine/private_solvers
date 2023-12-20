@@ -1,4 +1,4 @@
-use crate::types::spoke_chain_call::SpokeChainCall;
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 
 /// Core Action enum.
 #[derive(Debug, Clone)]

@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::quoted_intent::QuotedIntent;
-use crate::types::swap_intent::SwapIntent;
 use crate::workflow::executors::ethereum::send_transaction_swap_and_bridge_handler::BalancerSwapTokensInvolved;
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::config::balancer::{BalancerConfig, BalancerPool};
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};

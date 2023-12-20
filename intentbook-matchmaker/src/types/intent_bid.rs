@@ -1,7 +1,7 @@
-use cross_chain_market_maker::types::limit_order_intent_bid::LimitOrderIntentBid;
+use crate::types::limit_order_intent_bid::LimitOrderIntentBid;
+use crate::types::spoke_chain_call_bid::SpokeChainCallBid;
+use crate::types::swap_intent_bid::SwapIntentBid;
 use solver_common::types::intent_id::{IntentBidId, IntentId};
-use spoke_chain_caller::types::spoke_chain_call_bid::SpokeChainCallBid;
-use swap_intent_settler::types::swap_intent_bid::SwapIntentBid;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum IntentBid {

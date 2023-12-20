@@ -1,7 +1,7 @@
 use crate::types::intent::Intent;
 use crate::types::intent_bid::IntentBid;
+use crate::types::spoke_chain_call_bid::SpokeChainCallBid;
 use solver_common::types::proof_id::ProofId;
-use spoke_chain_caller::types::spoke_chain_call_bid::SpokeChainCallBid;
 use std::collections::HashSet;
 
 pub mod in_memory_state_manager;

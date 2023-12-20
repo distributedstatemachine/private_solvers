@@ -2,9 +2,9 @@ use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
 
-use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::workflow::event::Event;
 use futures::stream::StreamExt;
+use intentbook_matchmaker::types::limit_order_intent::LimitOrderIntent;
 
 #[async_trait]
 pub trait LimitOrderIntentSource {

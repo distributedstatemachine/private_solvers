@@ -1,7 +1,7 @@
-use cross_chain_market_maker::types::limit_order_intent::LimitOrderIntent;
+use crate::types::limit_order_intent::LimitOrderIntent;
+use crate::types::spoke_chain_call::SpokeChainCall;
+use crate::types::swap_intent::SwapIntent;
 use solver_common::types::intent_id::IntentId;
-use spoke_chain_caller::types::spoke_chain_call::SpokeChainCall;
-use swap_intent_settler::types::swap_intent::SwapIntent;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Intent {

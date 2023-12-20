@@ -2,9 +2,9 @@ use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
 
-use crate::types::swap_intent::SwapIntent;
 use crate::workflow::event::Event;
 use futures::stream::StreamExt;
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 
 #[async_trait]
 pub trait SwapIntentSource {

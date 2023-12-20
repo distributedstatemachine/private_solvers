@@ -8,7 +8,6 @@ use solver_common::workflow::run_engine;
 use std::sync::Arc;
 use tracing::info;
 
-pub mod types;
 pub mod workflow;
 
 use crate::workflow::action::Action;

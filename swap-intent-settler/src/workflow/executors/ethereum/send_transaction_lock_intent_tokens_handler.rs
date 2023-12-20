@@ -6,10 +6,10 @@ use bindings_khalani::escrow::Escrow;
 use ethers::contract::ContractCall;
 use tracing::info;
 
-use crate::types::swap_intent::SwapIntent;
 use crate::workflow::executors::lock_tokens_executor::{
     LockIntentTokensHandler, LockIntentTokensHandlerResult,
 };
+use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::error::ConfigError;
