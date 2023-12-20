@@ -103,34 +103,13 @@ mod tests {
             decimals: 2,
         };
 
-        let amount2 = Amount {
-            base_units: U256::from_dec_str("2000").unwrap(),
-            decimals: 2,
-        };
+        let coefficient = U256::from_dec_str("2000").unwrap();
 
-        let expected_product = Amount {
-            base_units: U256::from_dec_str("2000000").unwrap(),
-            decimals: 4,
-        };
-
-        let result = amount1 * amount2;
-        assert_eq!(result, expected_product);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_amount_multiplication_different_decimals() {
-        let amount1 = Amount {
-            base_units: U256::from_dec_str("1000").unwrap(),
-            decimals: 2,
-        };
-
-        let amount2 = Amount {
-            base_units: U256::from_dec_str("2000").unwrap(),
-            decimals: 3,
-        };
-
-        let _result = amount1 * amount2;
+        let result = amount1 * coefficient;
+        assert_eq!(
+            result,
+            Amount::from_base_units(U256::from_dec_str("2000000").unwrap(), 2)
+        );
     }
 
     #[test]
