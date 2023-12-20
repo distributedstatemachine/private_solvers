@@ -1,16 +1,17 @@
+use crate::types::intent::Intent;
+use crate::types::intent_bid::IntentBid;
 use crate::workflow::action::Action;
-use crate::workflow::event::Event;
 use anyhow::Result;
-use artemis_core::types::{Collector, CollectorMap, Executor};
+use artemis_core::types::{Collector, Executor};
 use async_trait::async_trait;
 use ethers::types::TxHash;
-use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Sender};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MatchIntentHandlerResult {
-    pub spoke_chain_call: SpokeChainCall,
+    pub intent: Intent,
+    pub intent_bid: IntentBid,
     pub matching_tx_hash: TxHash,
 }
 
@@ -18,7 +19,8 @@ pub struct MatchIntentHandlerResult {
 pub trait MatchIntentHandler {
     async fn match_intent(
         &self,
-        spoke_chain_call: SpokeChainCall,
+        intent: Intent,
+        intent_bid: IntentBid,
     ) -> Result<MatchIntentHandlerResult>;
 }
 
@@ -28,14 +30,10 @@ pub struct MatchIntentExecutor<H: MatchIntentHandler> {
 }
 
 impl<H: MatchIntentHandler> MatchIntentExecutor<H> {
-    pub fn new(handler: H) -> (Self, Box<dyn Collector<Event>>) {
+    pub fn new(handler: H) -> (Self, Box<dyn Collector<MatchIntentHandlerResult>>) {
         let (confirmation_sender, confirmation_receiver) = channel(512);
         let action_confirmation_collector =
             Box::new(ActionConfirmationCollector::new(confirmation_receiver));
-        let action_confirmation_collector: Box<dyn Collector<Event>> =
-            Box::new(CollectorMap::new(action_confirmation_collector, |intent| {
-                Event::IntentMatched(intent)
-            }));
         (
             MatchIntentExecutor {
                 handler,
@@ -49,8 +47,8 @@ impl<H: MatchIntentHandler> MatchIntentExecutor<H> {
 #[async_trait]
 impl<H: MatchIntentHandler + Sync + Send> Executor<Action> for MatchIntentExecutor<H> {
     async fn execute(&self, action: Action) -> Result<()> {
-        if let Action::MatchIntent(spoke_chain_call) = action {
-            let match_intent_handler_result = self.handler.match_intent(spoke_chain_call).await?;
+        if let Action::MatchIntent(intent, intent_bid) = action {
+            let match_intent_handler_result = self.handler.match_intent(intent, intent_bid).await?;
             self.confirmation_sender
                 .send(match_intent_handler_result)
                 .await?;

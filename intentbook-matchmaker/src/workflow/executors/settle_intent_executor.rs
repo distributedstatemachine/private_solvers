@@ -30,6 +30,7 @@ impl<H: SettleIntentHandler + Send + Sync> Executor<Action> for SettleIntentExec
             Action::Settle(intent_settlement_data) => {
                 self.0.process_settle_intent(intent_settlement_data).await
             }
+            _ => Ok(()),
         }
     }
 }

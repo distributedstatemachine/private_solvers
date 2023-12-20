@@ -1,8 +1,8 @@
 use anyhow::Result;
 use bindings_khalani::shared_types::IntentBid as ContractIntent;
 use bindings_khalani::swap_intent_book::SwapIntentBid as ContractSwapIntentBid;
-use ethers::abi::AbiDecode;
-use ethers::types::{Address, U256};
+use ethers::abi::{AbiDecode, AbiEncode};
+use ethers::types::{Address, Bytes, U256};
 
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 use solver_common::types::proof_id::ProofId;
@@ -38,6 +38,16 @@ impl From<SwapIntentBid> for ContractSwapIntentBid {
             filler: value.filler,
             fill_amount: value.fill_amount,
             fill_timestamp: value.fill_timestamp,
+        }
+    }
+}
+
+impl From<SwapIntentBid> for bindings_khalani::base_intent_book::IntentBid {
+    fn from(value: SwapIntentBid) -> Self {
+        let bid: ContractSwapIntentBid = value.clone().into();
+        Self {
+            intent_id: value.intent_id.into(),
+            bid: Bytes::from(bid.encode()),
         }
     }
 }

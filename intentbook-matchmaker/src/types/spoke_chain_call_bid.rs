@@ -1,17 +1,33 @@
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCallBid as ContractSpokeChainCallBid;
-use ethers::abi::{encode_packed, AbiDecode, Token as AbiToken};
-use ethers::types::Address;
+use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
+use ethers::types::{Address, Bytes};
 use ethers::utils::keccak256;
 
+use crate::types::intent_bid::calculate_intent_bid_id;
 use crate::types::spoke_chain_call::SpokeChainCall;
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 use solver_common::types::proof_id::ProofId;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SpokeChainCallBid {
-    pub intent_id: IntentId,
     pub intent_bid_id: IntentBidId,
+    pub intent_id: IntentId,
     pub caller: Address,
+}
+
+impl SpokeChainCallBid {
+    pub fn new(intent_id: IntentId, caller: Address) -> Self {
+        let bid = Self {
+            intent_bid_id: Default::default(),
+            intent_id,
+            caller,
+        };
+        let intent_bid_id = calculate_intent_bid_id(bid.clone().into());
+        Self {
+            intent_bid_id,
+            ..bid
+        }
+    }
 }
 
 impl TryFrom<WithIntentIdAndBidId<bindings_khalani::base_intent_book::IntentBid>>
@@ -49,5 +65,17 @@ impl SpokeChainCallBid {
         ])
         .unwrap();
         Ok(vec![keccak256(encoded_spoke_chain_call.clone()).into()])
+    }
+}
+
+impl From<SpokeChainCallBid> for bindings_khalani::base_intent_book::IntentBid {
+    fn from(value: SpokeChainCallBid) -> Self {
+        let bid: ContractSpokeChainCallBid = ContractSpokeChainCallBid {
+            caller: value.caller,
+        };
+        Self {
+            intent_id: value.intent_id.into(),
+            bid: Bytes::from(bid.encode()),
+        }
     }
 }

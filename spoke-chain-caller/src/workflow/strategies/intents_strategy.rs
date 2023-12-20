@@ -5,7 +5,10 @@ use anyhow::Result;
 use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use futures::lock::Mutex;
+use intentbook_matchmaker::types::intent::Intent;
+use solver_common::connectors::Connector;
 use tracing::info;
+use intentbook_matchmaker::types::spoke_chain_call_bid::SpokeChainCallBid;
 
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
@@ -13,14 +16,18 @@ use crate::workflow::state::state_manager::StateManager;
 
 pub struct IntentsStrategy<S: StateManager> {
     state_manager: Arc<Mutex<S>>,
+    connector: Arc<Connector>,
 }
 
 impl<S> IntentsStrategy<S>
 where
     S: StateManager + Sync + Send,
 {
-    pub fn new(state_manager: Arc<Mutex<S>>) -> Self {
-        Self { state_manager }
+    pub fn new(state_manager: Arc<Mutex<S>>, connector: Arc<Connector>) -> Self {
+        Self {
+            state_manager,
+            connector,
+        }
     }
 }
 
@@ -42,11 +49,21 @@ where
                     .lock()
                     .await
                     .create_intent_state(spoke_chain_call.clone());
-                vec![Action::MatchIntent(spoke_chain_call)]
+
+                let spoke_chain_call_bid = SpokeChainCallBid::new(
+                    spoke_chain_call.intent_id,
+                    self.connector.get_address()
+                );
+                vec![Action::MatchIntent(spoke_chain_call, spoke_chain_call_bid)]
             }
-            Event::IntentMatched(spoke_chain_call) => {
-                info!(?spoke_chain_call, "Spoke Chain Call matched");
-                vec![Action::CallSpoke(spoke_chain_call.spoke_chain_call)]
+            Event::IntentMatched(match_intent_handler_result) => {
+                info!(?match_intent_handler_result, "Spoke Chain Call matched");
+                if let Intent::SpokeChainCall(spoke_chain_call) = match_intent_handler_result.intent
+                {
+                    vec![Action::CallSpoke(spoke_chain_call)]
+                } else {
+                    vec![]
+                }
             }
             Event::CallSpokeConfirmed(call_spoke_handler_result) => {
                 info!(?call_spoke_handler_result, "Spoke Chain Call confirmed");

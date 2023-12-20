@@ -1,1 +1,2 @@
+pub mod send_transaction_match_intent_handler;
 pub mod send_transaction_settle_intent_handler;
