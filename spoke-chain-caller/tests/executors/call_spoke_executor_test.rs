@@ -15,6 +15,14 @@ use spoke_chain_caller::workflow::executors::ethereum::send_transaction_call_spo
 use spoke_chain_caller::workflow::action::Action;
 use spoke_chain_caller::types::spoke_chain_call::SpokeChainCall;
 
+abigen!(
+    MockContractToCall,
+    r#"[
+        function mockFunction(address _token, uint256 _amount) external
+    ]"#,
+    event_derives(serde::Deserialize, serde::Serialize)
+);
+
 #[ignore]
 #[tokio::test]
 async fn test_swap_and_bridge_executor() -> Result<()> {
@@ -32,6 +40,9 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
 
     let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia.into())?;
 
+    let contract_to_call_address = "0xbfa2dd37EC75C27CDbaDdd0c19e0f69fD277c16b"; // Replace with your actual address
+    let call_data = MockContractToCall::mock_function(usdc_sepolia.address, amount)?;
+
     //TO-DO: mock and execute contract to call
     let amount = U256::from_str_radix("1000000000", 10).unwrap();
     let spoke_chain_call_payload = SpokeChainCall {
@@ -40,12 +51,12 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
         intent_id: Default::default(),
         author: Default::default(),
         chain_id: ChainId::Sepolia,
-        contract_to_call: Default::default(),
-        call_data: Default::default()
+        contract_to_call: contract_to_call_address.to_string(),
+        call_data: call_data.into(),
     };
 
     executor
-        .execute(Action::CallSpoke(quoted_intent))
+        .execute(Action::CallSpoke(spoke_chain_call_payload))
         .await?;
 
     Ok(())
