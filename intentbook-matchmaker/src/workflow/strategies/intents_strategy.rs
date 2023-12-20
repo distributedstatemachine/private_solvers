@@ -42,7 +42,7 @@ where
                     .lock()
                     .await
                     .create_intent_state(intent.clone());
-                vec![]
+                Vec::default()
             }
             Event::NewMatchedIntent(intent_bid) => {
                 let intent_id = intent_bid.intent_id();
@@ -57,47 +57,25 @@ where
                 if intent.is_none() {
                     warn!(?intent_id, "Unknown intent ID")
                 }
-                vec![]
+                Vec::default()
             }
-            Event::ProvedSpokeChainCall(
-                intent_id,
-                proof_id,
-                _spoke_chain_call,
-                _spoke_chain_call_bid,
-            ) => {
-                info!(?intent_id, "SpokeChainCall intent is proved");
+            Event::NewProofReceived(intent_id, proof_id) => {
+                info!(?intent_id, "New proof received");
                 let mut state_mutex = self.state_manager.lock().await;
-                let intent = state_mutex
-                    .update_intent_state(intent_id, |intent| intent.is_spoke_chain_called = true);
-
-                let mut actions = Vec::new();
+                let intent = state_mutex.update_intent_state(intent_id, |intent| {
+                    intent.received_proofs.insert(proof_id);
+                });
 
                 if let Some(intent_state) = intent {
                     if intent_state.is_ready_to_settle() {
                         info!(?intent_id, "Intent ready to be settled");
-                        actions.push(Action::Settle(IntentSettlementData { intent_id }));
+                        return vec![Action::Settle(IntentSettlementData { intent_id })];
                     }
                 } else {
                     warn!(?intent_id, "Unknown intent ID")
                 }
 
-                let all_intents = state_mutex.get_all_intents();
-                for intent in all_intents {
-                    let intent_id = intent.intent.id();
-                    if intent.expected_proofs.contains(&proof_id) {
-                        let intent = state_mutex.update_intent_state(intent_id, |intent| {
-                            intent.received_proofs.insert(proof_id);
-                        });
-                        if let Some(intent) = intent {
-                            if intent.is_ready_to_settle() {
-                                info!(?intent_id, "Intent ready to be settled");
-                                actions.push(Action::Settle(IntentSettlementData { intent_id }));
-                            }
-                        }
-                    }
-                }
-
-                actions
+                Vec::default()
             }
         };
     }

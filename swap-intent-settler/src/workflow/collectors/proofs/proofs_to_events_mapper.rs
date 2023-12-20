@@ -5,10 +5,10 @@ use ethers::types::H256;
 use ethers::utils::keccak256;
 use tracing::debug;
 
-use crate::types::proof_id::ProofId;
 use crate::workflow::event::Event;
 use crate::workflow::state::IntentState;
 use solver_common::connectors::Connector;
+use solver_common::types::proof_id::ProofId;
 
 pub struct ProofsToEventsMapper {
     connector: Arc<Connector>,

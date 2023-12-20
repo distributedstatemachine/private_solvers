@@ -10,8 +10,8 @@ use ethers::types::ValueOrArray;
 use solver_common::config::addresses::VerifierConfig;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
+use solver_common::types::proof_id::ProofId;
 
-use crate::types::proof_id::ProofId;
 use crate::workflow::collectors::proofs::proofs_collector::ProofSource;
 
 #[derive(Debug, Clone)]

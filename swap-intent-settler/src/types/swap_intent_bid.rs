@@ -1,9 +1,11 @@
+use anyhow::Result;
 use bindings_khalani::shared_types::IntentBid as ContractIntent;
 use bindings_khalani::swap_intent_book::SwapIntentBid as ContractSwapIntentBid;
 use ethers::abi::AbiDecode;
 use ethers::types::{Address, U256};
 
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
+use solver_common::types::proof_id::ProofId;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SwapIntentBid {
@@ -37,5 +39,12 @@ impl From<SwapIntentBid> for ContractSwapIntentBid {
             fill_amount: value.fill_amount,
             fill_timestamp: value.fill_timestamp,
         }
+    }
+}
+
+impl SwapIntentBid {
+    pub fn get_expected_proofs(&self) -> Result<Vec<ProofId>> {
+        // TODO: calculate.
+        Ok(vec![])
     }
 }

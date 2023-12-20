@@ -1,14 +1,16 @@
+use std::sync::Arc;
+
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorStream};
 use async_trait::async_trait;
 use futures::lock::Mutex;
 use futures::StreamExt;
-use solver_common::config::addresses::VerifierConfig;
-use solver_common::connectors::Connector;
-use std::sync::Arc;
 use tracing::{info, warn};
 
-use crate::types::proof_id::ProofId;
+use solver_common::config::addresses::VerifierConfig;
+use solver_common::connectors::Connector;
+use solver_common::types::proof_id::ProofId;
+
 use crate::workflow::collectors::proofs::proofs_to_events_mapper::ProofsToEventsMapper;
 use crate::workflow::event::Event;
 use crate::workflow::state::state_manager::StateManager;
