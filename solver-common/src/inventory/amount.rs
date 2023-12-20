@@ -32,14 +32,13 @@ impl Add for Amount {
     }
 }
 
-impl Mul for Amount {
+impl Mul<U256> for Amount {
     type Output = Self;
 
-    fn mul(self, rhs: Self) -> Self::Output {
-        assert_eq!(self.decimals, rhs.decimals);
+    fn mul(self, rhs: U256) -> Self::Output {
         Amount {
-            base_units: self.base_units * rhs.base_units,
-            decimals: self.decimals * 2,
+            base_units: self.base_units * rhs,
+            decimals: self.decimals,
         }
     }
 }
