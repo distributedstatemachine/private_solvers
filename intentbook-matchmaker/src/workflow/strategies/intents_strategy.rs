@@ -52,30 +52,52 @@ where
                     .lock()
                     .await
                     .update_intent_state(intent_id, |intent| {
-                        intent.matched_bid = Some(intent_bid.clone())
+                        intent.handle_match(intent_bid.clone())
                     });
                 if intent.is_none() {
                     warn!(?intent_id, "Unknown intent ID")
                 }
                 vec![]
             }
-            Event::ProvedSpokeChainCall(intent_id) => {
+            Event::ProvedSpokeChainCall(
+                intent_id,
+                proof_id,
+                _spoke_chain_call,
+                _spoke_chain_call_bid,
+            ) => {
                 info!(?intent_id, "SpokeChainCall intent is proved");
-                let intent = self
-                    .state_manager
-                    .lock()
-                    .await
+                let mut state_mutex = self.state_manager.lock().await;
+                let intent = state_mutex
                     .update_intent_state(intent_id, |intent| intent.is_spoke_chain_called = true);
+
+                let mut actions = Vec::new();
 
                 if let Some(intent_state) = intent {
                     if intent_state.is_ready_to_settle() {
                         info!(?intent_id, "Intent ready to be settled");
-                        return vec![Action::Settle(IntentSettlementData { intent_id })];
+                        actions.push(Action::Settle(IntentSettlementData { intent_id }));
                     }
                 } else {
                     warn!(?intent_id, "Unknown intent ID")
                 }
-                vec![]
+
+                let all_intents = state_mutex.get_all_intents();
+                for intent in all_intents {
+                    let intent_id = intent.intent.id();
+                    if intent.expected_proofs.contains(&proof_id) {
+                        let intent = state_mutex.update_intent_state(intent_id, |intent| {
+                            intent.received_proofs.insert(proof_id);
+                        });
+                        if let Some(intent) = intent {
+                            if intent.is_ready_to_settle() {
+                                info!(?intent_id, "Intent ready to be settled");
+                                actions.push(Action::Settle(IntentSettlementData { intent_id }));
+                            }
+                        }
+                    }
+                }
+
+                actions
             }
         };
     }

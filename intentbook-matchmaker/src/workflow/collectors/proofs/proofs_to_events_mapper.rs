@@ -47,7 +47,7 @@ impl ProofsToEventsMapper {
         spoke_chain_call: &SpokeChainCall,
         spoke_chain_call_bid: &SpokeChainCallBid,
     ) -> Option<Event> {
-        let spoke_chain_call = encode_packed(&[
+        let encoded_spoke_chain_call = encode_packed(&[
             AbiToken::String(String::from("SpokeCalled")),
             AbiToken::Address(spoke_chain_call_bid.caller),
             AbiToken::FixedBytes(Vec::from(intent_id.as_bytes())),
@@ -57,7 +57,7 @@ impl ProofsToEventsMapper {
             AbiToken::Uint(spoke_chain_call.amount),
         ])
         .ok()?;
-        let expected_proof_id = keccak256(spoke_chain_call).into();
+        let expected_proof_id = keccak256(encoded_spoke_chain_call.clone()).into();
         debug!(
             ?intent_id,
             ?proof_id,
@@ -65,7 +65,12 @@ impl ProofsToEventsMapper {
             "Trying to map SpokeCalled proof onto event"
         );
         if proof_id == expected_proof_id {
-            Some(Event::ProvedSpokeChainCall(intent_id))
+            Some(Event::ProvedSpokeChainCall(
+                intent_id,
+                proof_id,
+                spoke_chain_call.clone(),
+                spoke_chain_call_bid.clone(),
+            ))
         } else {
             None
         }
