@@ -17,8 +17,8 @@
       "fuji": "0x39de5Be710360aFBbB663036B5fb046585d9dbb3"
     },
     "spoke_chain_executors": {
-      "sepolia": "0x0000000000000000000000000000000000000000",
-      "fuji": "0x0000000000000000000000000000000000000000"
+      "sepolia" : "0x900a4034d30C4253ce49222aF5f61B151202021b",
+      "fuji" : "0xd2632C1A62B15a9508321b3Be11041CE277f7047"
     },
     "intentbook_addresses": {
       "limit_order_intentbook": "0x0000000000000000000000000000000000000000",
