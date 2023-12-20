@@ -15,3 +15,4 @@ ethers.workspace = true
 async-trait.workspace = true
 async-stream.workspace = true
 futures.workspace = true
+serde.workspace = true

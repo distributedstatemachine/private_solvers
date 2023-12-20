@@ -4,6 +4,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use bindings_khalani::spoke_chain_executor::SpokeChainExecutor;
 use ethers::contract::ContractCall;
+use ethers::types::Address;
 use tracing::info;
 
 use crate::types::spoke_chain_call::SpokeChainCall;
@@ -13,6 +14,7 @@ use solver_common::connectors::{Connector, RpcClient};
 use solver_common::error::ConfigError;
 use solver_common::ethereum::transaction::submit_transaction;
 
+#[derive(Clone)]
 pub struct SendTransactionCallSpokeHandler {
     connector: Arc<Connector>,
     addresses_config: AddressesConfig,
@@ -47,23 +49,32 @@ impl CallSpokeHandler for SendTransactionCallSpokeHandler {
 }
 
 impl SendTransactionCallSpokeHandler {
-    fn build_call_spoke_chain_tx(
+    pub fn get_spoke_chain_executor_address(
         &self,
         spoke_chain_call: &SpokeChainCall,
-    ) -> Result<ContractCall<RpcClient, ()>> {
-        let rpc_client = self.connector.get_rpc_client(spoke_chain_call.chain_id)?;
-        let spoke_chain_executor_address = self
+    ) -> Result<Address> {
+        Ok(self
             .addresses_config
             .spoke_chain_executor_addresses
             .get(&spoke_chain_call.chain_id)
+            .cloned()
             .ok_or_else(|| {
                 ConfigError::ContractAddressNotFound(
                     String::from("SpokeChainExecutor"),
                     spoke_chain_call.chain_id.into(),
                 )
-            })?;
+            })?)
+    }
+
+    fn build_call_spoke_chain_tx(
+        &self,
+        spoke_chain_call: &SpokeChainCall,
+    ) -> Result<ContractCall<RpcClient, ()>> {
+        let rpc_client = self.connector.get_rpc_client(spoke_chain_call.chain_id)?;
+        let spoke_chain_executor_address =
+            self.get_spoke_chain_executor_address(spoke_chain_call)?;
         let spoke_chain_executor =
-            SpokeChainExecutor::new(*spoke_chain_executor_address, rpc_client);
+            SpokeChainExecutor::new(spoke_chain_executor_address, rpc_client);
         let mut call = spoke_chain_executor.call_spoke(
             spoke_chain_call.intent_id.into(),
             spoke_chain_call.contract_to_call,

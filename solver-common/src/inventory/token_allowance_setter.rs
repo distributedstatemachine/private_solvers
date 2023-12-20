@@ -1,21 +1,18 @@
+use crate::ethereum::transaction::submit_transaction;
+use crate::inventory::amount::Amount;
+use crate::inventory::token::Token;
+use crate::inventory::Inventory;
 use anyhow::Result;
 use async_trait::async_trait;
 use bindings_khalani::erc20::ERC20;
 use ethers::types::Address;
 use tracing::info;
 
-use crate::config::chain::ChainId;
-use crate::ethereum::transaction::submit_transaction;
-use crate::inventory::amount::Amount;
-use crate::inventory::token::Token;
-use crate::inventory::Inventory;
-
 #[derive(Debug, Clone)]
 pub struct AllowanceRequest {
     pub token: Token,
     pub allowance_amount: Amount,
     pub spender_address: Address,
-    pub chain_id: ChainId,
 }
 
 #[async_trait]
@@ -30,7 +27,7 @@ impl TokenAllowanceSetter for Inventory {
         let token = approval_request.token.clone();
 
         let spender_address = approval_request.spender_address;
-        let chain_id = approval_request.chain_id;
+        let chain_id = approval_request.token.chain_id;
         let rpc_client = self.connector.get_rpc_client(chain_id)?;
         let erc20 = ERC20::new(token.address, rpc_client);
         let mut function = erc20.approve(

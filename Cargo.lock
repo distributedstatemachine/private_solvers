@@ -3931,6 +3931,7 @@ dependencies = [
  "bindings-khalani",
  "ethers",
  "futures",
+ "serde",
  "solver-common",
  "tokio",
  "tracing",
