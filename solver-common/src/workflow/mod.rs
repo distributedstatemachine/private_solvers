@@ -2,6 +2,7 @@ use artemis_core::engine::Engine;
 use tracing::info;
 
 pub mod action_confirmation_collector;
+pub mod collector_filter_map;
 
 pub async fn run_engine<Event, Action>(engine: Engine<Event, Action>)
 where

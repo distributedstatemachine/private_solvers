@@ -2,10 +2,8 @@ use std::sync::Arc;
 
 use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
-use crate::workflow::collectors::ethereum::intents_mempool_source::IntentsMempoolSource;
 use crate::workflow::collectors::proofs::gmp_verifier_proof_source::GmpEventVerifierProofSource;
 use crate::workflow::collectors::proofs::proofs_collector::ProofsCollector;
-use crate::workflow::collectors::swap_intent_collector::SwapIntentCollector;
 use crate::workflow::event::Event;
 use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
 use crate::workflow::executors::ethereum::send_transaction_settle_intent_handler::SendTransactionSettleIntentHandler;
@@ -17,9 +15,12 @@ use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
 use artemis_core::engine::Engine;
 use futures::lock::Mutex;
+use intentbook_matchmaker::workflow::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
+use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntentCollector;
 use solver_common::config::Config;
 use solver_common::connectors::Connector;
 use solver_common::inventory::Inventory;
+use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 
 pub fn configure_engine(
     config: &Config,
@@ -28,10 +29,6 @@ pub fn configure_engine(
     inventory: Arc<Inventory>,
 ) -> Engine<Event, Action> {
     // Set up Ethereum specific clients.
-    let intents_mempool_source = IntentsMempoolSource::new(
-        connector.clone(),
-        config.addresses.intentbook_addresses.clone(),
-    );
     let gmp_event_verifier_sources: Vec<GmpEventVerifierProofSource> = config
         .addresses
         .verifiers
@@ -58,9 +55,6 @@ pub fn configure_engine(
     let mut engine = Engine::<Event, Action>::default();
 
     // Set up collectors.
-    let intents_collector = Box::new(SwapIntentCollector::new(intents_mempool_source));
-    engine.add_collector(intents_collector);
-
     for gmp_event_verifier_source in gmp_event_verifier_sources {
         let proof_collector = Box::new(ProofsCollector::new(
             gmp_event_verifier_source,
@@ -69,6 +63,20 @@ pub fn configure_engine(
         ));
         engine.add_collector(proof_collector);
     }
+
+    let new_intentbook_source = NewIntentbookIntentSource::new(
+        connector.clone(),
+        config.addresses.intentbook_addresses.swap_intent_intentbook,
+    );
+    let new_intent_collector = Box::new(NewIntentCollector::new(new_intentbook_source));
+    let new_intent_collector = Box::new(CollectorFilterMap::new(new_intent_collector, |event| {
+        if let intentbook_matchmaker::workflow::event::Event::NewIntent(intent) = event {
+            Some(Event::NewIntent(intent))
+        } else {
+            None
+        }
+    }));
+    engine.add_collector(new_intent_collector);
 
     // Set up strategies.
     let intents_strategy = Box::new(IntentsStrategy::new(

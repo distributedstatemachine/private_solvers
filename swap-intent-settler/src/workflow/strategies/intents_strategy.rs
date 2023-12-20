@@ -5,6 +5,7 @@ use anyhow::Result;
 use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use futures::lock::Mutex;
+use intentbook_matchmaker::types::intent::Intent;
 use tracing::{error, info};
 
 use crate::quote::intent_quoter::IntentQuoter;
@@ -44,21 +45,24 @@ where
 
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
         match event {
-            Event::NewSwapIntent(swap_intent) => {
-                info!(?swap_intent, "Received new swap intent");
-                self.state_manager
-                    .lock()
-                    .await
-                    .create_intent_state(swap_intent.clone());
-                info!(?swap_intent, "Quoting the swap intent");
-                match self.intent_quoter.quote_intent(swap_intent.clone()).await {
-                    Ok(quoted_intent) => {
-                        self.process_event(Event::IntentQuoted(quoted_intent)).await;
-                    }
-                    Err(e) => {
-                        error!(?swap_intent, ?e, "Failed to quote the swap intent");
+            Event::NewIntent(intent) => {
+                if let Intent::SwapIntent(swap_intent) = intent {
+                    info!(?swap_intent, "Received new swap intent");
+                    self.state_manager
+                        .lock()
+                        .await
+                        .create_intent_state(swap_intent.clone());
+                    info!(?swap_intent, "Quoting the swap intent");
+                    match self.intent_quoter.quote_intent(swap_intent.clone()).await {
+                        Ok(quoted_intent) => {
+                            self.process_event(Event::IntentQuoted(quoted_intent)).await;
+                        }
+                        Err(e) => {
+                            error!(?swap_intent, ?e, "Failed to quote the swap intent");
+                        }
                     }
                 }
+                return vec![];
             }
             Event::IntentQuoted(quoted_intent) => {
                 info!(?quoted_intent, "Intent is quoted and ready to be filled");
