@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use ethers::prelude::LocalWallet;
 use std::env;
+use std::path::Path;
 
 use crate::config::Config;
 use crate::connectors::Connector;
@@ -22,9 +23,19 @@ pub async fn create_connector() -> Result<Connector> {
 }
 
 pub fn create_e2e_config() -> Result<Config> {
-    let config_path =
-        env::var("CONFIG_FILE").unwrap_or_else(|_| "../config/config.json".to_string());
+    let paths = [
+        &env::var("CONFIG_FILE").unwrap_or_default(),
+        "../config/.local.config.json",
+        "./config/.local.config.json",
+        "../config/config.json",
+        "./config/config.json",
+    ];
 
-    Config::read_config(&config_path)
+    let config_path = paths
+        .iter()
+        .find(|&&path| !path.is_empty() && Path::new(path).exists())
+        .context("No config file path exists")?;
+
+    Config::read_config(config_path)
         .context(format!("Failed to read config from file: {}", config_path))
 }
