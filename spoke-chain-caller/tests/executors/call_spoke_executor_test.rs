@@ -45,7 +45,7 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
         .unwrap();
 
     let rpc_client = connector.get_rpc_client(chain_id).unwrap();
-    let usdc_token = inventory.find_token_by_symbol("USDC".into(), chain_id.into())?;
+    let usdc_token = inventory.find_token_by_symbol("USDC".into(), chain_id)?;
 
     let amount =
         Amount::from_user_units_token(U256::from_dec_str("100").unwrap(), usdc_token).unwrap();
@@ -64,13 +64,12 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
         intent_id: Default::default(),
         author: Default::default(),
         contract_to_call: contract_to_call_address,
-        call_data: call_data.into(),
+        call_data,
     };
 
-    let spoke_chain_executor_address: Address = (&handler
+    let spoke_chain_executor_address: Address = handler
         .get_spoke_chain_executor_address(&spoke_chain_call)
-        .unwrap())
-        .clone();
+        .unwrap();
     let current_allowance = inventory
         .get_allowance(
             usdc_token,

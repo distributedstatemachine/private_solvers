@@ -22,17 +22,17 @@ async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
     let quoter =
         InterchainLiquidityHubQuoter::new(connector, inventory.clone(), config.balancer.clone());
 
-    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia.into())?;
-    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), ChainId::Sepolia.into())?;
-    let usdc_fuji = inventory.find_token_by_symbol("USDC".into(), ChainId::Fuji.into())?;
-    let usdt_fuji = inventory.find_token_by_symbol("USDT".into(), ChainId::Fuji.into())?;
+    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia)?;
+    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), ChainId::Sepolia)?;
+    let usdc_fuji = inventory.find_token_by_symbol("USDC".into(), ChainId::Fuji)?;
+    let usdt_fuji = inventory.find_token_by_symbol("USDT".into(), ChainId::Fuji)?;
 
     let source_amount =
         U256::from_str_radix("1000000000", 10).context("Failed to parse source amount")?;
     let intent_swap_usdc_to_usdt_sepolia = SwapIntent {
         source_token: usdc_sepolia.address,
         destination_token: usdt_sepolia.address,
-        destination_chain_id: ChainId::Sepolia.into(),
+        destination_chain_id: ChainId::Sepolia,
         source_amount,
 
         intent_id: Default::default(),
@@ -53,14 +53,14 @@ async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
     let intent_swap_usdc_to_usdt_fuji = SwapIntent {
         source_token: usdc_fuji.address,
         destination_token: usdt_fuji.address,
-        destination_chain_id: ChainId::Fuji.into(),
+        destination_chain_id: ChainId::Fuji,
         ..intent_swap_usdc_to_usdt_sepolia.clone()
     };
 
     let intent_swap_usdt_to_usdc_fuji = SwapIntent {
         source_token: usdt_fuji.address,
         destination_token: usdc_fuji.address,
-        destination_chain_id: ChainId::Fuji.into(),
+        destination_chain_id: ChainId::Fuji,
         ..intent_swap_usdc_to_usdt_sepolia.clone()
     };
 

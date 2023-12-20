@@ -52,7 +52,7 @@ async fn test_swap_and_bridge_preview() -> Result<()> {
     let intent_swap_usdc_to_usdt_sepolia = SwapIntent {
         source_token: usdc_sepolia.address,
         destination_token: usdt_sepolia.address,
-        destination_chain_id: ChainId::Sepolia.into(),
+        destination_chain_id: ChainId::Sepolia,
         source_amount,
 
         intent_id: Default::default(),
@@ -127,14 +127,14 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
     .unwrap();
     let executor = SwapAndBridgeExecutor::new(handler);
 
-    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia.into())?;
-    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), ChainId::Sepolia.into())?;
+    let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia)?;
+    let usdt_sepolia = inventory.find_token_by_symbol("USDT".into(), ChainId::Sepolia)?;
 
     let source_amount = U256::from_str_radix("1000000000", 10).unwrap();
     let intent_swap_usdc_to_usdt_sepolia = SwapIntent {
         source_token: usdc_sepolia.address,
         destination_token: usdt_sepolia.address,
-        destination_chain_id: ChainId::Sepolia.into(),
+        destination_chain_id: ChainId::Sepolia,
         source_amount,
 
         intent_id: Default::default(),
