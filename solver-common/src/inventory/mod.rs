@@ -1,8 +1,8 @@
 pub mod amount;
 pub mod token;
 pub mod token_allowance_query;
-pub mod token_balance_query;
 pub mod token_allowance_setter;
+pub mod token_balance_query;
 
 use crate::config::chain::ChainId;
 use crate::config::token::TokenConfig;

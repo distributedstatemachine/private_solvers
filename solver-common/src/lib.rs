@@ -5,6 +5,6 @@ pub mod error;
 pub mod ethereum;
 
 pub mod inventory;
+pub mod tests;
 pub mod types;
 pub mod workflow;
-pub mod tests;
