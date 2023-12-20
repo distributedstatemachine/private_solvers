@@ -3,13 +3,14 @@ use crate::workflow::event::Event;
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorMap, Executor};
 use async_trait::async_trait;
-use bindings_khalani::shared_types::Intent;
 use ethers::types::TxHash;
+use intentbook_matchmaker::types::intent::Intent;
 use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PlaceIntentHandlerResult {
+    pub placed_intent: Intent,
     pub tx_hash: TxHash,
 }
 
@@ -49,10 +50,8 @@ impl<H: PlaceIntentHandler> PlaceIntentExecutor<H> {
 impl<H: PlaceIntentHandler + Sync + Send> Executor<Action> for PlaceIntentExecutor<H> {
     async fn execute(&self, action: Action) -> Result<()> {
         if let Action::PlaceIntent(intent) = action {
-            let match_intent_handler_result = self.handler.post_intent(intent).await?;
-            self.confirmation_sender
-                .send(match_intent_handler_result)
-                .await?;
+            let place_intent_result = self.handler.post_intent(intent).await?;
+            self.confirmation_sender.send(place_intent_result).await?;
         }
         Ok(())
     }

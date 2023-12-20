@@ -5,9 +5,9 @@ use crate::workflow::executors::place_intent_executor::{
 };
 use anyhow::Result;
 use async_trait::async_trait;
-use bindings_khalani::shared_types::Intent;
-use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCallIntentBook;
+use bindings_khalani::base_intent_book::BaseIntentBook;
 use ethers::contract::ContractCall;
+use intentbook_matchmaker::types::intent::Intent;
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
@@ -30,24 +30,28 @@ impl SendTransactionPlaceIntentHandler {
 #[async_trait]
 impl PlaceIntentHandler for SendTransactionPlaceIntentHandler {
     async fn post_intent(&self, intent: Intent) -> Result<PlaceIntentHandlerResult> {
-        let transaction = self.build_place_intent_tx(intent)?;
+        let transaction = self.build_place_intent_tx(intent.clone())?;
         let receipt = submit_transaction(transaction).await?;
         let tx_hash = receipt.transaction_hash;
-        Ok(PlaceIntentHandlerResult { tx_hash })
+        Ok(PlaceIntentHandlerResult {
+            tx_hash,
+            placed_intent: intent,
+        })
     }
 }
 
 impl SendTransactionPlaceIntentHandler {
     fn build_place_intent_tx(&self, intent: Intent) -> Result<ContractCall<RpcClient, [u8; 32]>> {
-        let rpc_client = self.connector.get_rpc_client(ChainId::Sepolia)?;
-        let intentbook_address = self
-            .addresses_config
-            .intentbook_addresses
-            .spoke_chain_call_intentbook;
-        let intentbook = SpokeChainCallIntentBook::new(intentbook_address, rpc_client);
-
-        let mut call = intentbook.place_intent(intent);
-        call.tx.set_chain_id(Into::<u32>::into(ChainId::Sepolia));
+        let rpc_client = self.connector.get_rpc_client(ChainId::Khalani)?;
+        let intentbook_addresses = &self.addresses_config.intentbook_addresses;
+        let intentbook_address = match intent {
+            Intent::SpokeChainCall(_) => intentbook_addresses.spoke_chain_call_intentbook,
+            Intent::LimitOrder(_) => intentbook_addresses.limit_order_intentbook,
+            Intent::SwapIntent(_) => intentbook_addresses.swap_intent_intentbook,
+        };
+        let intentbook = BaseIntentBook::new(intentbook_address, rpc_client);
+        let mut call = intentbook.place_intent(intent.into());
+        call.tx.set_chain_id(Into::<u32>::into(ChainId::Khalani));
         Ok(call)
     }
 }

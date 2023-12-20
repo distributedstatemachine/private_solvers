@@ -1,6 +1,6 @@
 use bindings_khalani::shared_types::Intent as ContractIntent;
 use bindings_khalani::shared_types::SwapIntent as ContractSwapIntent;
-use ethers::abi::AbiDecode;
+use ethers::abi::{AbiDecode, AbiEncode};
 use ethers::types::{Address, Bytes, U256};
 use solver_common::config::chain::ChainId;
 use solver_common::types::intent_id::{IntentId, WithIntentId};
@@ -55,6 +55,16 @@ impl From<SwapIntent> for ContractSwapIntent {
             source_permit_2: value.source_permit_2,
             deadline: value.deadline,
             nonce: value.nonce,
+        }
+    }
+}
+
+impl From<SwapIntent> for bindings_khalani::base_intent_book::Intent {
+    fn from(value: SwapIntent) -> Self {
+        let contract_swap_intent: ContractSwapIntent = value.clone().into();
+        bindings_khalani::base_intent_book::Intent {
+            intent: Bytes::from(AbiEncode::encode(contract_swap_intent)),
+            signature: value.signature,
         }
     }
 }

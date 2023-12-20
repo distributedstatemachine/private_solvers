@@ -19,3 +19,13 @@ impl Intent {
         }
     }
 }
+
+impl From<Intent> for bindings_khalani::base_intent_book::Intent {
+    fn from(value: Intent) -> Self {
+        match value {
+            Intent::SpokeChainCall(spoke_chain_call) => spoke_chain_call.into(),
+            Intent::LimitOrder(limit_order_intent) => limit_order_intent.into(),
+            Intent::SwapIntent(swap_intent) => swap_intent.into(),
+        }
+    }
+}
