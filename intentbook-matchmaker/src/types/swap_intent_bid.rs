@@ -5,9 +5,10 @@ use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
 use ethers::types::{Address, Bytes, H256, U256};
 use ethers::utils::keccak256;
 
-use crate::types::swap_intent::SwapIntent;
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 use solver_common::types::proof_id::ProofId;
+
+use crate::types::swap_intent::SwapIntent;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SwapIntentBid {
@@ -62,10 +63,9 @@ impl SwapIntentBid {
 
     fn get_swap_intent_token_lock_proof_id(&self, swap_intent_id: H256) -> ProofId {
         keccak256(
-            // TODO[solidity]: ensure this encoding is exactly what Solidity returns (write a test).
             encode_packed(&[
                 AbiToken::String(String::from("SwapIntentTokenLock")),
-                AbiToken::FixedBytes(Vec::from(swap_intent_id.as_bytes())),
+                AbiToken::FixedBytes(swap_intent_id.to_fixed_bytes().to_vec()),
             ])
             .unwrap(),
         )
@@ -86,5 +86,32 @@ impl SwapIntentBid {
             .unwrap(),
         )
         .into()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use ethers::abi::AbiDecode;
+    use ethers::types::H256;
+
+    use super::*;
+
+    #[test]
+    fn test_swap_intent_token_lock_hash() {
+        let swap_intent_bid = SwapIntentBid {
+            intent_id: Default::default(),
+            intent_bid_id: Default::default(),
+            filler: Default::default(),
+            fill_amount: Default::default(),
+        };
+        let swap_intent_id =
+            H256::decode_hex("0x897a3b81b3017617c14e99aba8c6373315c68ee8054aebb944c274710ad8b406")
+                .unwrap();
+        let proof_id = swap_intent_bid.get_swap_intent_token_lock_proof_id(swap_intent_id);
+        let expected_proof_id = IntentId::from(
+            H256::decode_hex("0xd1a8d584d0ae1ac3c487eca8a960349363db0e3253a584faf153dd8fdab6524c")
+                .unwrap(),
+        );
+        assert_eq!(expected_proof_id, proof_id);
     }
 }
