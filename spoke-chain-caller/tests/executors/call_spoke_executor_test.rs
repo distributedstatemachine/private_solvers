@@ -60,11 +60,14 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
         token: usdc_token.address,
         amount: amount.base_units,
         chain_id,
-
         intent_id: Default::default(),
         author: Default::default(),
         contract_to_call: contract_to_call_address,
         call_data,
+
+        signature: Default::default(),
+        reward_token: Default::default(),
+        reward_amount: Default::default(),
     };
 
     let spoke_chain_executor_address: Address = handler
