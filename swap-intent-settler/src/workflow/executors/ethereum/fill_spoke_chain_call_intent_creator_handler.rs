@@ -14,7 +14,7 @@ use solver_common::inventory::Inventory;
 
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use crate::workflow::executors::fill_spoke_chain_call_intent_creator_executor::{
-    FillCreatorHandlerResult, FillSpokeChainCallIntentCreatorHandler,
+    FillSpokeChainCallIntentCreatorHandler, FillSpokeChainCallIntentCreatorHandlerResult,
 };
 
 pub struct FillSpokeChainCallIntentCreatorHandlerImpl {
@@ -42,9 +42,9 @@ impl FillSpokeChainCallIntentCreatorHandler for FillSpokeChainCallIntentCreatorH
     async fn create_swap_intent_filler(
         &self,
         quoted_intent: QuotedSwapIntent,
-    ) -> Result<FillCreatorHandlerResult> {
+    ) -> Result<FillSpokeChainCallIntentCreatorHandlerResult> {
         let spoke_chain_call = self.create_spoke_chain_call_intent(&quoted_intent)?;
-        Ok(FillCreatorHandlerResult { spoke_chain_call })
+        Ok(FillSpokeChainCallIntentCreatorHandlerResult { spoke_chain_call })
     }
 }
 

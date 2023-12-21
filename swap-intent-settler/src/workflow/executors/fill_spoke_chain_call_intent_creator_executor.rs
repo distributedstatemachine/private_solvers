@@ -10,7 +10,7 @@ use crate::workflow::action::Action;
 use crate::workflow::event::Event;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FillCreatorHandlerResult {
+pub struct FillSpokeChainCallIntentCreatorHandlerResult {
     pub spoke_chain_call: SpokeChainCall,
 }
 
@@ -19,12 +19,12 @@ pub trait FillSpokeChainCallIntentCreatorHandler {
     async fn create_swap_intent_filler(
         &self,
         quoted_intent: QuotedSwapIntent,
-    ) -> Result<FillCreatorHandlerResult>;
+    ) -> Result<FillSpokeChainCallIntentCreatorHandlerResult>;
 }
 
 pub struct FillSpokeChainCallIntentCreatorExecutor<H: FillSpokeChainCallIntentCreatorHandler> {
     handler: H,
-    confirmation_sender: Sender<FillCreatorHandlerResult>,
+    confirmation_sender: Sender<FillSpokeChainCallIntentCreatorHandlerResult>,
 }
 
 impl<H: FillSpokeChainCallIntentCreatorHandler> FillSpokeChainCallIntentCreatorExecutor<H> {
