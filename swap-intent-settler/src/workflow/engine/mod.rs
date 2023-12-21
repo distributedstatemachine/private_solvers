@@ -1,5 +1,15 @@
 use std::sync::Arc;
 
+use artemis_core::engine::Engine;
+use futures::lock::Mutex;
+
+use intentbook_matchmaker::workflow::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
+use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntentCollector;
+use solver_common::config::Config;
+use solver_common::connectors::Connector;
+use solver_common::inventory::Inventory;
+use solver_common::workflow::collector_filter_map::CollectorFilterMap;
+
 use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
 use crate::workflow::collectors::proofs::gmp_verifier_proof_source::GmpEventVerifierProofSource;
@@ -13,14 +23,6 @@ use crate::workflow::executors::settle_intent_executor::SettleIntentExecutor;
 use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerExecutor;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
-use artemis_core::engine::Engine;
-use futures::lock::Mutex;
-use intentbook_matchmaker::workflow::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
-use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntentCollector;
-use solver_common::config::Config;
-use solver_common::connectors::Connector;
-use solver_common::inventory::Inventory;
-use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 
 pub fn configure_engine(
     config: &Config,
@@ -42,11 +44,7 @@ pub fn configure_engine(
         SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
     let send_transaction_settle_intent_handler =
         SendTransactionSettleIntentHandler::new(config.addresses.clone(), connector.clone());
-    let interchain_liquidity_hub_quoter = InterchainLiquidityHubQuoter::new(
-        connector.clone(),
-        inventory.clone(),
-        config.balancer.clone(),
-    );
+    let interchain_liquidity_hub_quoter = InterchainLiquidityHubQuoter::new(inventory.clone());
     let swap_intent_filler_handler =
         SendTransactionSwapIntentFillerHandler::new(config.addresses.clone(), connector.clone());
 

@@ -1,7 +1,7 @@
 use ethers::types::U256;
 use ethers::utils::format_units;
 use std::fmt::{self, Display, Formatter};
-use std::ops::{Add, Mul};
+use std::ops::{Add, Div, Mul};
 
 pub type Decimals = u8;
 
@@ -16,6 +16,25 @@ impl Amount {
         Amount {
             base_units,
             decimals,
+        }
+    }
+
+    pub fn rescale_to_decimals(&self, decimals: Decimals) -> Self {
+        if self.decimals == decimals {
+            return self.clone();
+        }
+        if self.decimals < decimals {
+            let multiplier = U256::exp10((decimals - self.decimals) as usize);
+            Self {
+                decimals,
+                base_units: self.base_units.mul(multiplier),
+            }
+        } else {
+            let divisor = U256::exp10((self.decimals - decimals) as usize);
+            Self {
+                decimals,
+                base_units: self.base_units.div(divisor),
+            }
         }
     }
 }
@@ -109,6 +128,23 @@ mod tests {
         assert_eq!(
             result,
             Amount::from_base_units(U256::from_dec_str("2000000").unwrap(), 2)
+        );
+    }
+
+    #[test]
+    fn test_rescale_to_decimals() {
+        let amount = Amount {
+            base_units: U256::from_dec_str("12345678901234567890").unwrap(),
+            decimals: 8,
+        };
+        assert_eq!(amount.to_string(), "123456789012.34567890");
+        assert_eq!(
+            amount.rescale_to_decimals(10).to_string(),
+            "123456789012.3456789000"
+        );
+        assert_eq!(
+            amount.rescale_to_decimals(6).to_string(),
+            "123456789012.345678"
         );
     }
 

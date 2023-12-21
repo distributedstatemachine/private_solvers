@@ -5,7 +5,6 @@ edition.workspace = true
 
 [dependencies]
 solver-common = { path = "../solver-common" }
-bindings-balancer = { path = "../crates/bindings-balancer" }
 bindings-khalani = { path = "../crates/bindings-khalani" }
 intentbook-matchmaker = { path = "../intentbook-matchmaker" }
 

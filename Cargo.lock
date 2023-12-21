@@ -344,14 +344,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bindings-balancer"
-version = "0.1.0"
-dependencies = [
- "ethers",
- "serde",
-]
-
-[[package]]
 name = "bindings-khalani"
 version = "0.1.0"
 dependencies = [
@@ -738,7 +730,6 @@ dependencies = [
  "artemis-core",
  "async-stream",
  "async-trait",
- "bindings-balancer",
  "bindings-khalani",
  "clap",
  "ethers",
@@ -4018,7 +4009,6 @@ dependencies = [
  "artemis-core",
  "async-stream",
  "async-trait",
- "bindings-balancer",
  "bindings-khalani",
  "clap",
  "ethers",

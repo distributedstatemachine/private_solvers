@@ -6,9 +6,9 @@ use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use futures::lock::Mutex;
 use intentbook_matchmaker::types::intent::Intent;
+use intentbook_matchmaker::types::spoke_chain_call_bid::SpokeChainCallBid;
 use solver_common::connectors::Connector;
 use tracing::info;
-use intentbook_matchmaker::types::spoke_chain_call_bid::SpokeChainCallBid;
 
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
@@ -52,7 +52,7 @@ where
 
                 let spoke_chain_call_bid = SpokeChainCallBid::new(
                     spoke_chain_call.intent_id,
-                    self.connector.get_address()
+                    self.connector.get_address(),
                 );
                 vec![Action::MatchIntent(spoke_chain_call, spoke_chain_call_bid)]
             }
