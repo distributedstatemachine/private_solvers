@@ -13,16 +13,16 @@
       "fuji": "0x0727D632966E3baC67b717cae152C6e7503dCcD0"
     },
     "swap_intent_fillers": {
-      "sepolia": "0xE8C8bf42BF612022BA012C67C8276c927CB77398",
-      "fuji": "0x39de5Be710360aFBbB663036B5fb046585d9dbb3"
+      "sepolia": "0x8B4B6854945ED134246167E9DE9E8fc019Fe6618",
+      "fuji": "0x75862bd9C4477f544839Ec9D542fFaC8bd0Ed403"
     },
     "spoke_chain_executors": {
-      "sepolia" : "0x900a4034d30C4253ce49222aF5f61B151202021b",
-      "fuji" : "0xd2632C1A62B15a9508321b3Be11041CE277f7047"
+      "sepolia" : "0x5Ab12932E6a790c48A41a67C531be0C1A1C9CB7B",
+      "fuji" : "0xe3b8c8b4ff312882048a411e9d09A408E695300b"
     },
     "intentbook_addresses": {
-      "limit_order_intentbook": "0x0000000000000000000000000000000000000000",
-      "spoke_chain_call_intentbook": "0x0000000000000000000000000000000000000000",
+      "limit_order_intentbook": "0xb3fBC0d521899846E152cf698BDD8ffA3dF451Dd",
+      "spoke_chain_call_intentbook": "0x3C7431eCf3A10A3eba970e875Fb1FFb7928b8624",
       "swap_intent_intentbook": "0x0000000000000000000000000000000000000000"
     }
   },
