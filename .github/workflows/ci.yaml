@@ -3,6 +3,7 @@ name: CI (Test , Docker , Publish)
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 env:
   SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
