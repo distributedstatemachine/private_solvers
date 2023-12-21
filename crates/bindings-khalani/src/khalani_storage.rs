@@ -26,13 +26,13 @@ pub mod khalani_storage {
         __abi,
     );
     #[rustfmt::skip]
-    const __BYTECODE: &[u8] = b"`\x80`@R4\x80\x15`\x0FW`\0\x80\xFD[P`?\x80`\x1D`\09`\0\xF3\xFE`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 2@\xF7\xD7\x01{\xDDzm\x12\xDE\xED\xF3A\xA4>p\x88\r=\xB9s]\x85\x18A)\x9A\xED\xB3\x10ldsolcC\0\x08\x13\x003";
+    const __BYTECODE: &[u8] = b"`\x80`@R4\x80\x15`\x0FW`\0\x80\xFD[P`?\x80`\x1D`\09`\0\xF3\xFE`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 }\x8D;\xF3\xF5\xAC\xB6P\xFD\xBA\xFE4\xB2\x9F]\xC1[R\x1A\x82N\xF2 ~\xCA\xD3%\x96p<\x9D>dsolcC\0\x08\x13\x003";
     /// The bytecode of the contract.
     pub static KHALANISTORAGE_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __BYTECODE,
     );
     #[rustfmt::skip]
-    const __DEPLOYED_BYTECODE: &[u8] = b"`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 2@\xF7\xD7\x01{\xDDzm\x12\xDE\xED\xF3A\xA4>p\x88\r=\xB9s]\x85\x18A)\x9A\xED\xB3\x10ldsolcC\0\x08\x13\x003";
+    const __DEPLOYED_BYTECODE: &[u8] = b"`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 }\x8D;\xF3\xF5\xAC\xB6P\xFD\xBA\xFE4\xB2\x9F]\xC1[R\x1A\x82N\xF2 ~\xCA\xD3%\x96p<\x9D>dsolcC\0\x08\x13\x003";
     /// The deployed bytecode of the contract.
     pub static KHALANISTORAGE_DEPLOYED_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __DEPLOYED_BYTECODE,

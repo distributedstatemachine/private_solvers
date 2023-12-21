@@ -85,9 +85,7 @@ pub mod verifier_registry {
                                     name: ::std::string::String::new(),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Address,
                                     internal_type: ::core::option::Option::Some(
-                                        ::std::borrow::ToOwned::to_owned(
-                                            "contract IntentEventVerifier",
-                                        ),
+                                        ::std::borrow::ToOwned::to_owned("contract EventVerifier"),
                                     ),
                                 },
                             ],

@@ -25,6 +25,7 @@ pub mod default_request_processor;
 pub mod deploy_aave_strategy;
 pub mod deploy_constants;
 pub mod deploy_escrow;
+pub mod deploy_intent_book;
 pub mod deploy_intent_prover_verifier;
 pub mod deploy_intents_mempool;
 pub mod deploy_khalani;

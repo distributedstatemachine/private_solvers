@@ -37,7 +37,6 @@ impl From<SwapIntentBid> for ContractSwapIntentBid {
         Self {
             filler: value.filler,
             fill_amount: value.fill_amount,
-            fill_timestamp: U256::zero(), // TODO: will be removed.
         }
     }
 }

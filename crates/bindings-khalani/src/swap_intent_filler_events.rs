@@ -40,13 +40,6 @@ pub mod swap_intent_filler_events {
                                     indexed: true,
                                 },
                                 ::ethers::core::abi::ethabi::EventParam {
-                                    name: ::std::borrow::ToOwned::to_owned("fillTimeStamp"),
-                                    kind: ::ethers::core::abi::ethabi::ParamType::Uint(
-                                        256usize,
-                                    ),
-                                    indexed: false,
-                                },
-                                ::ethers::core::abi::ethabi::EventParam {
                                     name: ::std::borrow::ToOwned::to_owned("fillAmount"),
                                     kind: ::ethers::core::abi::ethabi::ParamType::Uint(
                                         256usize,
@@ -138,7 +131,7 @@ pub mod swap_intent_filler_events {
         Eq,
         Hash
     )]
-    #[ethevent(name = "Fill", abi = "Fill(bytes32,address,address,uint256,uint256)")]
+    #[ethevent(name = "Fill", abi = "Fill(bytes32,address,address,uint256)")]
     pub struct FillFilter {
         #[ethevent(indexed)]
         pub intent_id: [u8; 32],
@@ -146,7 +139,6 @@ pub mod swap_intent_filler_events {
         pub filler: ::ethers::core::types::Address,
         #[ethevent(indexed)]
         pub author: ::ethers::core::types::Address,
-        pub fill_time_stamp: ::ethers::core::types::U256,
         pub fill_amount: ::ethers::core::types::U256,
     }
 }

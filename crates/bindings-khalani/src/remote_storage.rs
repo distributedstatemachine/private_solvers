@@ -26,13 +26,13 @@ pub mod remote_storage {
         __abi,
     );
     #[rustfmt::skip]
-    const __BYTECODE: &[u8] = b"`\x80`@R4\x80\x15`\x0FW`\0\x80\xFD[P`?\x80`\x1D`\09`\0\xF3\xFE`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 \xB6\xA6\x02#t'3\t\xBDId&Kc\xAB\xCB\xCB\x19P\xD6\xC3p\xFD\xF7\xF3G\xC67\x91Ll\xAFdsolcC\0\x08\x13\x003";
+    const __BYTECODE: &[u8] = b"`\x80`@R4\x80\x15`\x0FW`\0\x80\xFD[P`?\x80`\x1D`\09`\0\xF3\xFE`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 :\xA2\xDD~d\x89\x9C\xA6\x86[\xB8-vZ\x8E\t\x7F\x181\x06\xDElm\x0EKP\x03\x86E\xDAn\xCCdsolcC\0\x08\x13\x003";
     /// The bytecode of the contract.
     pub static REMOTESTORAGE_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __BYTECODE,
     );
     #[rustfmt::skip]
-    const __DEPLOYED_BYTECODE: &[u8] = b"`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 \xB6\xA6\x02#t'3\t\xBDId&Kc\xAB\xCB\xCB\x19P\xD6\xC3p\xFD\xF7\xF3G\xC67\x91Ll\xAFdsolcC\0\x08\x13\x003";
+    const __DEPLOYED_BYTECODE: &[u8] = b"`\x80`@R`\0\x80\xFD\xFE\xA2dipfsX\"\x12 :\xA2\xDD~d\x89\x9C\xA6\x86[\xB8-vZ\x8E\t\x7F\x181\x06\xDElm\x0EKP\x03\x86E\xDAn\xCCdsolcC\0\x08\x13\x003";
     /// The deployed bytecode of the contract.
     pub static REMOTESTORAGE_DEPLOYED_BYTECODE: ::ethers::core::types::Bytes = ::ethers::core::types::Bytes::from_static(
         __DEPLOYED_BYTECODE,
