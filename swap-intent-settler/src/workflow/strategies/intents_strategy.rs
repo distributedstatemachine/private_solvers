@@ -89,6 +89,10 @@ where
                     result.spoke_chain_call,
                 ))];
             }
+            Event::IntentPlaced(place_intent_result) => {
+                info!(?place_intent_result, "Intent placed");
+                return Vec::default();
+            }
             Event::TokensLockedOnSourceChain(_) => {}
             Event::ProvedTokensLockedOnSourceChain(_) => {}
             Event::ProvedSwapIntentFilledOnDestinationChain(_) => {}

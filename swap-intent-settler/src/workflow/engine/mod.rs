@@ -1,16 +1,10 @@
 use std::sync::Arc;
 
 use artemis_core::engine::Engine;
+use artemis_core::types::{CollectorMap, ExecutorMap};
 use futures::lock::Mutex;
 
 use crate::quote::one_to_one_intent_quoter::OneToOneIntentQuoter;
-use intentbook_matchmaker::workflow::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
-use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntentCollector;
-use solver_common::config::Config;
-use solver_common::connectors::Connector;
-use solver_common::inventory::Inventory;
-use solver_common::workflow::collector_filter_map::CollectorFilterMap;
-
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
 use crate::workflow::executors::ethereum::fill_spoke_chain_call_intent_creator_handler::FillSpokeChainCallIntentCreatorHandlerImpl;
@@ -19,6 +13,14 @@ use crate::workflow::executors::fill_spoke_chain_call_intent_creator_executor::F
 use crate::workflow::executors::lock_tokens_spoke_chain_call_intent_creator_executor::LockTokensSpokeChainCallIntentCreatorExecutor;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
+use intentbook_matchmaker::workflow::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
+use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntentCollector;
+use intentbook_matchmaker::workflow::executors::ethereum::send_transaction_place_intent_handler::SendTransactionPlaceIntentHandler;
+use intentbook_matchmaker::workflow::executors::place_intent_executor::PlaceIntentExecutor;
+use solver_common::config::Config;
+use solver_common::connectors::Connector;
+use solver_common::inventory::Inventory;
+use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 
 pub fn configure_engine(
     config: &Config,
@@ -53,6 +55,25 @@ pub fn configure_engine(
     engine.add_strategy(intents_strategy);
 
     // Set up executors.
+    let place_intent_handler = SendTransactionPlaceIntentHandler::new(
+        config.addresses.intentbook_addresses.clone(),
+        connector.clone(),
+    );
+    let (place_intent_executor, place_intent_confirmation_collector) =
+        PlaceIntentExecutor::new(place_intent_handler);
+    engine.add_executor(Box::new(ExecutorMap::new(
+        Box::new(place_intent_executor),
+        |action| match action {
+            Action::PlaceIntent(intent) => Some(intent),
+            _ => None,
+        },
+    )));
+    let place_intent_confirmation_collector = Box::new(CollectorMap::new(
+        place_intent_confirmation_collector,
+        Event::IntentPlaced,
+    ));
+    engine.add_collector(place_intent_confirmation_collector);
+
     let (
         lock_tokens_spoke_chain_call_intent_creator_executor,
         lock_tokens_spoke_chain_call_intent_creator_executor_result_collector,
