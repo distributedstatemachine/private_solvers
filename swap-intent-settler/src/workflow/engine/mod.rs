@@ -12,8 +12,6 @@ use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 
 use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
-use crate::workflow::collectors::proofs::gmp_verifier_proof_source::GmpEventVerifierProofSource;
-use crate::workflow::collectors::proofs::proofs_collector::ProofsCollector;
 use crate::workflow::event::Event;
 use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
 use crate::workflow::executors::ethereum::send_transaction_swap_intent_filler_handler::SendTransactionSwapIntentFillerHandler;
@@ -29,15 +27,6 @@ pub fn configure_engine(
     inventory: Arc<Inventory>,
 ) -> Engine<Event, Action> {
     // Set up Ethereum specific clients.
-    let gmp_event_verifier_sources: Vec<GmpEventVerifierProofSource> = config
-        .addresses
-        .verifiers
-        .iter()
-        .map(|verifier_config| {
-            GmpEventVerifierProofSource::new(connector.clone(), verifier_config.clone())
-        })
-        .collect();
-
     let send_transaction_lock_intent_tokens_handler =
         SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
     let interchain_liquidity_hub_quoter = InterchainLiquidityHubQuoter::new(inventory.clone());
@@ -49,15 +38,6 @@ pub fn configure_engine(
     let mut engine = Engine::<Event, Action>::default();
 
     // Set up collectors.
-    for gmp_event_verifier_source in gmp_event_verifier_sources {
-        let proof_collector = Box::new(ProofsCollector::new(
-            gmp_event_verifier_source,
-            state_manager.clone(),
-            connector.clone(),
-        ));
-        engine.add_collector(proof_collector);
-    }
-
     let new_intentbook_source = NewIntentbookIntentSource::new(
         connector.clone(),
         config.addresses.intentbook_addresses.swap_intent_intentbook,
