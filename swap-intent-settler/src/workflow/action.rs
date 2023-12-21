@@ -1,5 +1,4 @@
 use crate::quote::quoted_intent::QuotedIntent;
-use crate::workflow::executors::settle_intent_executor::SwapIntentSettlementData;
 use intentbook_matchmaker::types::intent::Intent;
 use intentbook_matchmaker::types::swap_intent::SwapIntent;
 
@@ -11,6 +10,4 @@ pub enum Action {
     LockTokensOnSourceChain(SwapIntent),
     FillIntentOnDestinationChain(QuotedIntent),
     SwapAndBridge(QuotedIntent),
-    ApproveTokens(QuotedIntent), // TODO: is it necessary?
-    SettleIntent(SwapIntentSettlementData),
 }

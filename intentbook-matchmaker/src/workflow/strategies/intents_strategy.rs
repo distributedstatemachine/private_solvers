@@ -8,7 +8,6 @@ use tracing::{info, warn};
 
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
-use crate::workflow::executors::settle_intent_executor::IntentSettlementData;
 use crate::workflow::state::state_manager::StateManager;
 
 pub struct IntentsStrategy<S: StateManager> {
@@ -69,12 +68,16 @@ where
                 if let Some(intent_state) = intent {
                     if intent_state.is_ready_to_settle() {
                         info!(?intent_id, "Intent ready to be settled");
-                        return vec![Action::Settle(IntentSettlementData { intent_id })];
+                        return vec![Action::Settle(intent_state.intent)];
                     }
                 } else {
                     warn!(?intent_id, "Unknown intent ID")
                 }
 
+                Vec::default()
+            }
+            Event::IntentSettled(settle_intent_handler_result) => {
+                info!(?settle_intent_handler_result, "Intent settled");
                 Vec::default()
             }
         };

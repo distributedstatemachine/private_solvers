@@ -16,10 +16,8 @@ use crate::workflow::collectors::proofs::gmp_verifier_proof_source::GmpEventVeri
 use crate::workflow::collectors::proofs::proofs_collector::ProofsCollector;
 use crate::workflow::event::Event;
 use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
-use crate::workflow::executors::ethereum::send_transaction_settle_intent_handler::SendTransactionSettleIntentHandler;
 use crate::workflow::executors::ethereum::send_transaction_swap_intent_filler_handler::SendTransactionSwapIntentFillerHandler;
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
-use crate::workflow::executors::settle_intent_executor::SettleIntentExecutor;
 use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerExecutor;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
@@ -42,8 +40,6 @@ pub fn configure_engine(
 
     let send_transaction_lock_intent_tokens_handler =
         SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
-    let send_transaction_settle_intent_handler =
-        SendTransactionSettleIntentHandler::new(config.addresses.clone(), connector.clone());
     let interchain_liquidity_hub_quoter = InterchainLiquidityHubQuoter::new(inventory.clone());
     let swap_intent_filler_handler =
         SendTransactionSwapIntentFillerHandler::new(config.addresses.clone(), connector.clone());
@@ -93,11 +89,6 @@ pub fn configure_engine(
         SwapIntentFillerExecutor::new(swap_intent_filler_handler);
     engine.add_executor(Box::new(swap_intent_filler_executor));
     engine.add_collector(swap_intent_filler_confirmation_collector);
-
-    let settle_intent_executor = Box::new(SettleIntentExecutor::new(
-        send_transaction_settle_intent_handler,
-    ));
-    engine.add_executor(settle_intent_executor);
 
     engine
 }

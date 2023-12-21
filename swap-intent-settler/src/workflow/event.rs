@@ -10,7 +10,6 @@ use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerHan
 pub enum Event {
     NewIntent(Intent),
     IntentQuoted(QuotedIntent),
-    IntentPlaced(),
 
     TokensLockedOnSourceChain(LockIntentTokensHandlerResult),
     IntentFilledOnDestination(SwapIntentFillerHandlerResult),

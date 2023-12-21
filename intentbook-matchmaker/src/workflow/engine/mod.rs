@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use artemis_core::engine::Engine;
+use artemis_core::types::CollectorMap;
 use futures::lock::Mutex;
 
 use solver_common::config::Config;
@@ -68,12 +69,18 @@ pub fn configure_engine(
     engine.add_strategy(intents_strategy);
 
     // Set up executors.
-    for intentbook_address in &intentbook_addresses {
-        let settle_intent_handler =
-            SendTransactionSettleIntentHandler::new(*intentbook_address, connector.clone());
-        let settle_intent_executor = SettleIntentExecutor::new(settle_intent_handler);
-        engine.add_executor(Box::new(settle_intent_executor));
-    }
+    let settle_intent_handler = SendTransactionSettleIntentHandler::new(
+        config.addresses.intentbook_addresses.clone(),
+        connector.clone(),
+    );
+    let (settle_intent_executor, settle_intent_confirmation_collector) =
+        SettleIntentExecutor::new(settle_intent_handler);
+    engine.add_executor(Box::new(settle_intent_executor));
+    let settle_intent_confirmation_collector = Box::new(CollectorMap::new(
+        settle_intent_confirmation_collector,
+        Event::IntentSettled,
+    ));
+    engine.add_collector(settle_intent_confirmation_collector);
 
     for gmp_event_verifier_source in gmp_event_verifier_sources {
         let proof_collector = Box::new(ProofsCollector::new(

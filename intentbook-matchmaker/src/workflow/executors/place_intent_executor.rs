@@ -1,10 +1,8 @@
-use crate::workflow::action::Action;
-use crate::workflow::event::Event;
+use crate::types::intent::Intent;
 use anyhow::Result;
-use artemis_core::types::{Collector, CollectorMap, Executor};
+use artemis_core::types::{Collector, Executor};
 use async_trait::async_trait;
 use ethers::types::TxHash;
-use intentbook_matchmaker::types::intent::Intent;
 use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 
@@ -25,17 +23,13 @@ pub struct PlaceIntentExecutor<H: PlaceIntentHandler> {
 }
 
 impl<H: PlaceIntentHandler> PlaceIntentExecutor<H> {
-    pub fn new(handler: H) -> (Self, Box<dyn Collector<Event>>) {
+    pub fn new(handler: H) -> (Self, Box<dyn Collector<PlaceIntentHandlerResult>>) {
         let (confirmation_sender, confirmation_receiver): (
             Sender<PlaceIntentHandlerResult>,
             Receiver<PlaceIntentHandlerResult>,
         ) = channel(512);
         let action_confirmation_collector =
             Box::new(ActionConfirmationCollector::new(confirmation_receiver));
-        let action_confirmation_collector: Box<dyn Collector<Event>> = Box::new(CollectorMap::new(
-            action_confirmation_collector,
-            |_handler_result| Event::IntentPlaced(),
-        ));
         (
             PlaceIntentExecutor {
                 handler,
@@ -47,12 +41,10 @@ impl<H: PlaceIntentHandler> PlaceIntentExecutor<H> {
 }
 
 #[async_trait]
-impl<H: PlaceIntentHandler + Sync + Send> Executor<Action> for PlaceIntentExecutor<H> {
-    async fn execute(&self, action: Action) -> Result<()> {
-        if let Action::PlaceIntent(intent) = action {
-            let place_intent_result = self.handler.post_intent(intent).await?;
-            self.confirmation_sender.send(place_intent_result).await?;
-        }
+impl<H: PlaceIntentHandler + Sync + Send> Executor<Intent> for PlaceIntentExecutor<H> {
+    async fn execute(&self, intent: Intent) -> Result<()> {
+        let place_intent_result = self.handler.post_intent(intent).await?;
+        self.confirmation_sender.send(place_intent_result).await?;
         Ok(())
     }
 }
