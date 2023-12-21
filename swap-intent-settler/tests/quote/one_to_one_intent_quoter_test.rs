@@ -24,7 +24,7 @@ async fn test_one_to_one_intent_quoter() -> Result<()> {
     let usdt_fuji = inventory.find_token_by_symbol("USDT".into(), ChainId::Fuji)?;
 
     let source_amount =
-        Amount::from_user_units_token(U256::from_dec_str("1000").unwrap(), usdc_sepolia).unwrap();
+        Amount::from_user_units_token(U256::from_dec_str("1000").unwrap(), usdc_sepolia);
 
     let intent_swap_usdc_to_usdt_sepolia = SwapIntent {
         source_chain_id: ChainId::Fuji,
