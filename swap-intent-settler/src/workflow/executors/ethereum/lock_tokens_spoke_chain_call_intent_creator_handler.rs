@@ -50,13 +50,16 @@ impl LockTokensSpokeChainCallIntentCreatorHandler
         swap_intent: SwapIntent,
     ) -> Result<LockTokensSpokeChainCallIntentCreatorHandlerResult> {
         info!(?swap_intent, "Locking source tokens of the intent");
-        let spoke_chain_call = self.create_spoke_chain_call_intent(&swap_intent)?;
+        let spoke_chain_call = self.create_spoke_chain_call_intent(&swap_intent).await?;
         Ok(LockTokensSpokeChainCallIntentCreatorHandlerResult { spoke_chain_call })
     }
 }
 
 impl LockTokensSpokeChainCallIntentCreatorHandlerImpl {
-    fn create_spoke_chain_call_intent(&self, swap_intent: &SwapIntent) -> Result<SpokeChainCall> {
+    async fn create_spoke_chain_call_intent(
+        &self,
+        swap_intent: &SwapIntent,
+    ) -> Result<SpokeChainCall> {
         let source_chain_id = swap_intent.source_chain_id;
         let escrow_address = self
             .addresses_config
@@ -96,5 +99,6 @@ impl LockTokensSpokeChainCallIntentCreatorHandlerImpl {
                 reward_amount: reward_amount.base_units,
             },
         )
+        .await
     }
 }

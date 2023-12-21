@@ -1,13 +1,17 @@
+use std::sync::Arc;
+
 use anyhow::Result;
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCall as ContractSpokeChainCall;
 use ethers::abi::{AbiDecode, AbiEncode};
-use ethers::types::{Address, Bytes, H256, U256};
-use std::sync::Arc;
+use ethers::contract::{Eip712, EthAbiType};
+use ethers::prelude::Signer;
+use ethers::types::{Address, Bytes, U256};
 
-use crate::types::intent::calculate_intent_id;
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::Connector;
 use solver_common::types::intent_id::{IntentId, WithIntentId};
+
+use crate::types::intent::calculate_intent_id;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SpokeChainCallStub {
@@ -34,8 +38,19 @@ pub struct SpokeChainCall {
     pub reward_amount: U256,
 }
 
+#[derive(Debug, Clone, Eip712, EthAbiType)]
+#[eip712(name = "SpokeChainCall", version = "1.0.0")]
+struct SpokeChainCall712 {
+    author: Address,
+    chain_id: u32,
+    call_data: Bytes,
+    contract_to_call: Address,
+    token: Address,
+    amount: U256,
+}
+
 impl SpokeChainCall {
-    pub fn create_signed(
+    pub async fn create_signed(
         connector: Arc<Connector>,
         spoke_chain_call_stub: SpokeChainCallStub,
     ) -> Result<SpokeChainCall> {
@@ -54,7 +69,7 @@ impl SpokeChainCall {
         let contract_intent: bindings_khalani::base_intent_book::Intent =
             spoke_chain_call.clone().into();
         let intent_id = calculate_intent_id(contract_intent);
-        let signature = Self::sign(connector.clone(), spoke_chain_call.clone())?;
+        let signature = Self::sign(connector.clone(), spoke_chain_call.clone()).await?;
         Ok(Self {
             intent_id,
             signature,
@@ -62,13 +77,27 @@ impl SpokeChainCall {
         })
     }
 
-    fn get_eip712_hash(_spoke_chain_call: SpokeChainCall) -> H256 {
-        todo!()
+    async fn sign(connector: Arc<Connector>, spoke_chain_call: SpokeChainCall) -> Result<Bytes> {
+        let spoke_chain_call_712: SpokeChainCall712 = spoke_chain_call.clone().into();
+        let rpc_client = connector.get_rpc_client(spoke_chain_call.chain_id)?;
+        let signature = rpc_client
+            .signer()
+            .sign_typed_data(&spoke_chain_call_712)
+            .await?;
+        Ok(Bytes::from(signature.to_vec()))
     }
+}
 
-    fn sign(_connector: Arc<Connector>, spoke_chain_call: SpokeChainCall) -> Result<Bytes> {
-        let _eip712_hash = Self::get_eip712_hash(spoke_chain_call);
-        todo!()
+impl From<SpokeChainCall> for SpokeChainCall712 {
+    fn from(value: SpokeChainCall) -> Self {
+        Self {
+            author: value.author,
+            chain_id: value.chain_id.into(),
+            contract_to_call: value.contract_to_call,
+            call_data: value.call_data,
+            token: value.token,
+            amount: value.amount,
+        }
     }
 }
 

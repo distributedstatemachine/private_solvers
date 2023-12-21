@@ -41,13 +41,13 @@ impl FillSpokeChainCallIntentCreatorHandler for FillSpokeChainCallIntentCreatorH
         &self,
         quoted_intent: QuotedSwapIntent,
     ) -> Result<FillSpokeChainCallIntentCreatorHandlerResult> {
-        let spoke_chain_call = self.create_spoke_chain_call_intent(&quoted_intent)?;
+        let spoke_chain_call = self.create_spoke_chain_call_intent(&quoted_intent).await?;
         Ok(FillSpokeChainCallIntentCreatorHandlerResult { spoke_chain_call })
     }
 }
 
 impl FillSpokeChainCallIntentCreatorHandlerImpl {
-    fn create_spoke_chain_call_intent(
+    async fn create_spoke_chain_call_intent(
         &self,
         quoted_intent: &QuotedSwapIntent,
     ) -> Result<SpokeChainCall> {
@@ -96,5 +96,6 @@ impl FillSpokeChainCallIntentCreatorHandlerImpl {
                 reward_amount: reward_amount.base_units,
             },
         )
+        .await
     }
 }
