@@ -3,13 +3,11 @@ use std::sync::Arc;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bindings_khalani::swap_intent_filler::SwapIntentFiller;
-use ethers::types::U256;
 
 use intentbook_matchmaker::types::spoke_chain_call::{SpokeChainCall, SpokeChainCallStub};
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::connectors::Connector;
 use solver_common::error::ConfigError;
-use solver_common::inventory::amount::Amount;
 use solver_common::inventory::Inventory;
 
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;
@@ -77,17 +75,15 @@ impl FillSpokeChainCallIntentCreatorHandlerImpl {
             .calldata()
             .ok_or(anyhow!("Unable to encode SwapIntentFiller"))?;
 
-        let source_chain_mirror_token = self.inventory.find_mirror_token(
-            quoted_intent.swap_intent.source_token,
-            quoted_intent.swap_intent.source_chain_id,
+        let destination_chain_mirror_token = self.inventory.find_mirror_token(
+            quoted_intent.swap_intent.destination_token,
+            quoted_intent.swap_intent.destination_chain_id,
         )?;
 
-        // TODO: currently, the reward for the Spoke Chain Call is 1 USD denominated in the source mirror tokens.
-        let reward_token = source_chain_mirror_token.address;
-        let reward_amount = Amount::from_user_units_token(
-            U256::from_dec_str("1").unwrap(),
-            source_chain_mirror_token,
-        );
+        // TODO: currently, the effective Filler agent receives the same reward as to what it delivers on the spoke chain,
+        //  meaning that it does not do any profit.
+        let reward_token = destination_chain_mirror_token.address;
+        let reward_amount = quoted_intent.clone().destination_amount;
         SpokeChainCall::create_signed(
             self.connector.clone(),
             SpokeChainCallStub {
