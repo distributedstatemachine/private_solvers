@@ -1,3 +1,3 @@
 pub mod intent_quoter;
-pub mod interchain_liquidity_hub;
-pub mod quoted_intent;
+pub mod one_to_one_intent_quoter;
+pub mod quoted_swap_intent;

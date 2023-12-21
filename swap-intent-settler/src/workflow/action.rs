@@ -1,4 +1,4 @@
-use crate::quote::quoted_intent::QuotedIntent;
+use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use intentbook_matchmaker::types::intent::Intent;
 use intentbook_matchmaker::types::swap_intent::SwapIntent;
 
@@ -8,6 +8,6 @@ pub enum Action {
     MatchIntent(Intent),
     PlaceIntent(Intent),
     LockTokensOnSourceChain(SwapIntent),
-    FillIntentOnDestinationChain(QuotedIntent),
-    SwapAndBridge(QuotedIntent),
+    FillIntentOnDestinationChain(QuotedSwapIntent),
+    SwapAndBridge(QuotedSwapIntent),
 }

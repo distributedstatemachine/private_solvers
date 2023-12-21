@@ -9,16 +9,16 @@ use solver_common::inventory::amount::Amount;
 use solver_common::inventory::Inventory;
 use solver_common::tests::connector::{create_connector, create_e2e_config};
 use swap_intent_settler::quote::intent_quoter::IntentQuoter;
-use swap_intent_settler::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
+use swap_intent_settler::quote::one_to_one_intent_quoter::OneToOneIntentQuoter;
 
 #[tokio::test]
-async fn test_interchain_liquidity_hub_quoter() -> Result<()> {
+async fn test_one_to_one_intent_quoter() -> Result<()> {
     let config = create_e2e_config().unwrap();
     let connector = create_connector().await?;
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config.clone(), connector.clone()).await?;
     let inventory = Arc::new(inventory);
-    let quoter = InterchainLiquidityHubQuoter::new(inventory.clone());
+    let quoter = OneToOneIntentQuoter::new(inventory.clone());
 
     let usdc_sepolia = inventory.find_token_by_symbol("USDC".into(), ChainId::Sepolia)?;
     let usdt_fuji = inventory.find_token_by_symbol("USDT".into(), ChainId::Fuji)?;

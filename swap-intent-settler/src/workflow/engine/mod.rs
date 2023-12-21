@@ -3,6 +3,7 @@ use std::sync::Arc;
 use artemis_core::engine::Engine;
 use futures::lock::Mutex;
 
+use crate::quote::one_to_one_intent_quoter::OneToOneIntentQuoter;
 use intentbook_matchmaker::workflow::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
 use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntentCollector;
 use solver_common::config::Config;
@@ -10,7 +11,6 @@ use solver_common::connectors::Connector;
 use solver_common::inventory::Inventory;
 use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 
-use crate::quote::interchain_liquidity_hub::interchain_liquidity_hub_quoter::InterchainLiquidityHubQuoter;
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
 use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
@@ -29,7 +29,7 @@ pub fn configure_engine(
     // Set up Ethereum specific clients.
     let send_transaction_lock_intent_tokens_handler =
         SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
-    let interchain_liquidity_hub_quoter = InterchainLiquidityHubQuoter::new(inventory.clone());
+    let intent_quoter = OneToOneIntentQuoter::new(inventory.clone());
     let swap_intent_filler_handler =
         SendTransactionSwapIntentFillerHandler::new(config.addresses.clone(), connector.clone());
 
@@ -53,10 +53,7 @@ pub fn configure_engine(
     engine.add_collector(new_intent_collector);
 
     // Set up strategies.
-    let intents_strategy = Box::new(IntentsStrategy::new(
-        state_manager.clone(),
-        interchain_liquidity_hub_quoter,
-    ));
+    let intents_strategy = Box::new(IntentsStrategy::new(state_manager.clone(), intent_quoter));
     engine.add_strategy(intents_strategy);
 
     // Set up executors.

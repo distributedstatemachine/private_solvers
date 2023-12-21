@@ -5,13 +5,13 @@ use ethers::types::{Address, TxHash, U256};
 use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Sender};
 
-use crate::quote::quoted_intent::QuotedIntent;
+use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SwapIntentFillerHandlerResult {
-    pub quoted_intent: QuotedIntent,
+    pub quoted_intent: QuotedSwapIntent,
     pub fill_tx_hash: TxHash,
     pub fill_timestamp: U256,
     pub fill_amount: U256,
@@ -22,7 +22,7 @@ pub struct SwapIntentFillerHandlerResult {
 pub trait SwapIntentFillerHandler {
     async fn fill_swap_intent(
         &self,
-        quoted_intent: QuotedIntent,
+        quoted_intent: QuotedSwapIntent,
     ) -> Result<SwapIntentFillerHandlerResult>;
 }
 

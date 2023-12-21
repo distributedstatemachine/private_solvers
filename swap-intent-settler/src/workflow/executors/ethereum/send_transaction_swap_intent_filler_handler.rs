@@ -6,7 +6,7 @@ use bindings_khalani::swap_intent_filler::{FillFilter, SwapIntentFiller};
 use ethers::contract::{parse_log, ContractCall};
 use tracing::info;
 
-use crate::quote::quoted_intent::QuotedIntent;
+use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use crate::workflow::executors::swap_intent_filler_executor::{
     SwapIntentFillerHandler, SwapIntentFillerHandlerResult,
 };
@@ -33,7 +33,7 @@ impl SendTransactionSwapIntentFillerHandler {
 impl SwapIntentFillerHandler for SendTransactionSwapIntentFillerHandler {
     async fn fill_swap_intent(
         &self,
-        quoted_intent: QuotedIntent,
+        quoted_intent: QuotedSwapIntent,
     ) -> Result<SwapIntentFillerHandlerResult> {
         info!(
             ?quoted_intent,
@@ -62,7 +62,7 @@ impl SwapIntentFillerHandler for SendTransactionSwapIntentFillerHandler {
 impl SendTransactionSwapIntentFillerHandler {
     fn build_fill_swap_intent_tx(
         &self,
-        quoted_intent: &QuotedIntent,
+        quoted_intent: &QuotedSwapIntent,
     ) -> Result<ContractCall<RpcClient, ()>> {
         let destination_chain_id = quoted_intent.swap_intent.destination_chain_id;
         let rpc_client = self.connector.get_rpc_client(destination_chain_id)?;

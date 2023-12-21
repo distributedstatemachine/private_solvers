@@ -1,4 +1,4 @@
-use crate::quote::quoted_intent::QuotedIntent;
+use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensHandlerResult;
 use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerHandlerResult;
 use intentbook_matchmaker::types::swap_intent::SwapIntent;
@@ -11,7 +11,7 @@ pub mod state_manager;
 pub struct IntentState {
     pub intent_id: IntentId,
     pub swap_intent: SwapIntent,
-    pub quoted_intent: Option<QuotedIntent>,
+    pub quoted_intent: Option<QuotedSwapIntent>,
 
     pub lock_intent_tokens_handler_result: Option<LockIntentTokensHandlerResult>,
     pub filler_handler_result: Option<SwapIntentFillerHandlerResult>,
