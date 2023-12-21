@@ -1,6 +1,6 @@
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use crate::workflow::executors::fill_spoke_chain_call_intent_creator_executor::FillCreatorHandlerResult;
-use crate::workflow::executors::lock_tokens_executor::LockIntentTokensHandlerResult;
+use crate::workflow::executors::lock_tokens_spoke_chain_call_intent_creator_executor::LockTokensSpokeChainCallIntentCreatorHandlerResult;
 use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::types::intent_id::IntentId;
 
@@ -13,7 +13,8 @@ pub struct IntentState {
     pub swap_intent: SwapIntent,
     pub quoted_intent: Option<QuotedSwapIntent>,
 
-    pub lock_intent_tokens_handler_result: Option<LockIntentTokensHandlerResult>,
+    pub lock_intent_tokens_handler_result:
+        Option<LockTokensSpokeChainCallIntentCreatorHandlerResult>,
     pub filler_handler_result: Option<FillCreatorHandlerResult>,
 
     pub is_proved_that_tokens_locked_on_source_chain: bool,

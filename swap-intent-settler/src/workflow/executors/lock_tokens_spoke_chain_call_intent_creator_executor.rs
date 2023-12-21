@@ -9,22 +9,25 @@ use solver_common::workflow::action_confirmation_collector::ActionConfirmationCo
 use tokio::sync::mpsc::{channel, Sender};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LockIntentTokensHandlerResult {
+pub struct LockTokensSpokeChainCallIntentCreatorHandlerResult {
     pub swap_intent: SwapIntent,
     pub locking_tx_hash: TxHash,
 }
 
 #[async_trait]
-pub trait LockIntentTokensHandler {
-    async fn create_spoke_chain_call_intent(&self, swap_intent: SwapIntent) -> Result<LockIntentTokensHandlerResult>;
+pub trait LockTokensSpokeChainCallIntentCreatorHandler {
+    async fn create_spoke_chain_call_intent(
+        &self,
+        swap_intent: SwapIntent,
+    ) -> Result<LockTokensSpokeChainCallIntentCreatorHandlerResult>;
 }
 
-pub struct LockIntentTokensExecutor<H: LockIntentTokensHandler> {
+pub struct LockTokensSpokeChainCallIntentCreatorExecutor<H: LockTokensSpokeChainCallIntentCreatorHandler> {
     handler: H,
-    confirmation_sender: Sender<LockIntentTokensHandlerResult>,
+    confirmation_sender: Sender<LockTokensSpokeChainCallIntentCreatorHandlerResult>,
 }
 
-impl<H: LockIntentTokensHandler> LockIntentTokensExecutor<H> {
+impl<H: LockTokensSpokeChainCallIntentCreatorHandler> LockTokensSpokeChainCallIntentCreatorExecutor<H> {
     pub fn new(handler: H) -> (Self, Box<dyn Collector<Event>>) {
         let (confirmation_sender, confirmation_receiver) = channel(512);
         let fill_action_confirmation_collector =
@@ -35,7 +38,7 @@ impl<H: LockIntentTokensHandler> LockIntentTokensExecutor<H> {
             }),
         );
         (
-            LockIntentTokensExecutor {
+            LockTokensSpokeChainCallIntentCreatorExecutor {
                 handler,
                 confirmation_sender,
             },
@@ -47,12 +50,17 @@ impl<H: LockIntentTokensHandler> LockIntentTokensExecutor<H> {
 }
 
 #[async_trait]
-impl<H: LockIntentTokensHandler + Sync + Send> Executor<Action> for LockIntentTokensExecutor<H> {
+impl<H: LockTokensSpokeChainCallIntentCreatorHandler + Sync + Send> Executor<Action>
+    for LockTokensSpokeChainCallIntentCreatorExecutor<H>
+{
     async fn execute(&self, action: Action) -> Result<()> {
         if let Action::CreateSpokeChainCallIntentToLockSwapIntentTokensOnSourceChain(swap_intent) =
             action
         {
-            let lock_intent_tokens_handler_result = self.handler.create_spoke_chain_call_intent(swap_intent).await?;
+            let lock_intent_tokens_handler_result = self
+                .handler
+                .create_spoke_chain_call_intent(swap_intent)
+                .await?;
             self.confirmation_sender
                 .send(lock_intent_tokens_handler_result)
                 .await?;

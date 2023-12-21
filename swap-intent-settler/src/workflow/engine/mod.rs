@@ -14,9 +14,9 @@ use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
 use crate::workflow::executors::ethereum::fill_spoke_chain_call_intent_creator_handler::FillSpokeChainCallIntentCreatorHandlerImpl;
-use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
+use crate::workflow::executors::ethereum::lock_tokens_spoke_chain_call_intent_creator_handler::LockTokensSpokeChainCallIntentCreatorHandlerImpl;
 use crate::workflow::executors::fill_spoke_chain_call_intent_creator_executor::FillSpokeChainCallIntentCreatorExecutor;
-use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
+use crate::workflow::executors::lock_tokens_spoke_chain_call_intent_creator_executor::LockTokensSpokeChainCallIntentCreatorExecutor;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
 
@@ -27,8 +27,6 @@ pub fn configure_engine(
     inventory: Arc<Inventory>,
 ) -> Engine<Event, Action> {
     // Set up Ethereum specific clients.
-    let send_transaction_lock_intent_tokens_handler =
-        SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
     let intent_quoter = OneToOneIntentQuoter::new(inventory.clone());
 
     let state_manager = Arc::new(Mutex::new(state_manager));
@@ -55,21 +53,32 @@ pub fn configure_engine(
     engine.add_strategy(intents_strategy);
 
     // Set up executors.
-    let (lock_intent_tokens_executor, lock_intent_tokens_confirmation_collector) =
-        LockIntentTokensExecutor::new(send_transaction_lock_intent_tokens_handler);
-    engine.add_executor(Box::new(lock_intent_tokens_executor));
-    engine.add_collector(lock_intent_tokens_confirmation_collector);
+    let (
+        lock_tokens_spoke_chain_call_intent_creator_executor,
+        lock_tokens_spoke_chain_call_intent_creator_executor_result_collector,
+    ) = LockTokensSpokeChainCallIntentCreatorExecutor::new(
+        LockTokensSpokeChainCallIntentCreatorHandlerImpl::new(
+            config.addresses.clone(),
+            connector.clone(),
+        ),
+    );
+    engine.add_executor(Box::new(
+        lock_tokens_spoke_chain_call_intent_creator_executor,
+    ));
+    engine.add_collector(lock_tokens_spoke_chain_call_intent_creator_executor_result_collector);
 
-    let (swap_intent_filler_executor, swap_intent_filler_confirmation_collector) =
-        FillSpokeChainCallIntentCreatorExecutor::new(
-            FillSpokeChainCallIntentCreatorHandlerImpl::new(
-                config.addresses.clone(),
-                connector.clone(),
-                inventory.clone(),
-            ),
-        );
-    engine.add_executor(Box::new(swap_intent_filler_executor));
-    engine.add_collector(swap_intent_filler_confirmation_collector);
+    let (
+        fill_spoke_chain_call_intent_creator_executor,
+        fill_spoke_chain_call_intent_creator_executor_result,
+    ) = FillSpokeChainCallIntentCreatorExecutor::new(
+        FillSpokeChainCallIntentCreatorHandlerImpl::new(
+            config.addresses.clone(),
+            connector.clone(),
+            inventory.clone(),
+        ),
+    );
+    engine.add_executor(Box::new(fill_spoke_chain_call_intent_creator_executor));
+    engine.add_collector(fill_spoke_chain_call_intent_creator_executor_result);
 
     engine
 }

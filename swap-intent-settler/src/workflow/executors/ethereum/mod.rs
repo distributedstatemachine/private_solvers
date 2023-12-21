@@ -1,2 +1,2 @@
-pub mod send_transaction_lock_intent_tokens_handler;
 pub mod fill_spoke_chain_call_intent_creator_handler;
+pub mod lock_tokens_spoke_chain_call_intent_creator_handler;
