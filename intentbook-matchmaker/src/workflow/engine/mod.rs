@@ -27,15 +27,6 @@ pub fn configure_engine(
 ) -> Engine<Event, Action> {
     let state_manager = Arc::new(Mutex::new(state_manager));
 
-    let gmp_event_verifier_sources: Vec<GmpEventVerifierProofSource> = config
-        .addresses
-        .verifiers
-        .iter()
-        .map(|verifier_config| {
-            GmpEventVerifierProofSource::new(connector.clone(), verifier_config.clone())
-        })
-        .collect();
-
     let intentbook_addresses = vec![
         config
             .addresses
@@ -82,6 +73,14 @@ pub fn configure_engine(
     ));
     engine.add_collector(settle_intent_confirmation_collector);
 
+    let gmp_event_verifier_sources: Vec<GmpEventVerifierProofSource> = config
+        .addresses
+        .verifiers
+        .iter()
+        .map(|verifier_config| {
+            GmpEventVerifierProofSource::new(connector.clone(), verifier_config.clone())
+        })
+        .collect();
     for gmp_event_verifier_source in gmp_event_verifier_sources {
         let proof_collector = Box::new(ProofsCollector::new(
             gmp_event_verifier_source,
