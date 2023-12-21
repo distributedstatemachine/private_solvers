@@ -34,6 +34,7 @@ impl From<Intent> for bindings_khalani::base_intent_book::Intent {
 
 pub fn calculate_intent_id(intent: bindings_khalani::base_intent_book::Intent) -> IntentId {
     keccak256(
+        // TODO[solidity]: ensure this encoding is exactly what Solidity returns (write a test).
         encode_packed(&[
             Token::Bytes(intent.intent.to_vec()),
             Token::Bytes(intent.signature.to_vec()),

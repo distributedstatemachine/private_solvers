@@ -44,6 +44,7 @@ pub fn calculate_intent_bid_id(
     intent_bid: bindings_khalani::base_intent_book::IntentBid,
 ) -> IntentBidId {
     keccak256(
+        // TODO[solidity]: ensure this encoding is exactly what Solidity returns (write a test).
         encode_packed(&[
             Token::FixedBytes(Vec::from(intent_bid.intent_id)),
             Token::Bytes(intent_bid.bid.to_vec()),

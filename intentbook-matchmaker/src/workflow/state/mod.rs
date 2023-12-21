@@ -32,9 +32,9 @@ impl IntentState {
 
     pub fn handle_match(&mut self, intent_bid: IntentBid) {
         match &self.intent {
-            Intent::SwapIntent(..) => {
+            Intent::SwapIntent(swap_intent) => {
                 if let IntentBid::SwapIntentBid(swap_intent_bid) = &intent_bid {
-                    let proof_ids = swap_intent_bid.get_expected_proofs();
+                    let proof_ids = swap_intent_bid.get_expected_proofs(swap_intent);
                     if let Ok(proof_ids) = proof_ids {
                         self.expected_proofs.extend(proof_ids);
                     }

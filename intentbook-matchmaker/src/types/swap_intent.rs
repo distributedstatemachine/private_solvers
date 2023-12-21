@@ -1,7 +1,8 @@
 use bindings_khalani::shared_types::Intent as ContractIntent;
 use bindings_khalani::shared_types::SwapIntent as ContractSwapIntent;
-use ethers::abi::{AbiDecode, AbiEncode};
-use ethers::types::{Address, Bytes, U256};
+use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
+use ethers::types::{Address, Bytes, H256, U256};
+use ethers::utils::keccak256;
 use solver_common::config::chain::ChainId;
 use solver_common::types::intent_id::{IntentId, WithIntentId};
 
@@ -18,6 +19,34 @@ pub struct SwapIntent {
     pub source_permit_2: Bytes,
     pub deadline: U256,
     pub nonce: U256,
+}
+
+impl SwapIntent {
+    // TODO: it is confusing to call it "swap intent ID".
+    pub fn calculate_swap_intent_id(&self) -> H256 {
+        keccak256(
+            // TODO[solidity]: ensure this encoding is exactly what Solidity returns (write a test).
+            encode_packed(&[
+                AbiToken::Address(self.author),
+                AbiToken::FixedBytes(Vec::from(
+                    H256::from_low_u64_be(Into::<u32>::into(self.source_chain_id).into())
+                        .as_bytes(),
+                )),
+                AbiToken::FixedBytes(Vec::from(
+                    H256::from_low_u64_be(Into::<u32>::into(self.destination_chain_id).into())
+                        .as_bytes(),
+                )),
+                AbiToken::Address(self.source_token),
+                AbiToken::Address(self.destination_token),
+                AbiToken::Uint(self.source_amount),
+                AbiToken::Bytes(self.source_permit_2.to_vec()),
+                AbiToken::Uint(self.nonce),
+                AbiToken::Uint(self.deadline),
+            ])
+            .unwrap(),
+        )
+        .into()
+    }
 }
 
 impl TryFrom<WithIntentId<ContractIntent>> for SwapIntent {
