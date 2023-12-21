@@ -2,6 +2,7 @@ use bindings_khalani::shared_types::Intent as ContractIntent;
 use bindings_khalani::shared_types::SwapIntent as ContractSwapIntent;
 use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
 use ethers::types::{Address, Bytes, H256, U256};
+use ethers::utils::hex::FromHex;
 use ethers::utils::keccak256;
 use solver_common::config::chain::ChainId;
 use solver_common::types::intent_id::{IntentId, WithIntentId};
@@ -92,8 +93,21 @@ impl From<SwapIntent> for bindings_khalani::base_intent_book::Intent {
     fn from(value: SwapIntent) -> Self {
         let contract_swap_intent: ContractSwapIntent = value.clone().into();
         bindings_khalani::base_intent_book::Intent {
-            intent: Bytes::from(AbiEncode::encode(contract_swap_intent)),
+            intent: abi_encode_with_prefix(contract_swap_intent),
             signature: value.signature,
         }
     }
+}
+
+// TODO: I don't know why Solidity's abi.encode(...) adds a prefix of 0x00..20 but ethers-rs AbiEncode::encode does not.
+pub fn abi_encode_with_prefix<T>(t: T) -> Bytes
+where
+    T: AbiEncode,
+{
+    let mut encoded =
+        Bytes::from_hex("0x0000000000000000000000000000000000000000000000000000000000000020")
+            .unwrap()
+            .to_vec();
+    encoded.extend(AbiEncode::encode(t));
+    Bytes::from(encoded)
 }
