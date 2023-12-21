@@ -40,6 +40,8 @@ pub struct SpokeChainCall {
 
 #[derive(Debug, Clone, Eip712, EthAbiType)]
 #[eip712(name = "SpokeChainCall", version = "1.0.0")]
+// TODO: this has to be fixed to correspond to:
+//   https://github.com/tvl-labs/khalani-protocol/blob/master/src/Intents/intentbook/lib/SpokeChainCallIntentLib.sol#L33
 struct SpokeChainCall712 {
     author: Address,
     chain_id: u32,
