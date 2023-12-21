@@ -7,7 +7,6 @@ use intentbook_matchmaker::types::swap_intent::SwapIntent;
 pub enum Action {
     MatchIntent(Intent),
     PlaceIntent(Intent),
-    LockTokensOnSourceChain(SwapIntent),
-    FillIntentOnDestinationChain(QuotedSwapIntent),
-    SwapAndBridge(QuotedSwapIntent),
+    CreateSpokeChainCallIntentToLockSwapIntentTokensOnSourceChain(SwapIntent),
+    CreateSpokeChainCallIntentToFillSwapIntentOnDestinationChain(QuotedSwapIntent),
 }

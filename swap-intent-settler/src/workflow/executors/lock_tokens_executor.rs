@@ -16,7 +16,7 @@ pub struct LockIntentTokensHandlerResult {
 
 #[async_trait]
 pub trait LockIntentTokensHandler {
-    async fn lock_tokens(&self, swap_intent: SwapIntent) -> Result<LockIntentTokensHandlerResult>;
+    async fn create_spoke_chain_call_intent(&self, swap_intent: SwapIntent) -> Result<LockIntentTokensHandlerResult>;
 }
 
 pub struct LockIntentTokensExecutor<H: LockIntentTokensHandler> {
@@ -42,13 +42,17 @@ impl<H: LockIntentTokensHandler> LockIntentTokensExecutor<H> {
             fill_action_confirmation_collector,
         )
     }
+
+    pub fn create_lock_tokens_intent(&self) {}
 }
 
 #[async_trait]
 impl<H: LockIntentTokensHandler + Sync + Send> Executor<Action> for LockIntentTokensExecutor<H> {
     async fn execute(&self, action: Action) -> Result<()> {
-        if let Action::LockTokensOnSourceChain(swap_intent) = action {
-            let lock_intent_tokens_handler_result = self.handler.lock_tokens(swap_intent).await?;
+        if let Action::CreateSpokeChainCallIntentToLockSwapIntentTokensOnSourceChain(swap_intent) =
+            action
+        {
+            let lock_intent_tokens_handler_result = self.handler.create_spoke_chain_call_intent(swap_intent).await?;
             self.confirmation_sender
                 .send(lock_intent_tokens_handler_result)
                 .await?;

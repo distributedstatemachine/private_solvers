@@ -64,17 +64,32 @@ where
                 return vec![];
             }
             Event::IntentQuoted(quoted_intent) => {
-                info!(?quoted_intent, "Intent is quoted and ready to be filled");
+                info!(?quoted_intent, "Intent is quoted");
                 self.state_manager
                     .lock()
                     .await
                     .update_intent_state(quoted_intent.clone().swap_intent.intent_id, |intent| {
                         intent.quoted_intent = Some(quoted_intent.clone())
                     });
-                return vec![Action::LockTokensOnSourceChain(quoted_intent.swap_intent)];
+                return vec![
+                    Action::CreateSpokeChainCallIntentToLockSwapIntentTokensOnSourceChain(
+                        quoted_intent.clone().swap_intent,
+                    ),
+                    Action::CreateSpokeChainCallIntentToFillSwapIntentOnDestinationChain(
+                        quoted_intent,
+                    ),
+                ];
+            }
+            Event::CreatedSpokeChainCallIntentToFillSwapIntentOnDestinationChain(result) => {
+                info!(
+                    ?result,
+                    "Created SpokeChainCall intent to fill SwapIntent on destination chain, now placing it into the SpokeChainCall intentbook"
+                );
+                return vec![Action::PlaceIntent(Intent::SpokeChainCall(
+                    result.spoke_chain_call,
+                ))];
             }
             Event::TokensLockedOnSourceChain(_) => {}
-            Event::IntentFilledOnDestination(_) => {}
             Event::ProvedTokensLockedOnSourceChain(_) => {}
             Event::ProvedSwapIntentFilledOnDestinationChain(_) => {}
         }

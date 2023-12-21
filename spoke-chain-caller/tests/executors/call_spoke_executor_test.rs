@@ -48,7 +48,7 @@ async fn test_swap_and_bridge_executor() -> Result<()> {
     let usdc_token = inventory.find_token_by_symbol("USDC".into(), chain_id)?;
 
     let amount =
-        Amount::from_user_units_token(U256::from_dec_str("100").unwrap(), usdc_token).unwrap();
+        Amount::from_user_units_token(U256::from_dec_str("100").unwrap(), usdc_token);
 
     let mock_contract_to_call = MockContractToCall::new(contract_to_call_address, rpc_client);
     let call_data = mock_contract_to_call

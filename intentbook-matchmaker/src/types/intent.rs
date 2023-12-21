@@ -1,6 +1,8 @@
 use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::types::swap_intent::SwapIntent;
+use ethers::abi::{encode_packed, Token};
+use ethers::utils::keccak256;
 use solver_common::types::intent_id::IntentId;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -28,4 +30,15 @@ impl From<Intent> for bindings_khalani::base_intent_book::Intent {
             Intent::SwapIntent(swap_intent) => swap_intent.into(),
         }
     }
+}
+
+pub fn calculate_intent_id(intent: bindings_khalani::base_intent_book::Intent) -> IntentId {
+    keccak256(
+        encode_packed(&[
+            Token::Bytes(intent.intent.to_vec()),
+            Token::Bytes(intent.signature.to_vec()),
+        ])
+        .unwrap(),
+    )
+    .into()
 }

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorMap, Executor};
 use async_trait::async_trait;
-use ethers::types::{Address, TxHash, U256};
+use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Sender};
 
@@ -10,38 +10,34 @@ use crate::workflow::action::Action;
 use crate::workflow::event::Event;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SwapIntentFillerHandlerResult {
-    pub quoted_intent: QuotedSwapIntent,
-    pub fill_tx_hash: TxHash,
-    pub fill_timestamp: U256,
-    pub fill_amount: U256,
-    pub filler: Address,
+pub struct FillCreatorHandlerResult {
+    pub spoke_chain_call: SpokeChainCall,
 }
 
 #[async_trait]
-pub trait SwapIntentFillerHandler {
-    async fn fill_swap_intent(
+pub trait FillSpokeChainCallIntentCreatorHandler {
+    async fn create_swap_intent_filler(
         &self,
         quoted_intent: QuotedSwapIntent,
-    ) -> Result<SwapIntentFillerHandlerResult>;
+    ) -> Result<FillCreatorHandlerResult>;
 }
 
-pub struct SwapIntentFillerExecutor<H: SwapIntentFillerHandler> {
+pub struct FillSpokeChainCallIntentCreatorExecutor<H: FillSpokeChainCallIntentCreatorHandler> {
     handler: H,
-    confirmation_sender: Sender<SwapIntentFillerHandlerResult>,
+    confirmation_sender: Sender<FillCreatorHandlerResult>,
 }
 
-impl<H: SwapIntentFillerHandler> SwapIntentFillerExecutor<H> {
+impl<H: FillSpokeChainCallIntentCreatorHandler> FillSpokeChainCallIntentCreatorExecutor<H> {
     pub fn new(handler: H) -> (Self, Box<dyn Collector<Event>>) {
         let (confirmation_sender, confirmation_receiver) = channel(512);
         let fill_action_confirmation_collector =
             Box::new(ActionConfirmationCollector::new(confirmation_receiver));
         let fill_action_confirmation_collector: Box<dyn Collector<Event>> =
             Box::new(CollectorMap::new(fill_action_confirmation_collector, |e| {
-                Event::IntentFilledOnDestination(e)
+                Event::CreatedSpokeChainCallIntentToFillSwapIntentOnDestinationChain(e)
             }));
         (
-            SwapIntentFillerExecutor {
+            FillSpokeChainCallIntentCreatorExecutor {
                 handler,
                 confirmation_sender,
             },
@@ -51,11 +47,18 @@ impl<H: SwapIntentFillerHandler> SwapIntentFillerExecutor<H> {
 }
 
 #[async_trait]
-impl<H: SwapIntentFillerHandler + Sync + Send> Executor<Action> for SwapIntentFillerExecutor<H> {
+impl<H: FillSpokeChainCallIntentCreatorHandler + Sync + Send> Executor<Action>
+    for FillSpokeChainCallIntentCreatorExecutor<H>
+{
     async fn execute(&self, action: Action) -> Result<()> {
-        if let Action::FillIntentOnDestinationChain(quoted_intent) = action {
-            let filled_intent = self.handler.fill_swap_intent(quoted_intent).await?;
-            self.confirmation_sender.send(filled_intent).await?;
+        if let Action::CreateSpokeChainCallIntentToFillSwapIntentOnDestinationChain(quoted_intent) =
+            action
+        {
+            let filler_handler_result = self
+                .handler
+                .create_swap_intent_filler(quoted_intent)
+                .await?;
+            self.confirmation_sender.send(filler_handler_result).await?;
         }
         return Ok(());
     }

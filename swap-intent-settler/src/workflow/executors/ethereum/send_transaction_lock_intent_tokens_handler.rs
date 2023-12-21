@@ -31,7 +31,7 @@ impl SendTransactionLockIntentTokensHandler {
 
 #[async_trait]
 impl LockIntentTokensHandler for SendTransactionLockIntentTokensHandler {
-    async fn lock_tokens(&self, swap_intent: SwapIntent) -> Result<LockIntentTokensHandlerResult> {
+    async fn create_spoke_chain_call_intent(&self, swap_intent: SwapIntent) -> Result<LockIntentTokensHandlerResult> {
         info!(?swap_intent, "Locking source tokens of the intent");
         let transaction = self.build_lock_tokens_tx(&swap_intent)?;
         let receipt = submit_transaction(transaction).await?;

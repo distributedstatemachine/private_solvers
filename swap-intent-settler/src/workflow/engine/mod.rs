@@ -13,10 +13,10 @@ use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
+use crate::workflow::executors::ethereum::fill_spoke_chain_call_intent_creator_handler::FillSpokeChainCallIntentCreatorHandlerImpl;
 use crate::workflow::executors::ethereum::send_transaction_lock_intent_tokens_handler::SendTransactionLockIntentTokensHandler;
-use crate::workflow::executors::ethereum::send_transaction_swap_intent_filler_handler::SendTransactionSwapIntentFillerHandler;
+use crate::workflow::executors::fill_spoke_chain_call_intent_creator_executor::FillSpokeChainCallIntentCreatorExecutor;
 use crate::workflow::executors::lock_tokens_executor::LockIntentTokensExecutor;
-use crate::workflow::executors::swap_intent_filler_executor::SwapIntentFillerExecutor;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
 
@@ -30,8 +30,6 @@ pub fn configure_engine(
     let send_transaction_lock_intent_tokens_handler =
         SendTransactionLockIntentTokensHandler::new(config.addresses.clone(), connector.clone());
     let intent_quoter = OneToOneIntentQuoter::new(inventory.clone());
-    let swap_intent_filler_handler =
-        SendTransactionSwapIntentFillerHandler::new(config.addresses.clone(), connector.clone());
 
     let state_manager = Arc::new(Mutex::new(state_manager));
 
@@ -63,7 +61,13 @@ pub fn configure_engine(
     engine.add_collector(lock_intent_tokens_confirmation_collector);
 
     let (swap_intent_filler_executor, swap_intent_filler_confirmation_collector) =
-        SwapIntentFillerExecutor::new(swap_intent_filler_handler);
+        FillSpokeChainCallIntentCreatorExecutor::new(
+            FillSpokeChainCallIntentCreatorHandlerImpl::new(
+                config.addresses.clone(),
+                connector.clone(),
+                inventory.clone(),
+            ),
+        );
     engine.add_executor(Box::new(swap_intent_filler_executor));
     engine.add_collector(swap_intent_filler_confirmation_collector);
 
