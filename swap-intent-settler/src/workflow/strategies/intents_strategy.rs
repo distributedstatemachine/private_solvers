@@ -80,6 +80,15 @@ where
                     ),
                 ];
             }
+            Event::CreatedSpokeChainCallToLockTokensOnSourceChain(result) => {
+                info!(
+                    ?result,
+                    "Created SpokeChainCall intent to lock tokens in the Escrow on the source chain, now placing it into the SpokeChainCall intentbook"
+                );
+                return vec![Action::PlaceIntent(Intent::SpokeChainCall(
+                    result.spoke_chain_call,
+                ))];
+            }
             Event::CreatedSpokeChainCallIntentToFillSwapIntentOnDestinationChain(result) => {
                 info!(
                     ?result,
@@ -93,10 +102,6 @@ where
                 info!(?place_intent_result, "Intent placed");
                 return Vec::default();
             }
-            Event::TokensLockedOnSourceChain(_) => {}
-            Event::ProvedTokensLockedOnSourceChain(_) => {}
-            Event::ProvedSwapIntentFilledOnDestinationChain(_) => {}
         }
-        return Vec::default();
     }
 }

@@ -54,7 +54,6 @@ impl From<SwapIntentBid> for bindings_khalani::base_intent_book::IntentBid {
 
 impl SwapIntentBid {
     pub fn get_expected_proofs(&self) -> Result<Vec<ProofId>> {
-        // TODO: calculate.
-        Ok(vec![])
+        todo!()
     }
 }

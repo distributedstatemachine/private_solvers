@@ -81,6 +81,7 @@ pub fn configure_engine(
         LockTokensSpokeChainCallIntentCreatorHandlerImpl::new(
             config.addresses.clone(),
             connector.clone(),
+            inventory.clone(),
         ),
     );
     engine.add_executor(Box::new(
