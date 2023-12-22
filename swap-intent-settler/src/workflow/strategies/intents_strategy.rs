@@ -5,8 +5,9 @@ use anyhow::Result;
 use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use futures::lock::Mutex;
-use intentbook_matchmaker::types::intent::Intent;
 use tracing::{error, info};
+
+use intentbook_matchmaker::types::intent::Intent;
 
 use crate::quote::intent_quoter::IntentQuoter;
 use crate::workflow::action::Action;
@@ -43,7 +44,7 @@ where
     }
 
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
-        match event {
+        return match event {
             Event::NewIntent(intent) => {
                 if let Intent::SwapIntent(swap_intent) = intent {
                     info!(?swap_intent, "Received new swap intent");
@@ -61,7 +62,7 @@ where
                         }
                     }
                 }
-                return vec![];
+                vec![]
             }
             Event::IntentQuoted(quoted_intent) => {
                 info!(?quoted_intent, "Intent is quoted");
@@ -71,37 +72,61 @@ where
                     .update_intent_state(quoted_intent.clone().swap_intent.intent_id, |intent| {
                         intent.quoted_intent = Some(quoted_intent.clone())
                     });
-                return vec![
-                    Action::CreateSpokeChainCallIntentToLockSwapIntentTokensOnSourceChain(
-                        quoted_intent.clone().swap_intent,
-                    ),
-                    Action::CreateSpokeChainCallIntentToFillSwapIntentOnDestinationChain(
-                        quoted_intent,
-                    ),
-                ];
+                vec![Action::CreateMatchedBid(quoted_intent)]
+            }
+            Event::CreatedMatchedIntentBid(result) => {
+                info!(?result, "Created matched intent bid");
+                vec![Action::MatchSwapIntent(
+                    result.swap_intent,
+                    result.swap_intent_bid,
+                )]
+            }
+            Event::IntentMatched(match_result) => {
+                info!(?match_result, "SwapIntent is matched, creating sub intents");
+                let intent_id = match_result.intent.id();
+                let intent_state =
+                    self.state_manager
+                        .lock()
+                        .await
+                        .update_intent_state(intent_id, |intent| {
+                            intent.is_matched = true;
+                        });
+                if let Some(intent_state) = intent_state {
+                    if let Some(quoted_intent) = intent_state.quoted_intent {
+                        return vec![
+                            Action::CreateSpokeChainCallIntentToLockSwapIntentTokensOnSourceChain(
+                                quoted_intent.clone().swap_intent,
+                            ),
+                            Action::CreateSpokeChainCallIntentToFillSwapIntentOnDestinationChain(
+                                quoted_intent,
+                            ),
+                        ];
+                    }
+                }
+                vec![]
             }
             Event::CreatedSpokeChainCallToLockTokensOnSourceChain(result) => {
                 info!(
                     ?result,
                     "Created SpokeChainCall intent to lock tokens in the Escrow on the source chain, now placing it into the SpokeChainCall intentbook"
                 );
-                return vec![Action::PlaceIntent(Intent::SpokeChainCall(
+                vec![Action::PlaceIntent(Intent::SpokeChainCall(
                     result.spoke_chain_call,
-                ))];
+                ))]
             }
             Event::CreatedSpokeChainCallIntentToFillSwapIntentOnDestinationChain(result) => {
                 info!(
                     ?result,
                     "Created SpokeChainCall intent to fill SwapIntent on destination chain, now placing it into the SpokeChainCall intentbook"
                 );
-                return vec![Action::PlaceIntent(Intent::SpokeChainCall(
+                vec![Action::PlaceIntent(Intent::SpokeChainCall(
                     result.spoke_chain_call,
-                ))];
+                ))]
             }
             Event::IntentPlaced(place_intent_result) => {
                 info!(?place_intent_result, "Intent placed");
-                return Vec::default();
+                Vec::default()
             }
-        }
+        };
     }
 }

@@ -5,6 +5,7 @@ use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
 use ethers::types::{Address, BigEndianHash, Bytes, H256, U256};
 use ethers::utils::keccak256;
 
+use crate::types::intent_bid::calculate_intent_bid_id;
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 use solver_common::types::proof_id::ProofId;
 
@@ -12,10 +13,26 @@ use crate::types::swap_intent::SwapIntent;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SwapIntentBid {
-    pub intent_id: IntentId,
     pub intent_bid_id: IntentBidId,
+    pub intent_id: IntentId,
     pub filler: Address,
     pub fill_amount: U256,
+}
+
+impl SwapIntentBid {
+    pub fn new(intent_id: IntentId, filler: Address, fill_amount: U256) -> Self {
+        let bid = Self {
+            intent_bid_id: Default::default(),
+            intent_id,
+            filler,
+            fill_amount,
+        };
+        let intent_bid_id = calculate_intent_bid_id(bid.clone().into());
+        Self {
+            intent_bid_id,
+            ..bid
+        }
+    }
 }
 
 impl TryFrom<WithIntentIdAndBidId<ContractIntent>> for SwapIntentBid {
