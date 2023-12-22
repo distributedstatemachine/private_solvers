@@ -9,8 +9,8 @@
       }
     },
     "escrows": {
-      "sepolia": "0x027338BB3dEd3A9F68bf08b6Af96fe3983916bD9",
-      "fuji": "0x0727D632966E3baC67b717cae152C6e7503dCcD0"
+      "sepolia": "0x21e8BeBD9334c5e5d61d40930f302c23E2c2BEEE",
+      "fuji": "0xbf30B579f4FddDE40bA8FDDC72AC0f3934B49616"
     },
     "swap_intent_fillers": {
       "sepolia": "0xA1D71720813BC4ebe01bdef65B0DbDB564fD598d",
