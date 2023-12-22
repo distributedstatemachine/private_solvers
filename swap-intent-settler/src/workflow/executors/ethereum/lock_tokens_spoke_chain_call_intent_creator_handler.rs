@@ -49,7 +49,10 @@ impl LockTokensSpokeChainCallIntentCreatorHandler
         &self,
         swap_intent: SwapIntent,
     ) -> Result<LockTokensSpokeChainCallIntentCreatorHandlerResult> {
-        info!(?swap_intent, "Locking source tokens of the intent");
+        info!(
+            ?swap_intent,
+            "Creating a SpokeChainCall intent to lock source tokens of the SwapIntent"
+        );
         let spoke_chain_call = self.create_spoke_chain_call_intent(&swap_intent).await?;
         Ok(LockTokensSpokeChainCallIntentCreatorHandlerResult { spoke_chain_call })
     }
