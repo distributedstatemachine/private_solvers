@@ -85,8 +85,8 @@ impl LockTokensSpokeChainCallIntentCreatorHandlerImpl {
             .find_mirror_token(swap_intent.source_token, swap_intent.source_chain_id)?;
 
         // TODO: currently, the reward for the Spoke Chain Call is 1 USD denominated in the source mirror tokens.
-        let reward_token = source_chain_mirror_token.address;
-        let reward_amount = Amount::from_user_units_token(
+        let _reward_token = source_chain_mirror_token.address;
+        let _reward_amount = Amount::from_user_units_token(
             U256::from_dec_str("1").unwrap(),
             source_chain_mirror_token,
         );
@@ -98,8 +98,10 @@ impl LockTokensSpokeChainCallIntentCreatorHandlerImpl {
                 call_data,
                 token: Address::zero(),
                 amount: U256::zero(),
-                reward_token,
-                reward_amount: reward_amount.base_units,
+
+                // TODO: investigate the issue while creating a non-zero reward.
+                reward_token: Default::default(),
+                reward_amount: Default::default(),
             },
         )
         .await

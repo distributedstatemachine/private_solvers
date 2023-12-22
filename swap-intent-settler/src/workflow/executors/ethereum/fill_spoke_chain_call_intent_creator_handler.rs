@@ -82,8 +82,8 @@ impl FillSpokeChainCallIntentCreatorHandlerImpl {
 
         // TODO: currently, the effective Filler agent receives the same reward as to what it delivers on the spoke chain,
         //  meaning that it does not do any profit.
-        let reward_token = destination_chain_mirror_token.address;
-        let reward_amount = quoted_intent.clone().destination_amount;
+        let _reward_token = destination_chain_mirror_token.address;
+        let _reward_amount = quoted_intent.clone().destination_amount;
         SpokeChainCall::create_signed(
             self.connector.clone(),
             SpokeChainCallStub {
@@ -92,8 +92,10 @@ impl FillSpokeChainCallIntentCreatorHandlerImpl {
                 call_data,
                 token: quoted_intent.swap_intent.destination_token,
                 amount: quoted_intent.destination_amount.base_units,
-                reward_token,
-                reward_amount: reward_amount.base_units,
+
+                // TODO: investigate the issue while creating a non-zero reward.
+                reward_token: Default::default(),
+                reward_amount: Default::default(),
             },
         )
         .await
