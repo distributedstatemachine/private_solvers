@@ -45,7 +45,7 @@ impl SwapIntent {
                         .to_fixed_bytes()
                         .to_vec(),
                 ),
-                AbiToken::FixedBytes(self.source_permit_2.to_vec()),
+                AbiToken::Bytes(self.source_permit_2.to_vec()),
                 AbiToken::FixedBytes(H256::from_uint(&self.nonce).to_fixed_bytes().to_vec()),
                 AbiToken::FixedBytes(H256::from_uint(&self.deadline).to_fixed_bytes().to_vec()),
             ])
