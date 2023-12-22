@@ -13,8 +13,8 @@
       "fuji": "0x0727D632966E3baC67b717cae152C6e7503dCcD0"
     },
     "swap_intent_fillers": {
-      "sepolia": "0x8B4B6854945ED134246167E9DE9E8fc019Fe6618",
-      "fuji": "0x75862bd9C4477f544839Ec9D542fFaC8bd0Ed403"
+      "sepolia": "0xA1D71720813BC4ebe01bdef65B0DbDB564fD598d",
+      "fuji": "0x495a3bD94B35F7B0d65c1BA2C534c5CfBD64a599"
     },
     "spoke_chain_executors": {
       "sepolia" : "0x5Ab12932E6a790c48A41a67C531be0C1A1C9CB7B",
