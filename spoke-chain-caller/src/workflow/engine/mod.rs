@@ -1,25 +1,27 @@
 use std::sync::Arc;
 
 use crate::workflow::action::Action;
-use crate::workflow::collectors::spoke_chain_call_collector::SpokeChainCallCollector;
 use crate::workflow::event::Event;
 use crate::workflow::strategies::intents_strategy::IntentsStrategy;
 
-use crate::workflow::collectors::ethereum::spoke_chain_call_intentbook_source::SpokeChainCallIntentbookSource;
 use crate::workflow::executors::call_spoke_executor::CallSpokeExecutor;
 use crate::workflow::executors::ethereum::send_transaction_call_spoke_handler::SendTransactionCallSpokeHandler;
 use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use artemis_core::engine::Engine;
-use artemis_core::types::{CollectorMap, ExecutorMap};
+use artemis_core::types::{Collector, CollectorMap, ExecutorMap};
 
 use futures::lock::Mutex;
 use intentbook_matchmaker::types::intent::Intent;
 use intentbook_matchmaker::types::intent_bid::IntentBid;
 use intentbook_matchmaker::workflow::action::Action as MatchmakerAction;
+use intentbook_matchmaker::workflow::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
+use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntentCollector;
+use intentbook_matchmaker::workflow::event::Event as MatchmakerEvent;
 use intentbook_matchmaker::workflow::executors::ethereum::send_transaction_match_intent_handler::SendTransactionMatchIntentHandler;
 use intentbook_matchmaker::workflow::executors::match_intent_executor::MatchIntentExecutor;
 use solver_common::config::Config;
 use solver_common::connectors::Connector;
+use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 
 pub fn configure_engine(
     config: &Config,
@@ -28,14 +30,6 @@ pub fn configure_engine(
 ) -> Engine<Event, Action> {
     // Set up SpokeChainCall specific intent source.
     let state_manager = Arc::new(Mutex::new(state_manager));
-
-    let spoke_chain_call_intent_source = SpokeChainCallIntentbookSource::new(
-        connector.clone(),
-        config
-            .addresses
-            .intentbook_addresses
-            .spoke_chain_call_intentbook,
-    );
 
     let send_transaction_match_intent_handler =
         SendTransactionMatchIntentHandler::new(config.addresses.clone(), connector.clone());
@@ -46,8 +40,27 @@ pub fn configure_engine(
     let mut engine = Engine::<Event, Action>::default();
 
     // Set up collectors.
-    let intents_collector = Box::new(SpokeChainCallCollector::new(spoke_chain_call_intent_source));
-    engine.add_collector(intents_collector);
+    let new_intent_collector = NewIntentCollector::new(NewIntentbookIntentSource::new(
+        connector.clone(),
+        config
+            .addresses
+            .intentbook_addresses
+            .spoke_chain_call_intentbook,
+    ));
+    let new_intent_collector: Box<dyn Collector<Event>> = Box::new(CollectorFilterMap::new(
+        Box::new(new_intent_collector),
+        |event| match event {
+            MatchmakerEvent::NewIntent(intent) => match &intent {
+                Intent::SpokeChainCall(spoke_chain_call) => {
+                    Some(Event::NewSpokeChainCall(spoke_chain_call.clone()))
+                }
+                Intent::LimitOrder(_) => None,
+                Intent::SwapIntent(_) => None,
+            },
+            _ => None,
+        },
+    ));
+    engine.add_collector(new_intent_collector);
 
     // Set up strategies.
     let intents_strategy = Box::new(IntentsStrategy::new(state_manager, connector.clone()));
