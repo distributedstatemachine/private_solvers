@@ -21,9 +21,9 @@
       "fuji" : "0xe3b8c8b4ff312882048a411e9d09A408E695300b"
     },
     "intentbook_addresses": {
-      "limit_order_intentbook": "0xb3fBC0d521899846E152cf698BDD8ffA3dF451Dd",
-      "spoke_chain_call_intentbook": "0x3C7431eCf3A10A3eba970e875Fb1FFb7928b8624",
-      "swap_intent_intentbook": "0x0000000000000000000000000000000000000000"
+      "limit_order_intentbook": "0x6de23d1487Dce0Ca32ade0b0Ea5ea7767Cb30b6B",
+      "spoke_chain_call_intentbook": "0xd52EA650a564337bc9306F9fc554DB33FBd4610c",
+      "swap_intent_intentbook": "0x760F02382B337b70032D74598B8Df4d6669E06b3"
     }
   },
   "balancer": {
