@@ -1,3 +1,4 @@
+use anyhow::Result;
 use bindings_khalani::shared_types::Intent as ContractIntent;
 use bindings_khalani::shared_types::SwapIntent as ContractSwapIntent;
 use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
@@ -60,7 +61,7 @@ impl TryFrom<WithIntentId<ContractIntent>> for SwapIntent {
 
     fn try_from(value: WithIntentId<ContractIntent>) -> Result<Self, Self::Error> {
         let (intent_id, intent) = value;
-        let value: ContractSwapIntent = ContractSwapIntent::decode(intent.intent)?;
+        let value: ContractSwapIntent = abi_decode_with_prefix(intent.intent)?;
         Ok(SwapIntent {
             intent_id,
             author: value.author,
@@ -114,6 +115,26 @@ where
             .to_vec();
     encoded.extend(AbiEncode::encode(t));
     Bytes::from(encoded)
+}
+
+// TODO: I can't figure out why ethers-rs ABI encoding/decoding is different from Solidity, so I use this workaround.
+pub fn abi_decode_with_prefix<T>(bytes: impl AsRef<[u8]>) -> Result<T>
+where
+    T: AbiDecode,
+{
+    let bytes_ref = bytes.as_ref();
+
+    let prefix: Vec<u8> =
+        Bytes::from_hex("0x0000000000000000000000000000000000000000000000000000000000000020")
+            .unwrap()
+            .to_vec();
+
+    // Check if the prefix matches
+    if prefix.len() <= bytes_ref.len() && &bytes_ref[..prefix.len()] == prefix.as_slice() {
+        return Ok(AbiDecode::decode(&bytes_ref[prefix.len()..])?);
+    }
+
+    Ok(AbiDecode::decode(bytes)?)
 }
 
 #[cfg(test)]

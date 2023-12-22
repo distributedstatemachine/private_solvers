@@ -1,10 +1,11 @@
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCallBid as ContractSpokeChainCallBid;
-use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
+use ethers::abi::{encode_packed, Token as AbiToken};
 use ethers::types::{Address, Bytes};
 use ethers::utils::keccak256;
 
 use crate::types::intent_bid::calculate_intent_bid_id;
 use crate::types::spoke_chain_call::SpokeChainCall;
+use crate::types::swap_intent::{abi_decode_with_prefix, abi_encode_with_prefix};
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 use solver_common::types::proof_id::ProofId;
 
@@ -39,7 +40,7 @@ impl TryFrom<WithIntentIdAndBidId<bindings_khalani::base_intent_book::IntentBid>
         value: WithIntentIdAndBidId<bindings_khalani::base_intent_book::IntentBid>,
     ) -> Result<Self, Self::Error> {
         let (intent_id, intent_bid_id, value) = value;
-        let value: ContractSpokeChainCallBid = ContractSpokeChainCallBid::decode(value.bid)?;
+        let value: ContractSpokeChainCallBid = abi_decode_with_prefix(value.bid)?;
         Ok(SpokeChainCallBid {
             intent_id,
             intent_bid_id,
@@ -75,7 +76,7 @@ impl From<SpokeChainCallBid> for bindings_khalani::base_intent_book::IntentBid {
         };
         Self {
             intent_id: value.intent_id.into(),
-            bid: Bytes::from(bid.encode()),
+            bid: Bytes::from(abi_encode_with_prefix(bid)),
         }
     }
 }

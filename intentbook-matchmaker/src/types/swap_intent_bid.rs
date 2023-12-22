@@ -1,7 +1,7 @@
 use anyhow::Result;
 use bindings_khalani::shared_types::IntentBid as ContractIntent;
 use bindings_khalani::swap_intent_book::SwapIntentBid as ContractSwapIntentBid;
-use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
+use ethers::abi::{encode_packed, Token as AbiToken};
 use ethers::types::{Address, BigEndianHash, Bytes, H256, U256};
 use ethers::utils::keccak256;
 
@@ -9,7 +9,7 @@ use crate::types::intent_bid::calculate_intent_bid_id;
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 use solver_common::types::proof_id::ProofId;
 
-use crate::types::swap_intent::SwapIntent;
+use crate::types::swap_intent::{abi_decode_with_prefix, abi_encode_with_prefix, SwapIntent};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SwapIntentBid {
@@ -40,7 +40,7 @@ impl TryFrom<WithIntentIdAndBidId<ContractIntent>> for SwapIntentBid {
 
     fn try_from(value: WithIntentIdAndBidId<ContractIntent>) -> Result<Self, Self::Error> {
         let (intent_id, intent_bid_id, intent_bid) = value;
-        let value: ContractSwapIntentBid = ContractSwapIntentBid::decode(intent_bid.bid)?;
+        let value: ContractSwapIntentBid = abi_decode_with_prefix(intent_bid.bid)?;
         Ok(SwapIntentBid {
             intent_id,
             intent_bid_id,
@@ -64,7 +64,7 @@ impl From<SwapIntentBid> for bindings_khalani::base_intent_book::IntentBid {
         let bid: ContractSwapIntentBid = value.clone().into();
         Self {
             intent_id: value.intent_id.into(),
-            bid: Bytes::from(bid.encode()),
+            bid: Bytes::from(abi_encode_with_prefix(bid)),
         }
     }
 }

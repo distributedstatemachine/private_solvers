@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCall as ContractSpokeChainCall;
-use ethers::abi::{AbiDecode, AbiEncode};
 use ethers::contract::{Eip712, EthAbiType};
 use ethers::types::{Address, Bytes, U256};
 
@@ -11,6 +10,7 @@ use solver_common::connectors::Connector;
 use solver_common::types::intent_id::{IntentId, WithIntentId};
 
 use crate::types::intent::calculate_intent_id;
+use crate::types::swap_intent::{abi_decode_with_prefix, abi_encode_with_prefix};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SpokeChainCallStub {
@@ -112,7 +112,7 @@ impl TryFrom<WithIntentId<bindings_khalani::base_intent_book::Intent>> for Spoke
     ) -> Result<Self, Self::Error> {
         let (intent_id, value) = value;
         let contract_spoke_chain_call: ContractSpokeChainCall =
-            ContractSpokeChainCall::decode(value.intent)?;
+            abi_decode_with_prefix(value.intent)?;
         Ok(SpokeChainCall {
             intent_id,
             signature: value.signature,
@@ -141,7 +141,7 @@ impl From<SpokeChainCall> for bindings_khalani::base_intent_book::Intent {
             reward_amount: value.reward_amount,
         };
         bindings_khalani::base_intent_book::Intent {
-            intent: Bytes::from(contract_spoke_chain_call.encode()),
+            intent: Bytes::from(abi_encode_with_prefix(contract_spoke_chain_call)),
             signature: value.signature,
         }
     }

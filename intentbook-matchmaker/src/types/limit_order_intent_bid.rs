@@ -1,9 +1,9 @@
 use bindings_khalani::limit_order_intent_book::{
     IntentBid as ContractIntentBid, LimitOrderBid as ContractLimitOrderBid,
 };
-use ethers::abi::{AbiDecode, AbiEncode};
 use ethers::types::{Address, Bytes, U256};
 
+use crate::types::swap_intent::{abi_decode_with_prefix, abi_encode_with_prefix};
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -19,7 +19,7 @@ impl TryFrom<WithIntentIdAndBidId<ContractIntentBid>> for LimitOrderIntentBid {
 
     fn try_from(value: WithIntentIdAndBidId<ContractIntentBid>) -> Result<Self, Self::Error> {
         let (intent_id, intent_bid_id, intent) = value;
-        let limit_order = ContractLimitOrderBid::decode(intent.bid)?;
+        let limit_order: ContractLimitOrderBid = abi_decode_with_prefix(intent.bid)?;
         Ok(Self {
             intent_id,
             intent_bid_id,
@@ -43,7 +43,7 @@ impl From<LimitOrderIntentBid> for ContractIntentBid {
         let limit_order: ContractLimitOrderBid = value.clone().into();
         Self {
             intent_id: value.intent_id.into(),
-            bid: Bytes::from(limit_order.encode()),
+            bid: Bytes::from(abi_encode_with_prefix(limit_order)),
         }
     }
 }

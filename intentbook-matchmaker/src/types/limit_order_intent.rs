@@ -2,11 +2,11 @@ use anyhow::anyhow;
 use bindings_khalani::limit_order_intent_book::{
     Intent as ContractIntent, LimitOrder as ContractLimitOrder,
 };
-use ethers::abi::{AbiDecode, AbiEncode};
 use ethers::types::{Address, Bytes, U256};
 use solver_common::config::chain::ChainId;
 use std::sync::Arc;
 
+use crate::types::swap_intent::{abi_decode_with_prefix, abi_encode_with_prefix};
 use solver_common::inventory::{amount::Amount, token::Token, Inventory};
 use solver_common::types::intent_id::{IntentId, WithIntentId};
 
@@ -29,7 +29,7 @@ impl TryFrom<WithIntentId<(Arc<Inventory>, ContractIntent)>> for LimitOrderInten
     ) -> Result<Self, Self::Error> {
         let (intent_id, inventory_and_intent) = value;
         let (inventory, intent) = inventory_and_intent;
-        let limit_order = ContractLimitOrder::decode(intent.intent)?;
+        let limit_order: ContractLimitOrder = abi_decode_with_prefix(intent.intent)?;
         let token = inventory
             .find_token_by_address(limit_order.token, ChainId::Khalani)
             .ok_or(anyhow!("Unknown LimitOrder token {}", limit_order.token))?;
@@ -67,7 +67,7 @@ impl From<LimitOrderIntent> for ContractIntent {
     fn from(value: LimitOrderIntent) -> Self {
         let limit_order: ContractLimitOrder = value.clone().into();
         Self {
-            intent: Bytes::from(limit_order.encode()),
+            intent: Bytes::from(abi_encode_with_prefix(limit_order)),
             signature: value.signature.clone(),
         }
     }
