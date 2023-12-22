@@ -1,6 +1,7 @@
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCallBid as ContractSpokeChainCallBid;
 use ethers::abi::{encode_packed, Token as AbiToken};
-use ethers::types::{Address, Bytes};
+use ethers::prelude::H256;
+use ethers::types::{Address, BigEndianHash, Bytes};
 use ethers::utils::keccak256;
 
 use crate::types::intent_bid::calculate_intent_bid_id;
@@ -62,7 +63,11 @@ impl SpokeChainCallBid {
             AbiToken::Address(spoke_chain_call.contract_to_call),
             AbiToken::Bytes(spoke_chain_call.call_data.to_vec()),
             AbiToken::Address(spoke_chain_call.token),
-            AbiToken::Uint(spoke_chain_call.amount),
+            AbiToken::FixedBytes(
+                H256::from_uint(&spoke_chain_call.amount)
+                    .to_fixed_bytes()
+                    .to_vec(),
+            ),
         ])
         .unwrap();
         Ok(vec![keccak256(encoded_spoke_chain_call.clone()).into()])
