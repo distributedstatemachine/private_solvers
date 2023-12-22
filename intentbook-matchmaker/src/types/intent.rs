@@ -61,7 +61,7 @@ mod tests {
     fn test_calculate_intent_id() {
         let swap_intent = SwapIntent {
             intent_id: Default::default(),
-            signature: Bytes::from_hex("0xe368bbf77611d60510b61ea01042b987b5484390e3c7402333b73a8b1fbb406f5c21ace1fdade823ed7dc0b4a4a1c1ffaab63eba7e3f6cff923b6e1e29f6566a1c").unwrap(),
+            signature: Bytes::from_hex("0x03085e995510aaafc8ed856644f749594f4a5841798f204215a35f9f12db14ad516e0af477c5401f0a4562cae3a2eaef8547180d2082806a850b6a3e420111501c").unwrap(),
             source_chain_id: ChainId::Sepolia,
 
             destination_chain_id: ChainId::Fuji,
@@ -75,14 +75,14 @@ mod tests {
                 .parse::<Address>()
                 .unwrap(),
             source_amount: Default::default(),
-            source_permit_2: Default::default(),
+            source_permit_2: Bytes::from_hex("0xabcd").unwrap(),
             deadline: Default::default(),
             nonce: Default::default(),
         };
         let contract_intent: bindings_khalani::base_intent_book::Intent = swap_intent.into();
         let intent_id = calculate_intent_id(contract_intent);
         let expected_intent_id = IntentId::from(
-            H256::decode_hex("0x76347f79cb00041c374090d5368c061abd8ee93081c67a2318b35f7bb65192a3")
+            H256::decode_hex("0x18a6f26d500a8a4534277587f56f3d435c34b373522f97215bb5502d7bc286d0")
                 .unwrap(),
         );
         assert_eq!(expected_intent_id, intent_id);
