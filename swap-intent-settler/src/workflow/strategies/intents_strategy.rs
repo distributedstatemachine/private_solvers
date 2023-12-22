@@ -55,7 +55,7 @@ where
                     info!(?swap_intent, "Quoting the swap intent");
                     match self.intent_quoter.quote_intent(swap_intent.clone()).await {
                         Ok(quoted_intent) => {
-                            self.process_event(Event::IntentQuoted(quoted_intent)).await;
+                            return self.process_event(Event::IntentQuoted(quoted_intent)).await;
                         }
                         Err(e) => {
                             error!(?swap_intent, ?e, "Failed to quote the swap intent");
