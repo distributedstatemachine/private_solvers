@@ -4,7 +4,6 @@ use anyhow::Result;
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCall as ContractSpokeChainCall;
 use ethers::abi::{AbiDecode, AbiEncode};
 use ethers::contract::{Eip712, EthAbiType};
-use ethers::prelude::Signer;
 use ethers::types::{Address, Bytes, U256};
 
 use solver_common::config::chain::ChainId;
@@ -79,14 +78,16 @@ impl SpokeChainCall {
         })
     }
 
-    async fn sign(connector: Arc<Connector>, spoke_chain_call: SpokeChainCall) -> Result<Bytes> {
-        let spoke_chain_call_712: SpokeChainCall712 = spoke_chain_call.clone().into();
+    async fn sign(_connector: Arc<Connector>, _spoke_chain_call: SpokeChainCall) -> Result<Bytes> {
+        // TODO: implement EIP712 signing. Currently, the SpokeChainCall intentbook does not validate signature.
+        Ok(Bytes::default())
+        /* let spoke_chain_call_712: SpokeChainCall712 = spoke_chain_call.clone().into();
         let rpc_client = connector.get_rpc_client(spoke_chain_call.chain_id)?;
         let signature = rpc_client
             .signer()
             .sign_typed_data(&spoke_chain_call_712)
             .await?;
-        Ok(Bytes::from(signature.to_vec()))
+        Ok(Bytes::from(signature.to_vec()))*/
     }
 }
 
