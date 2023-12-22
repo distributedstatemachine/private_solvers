@@ -24,6 +24,7 @@ use intentbook_matchmaker::workflow::executors::ethereum::send_transaction_match
 use intentbook_matchmaker::workflow::executors::ethereum::send_transaction_place_intent_handler::SendTransactionPlaceIntentHandler;
 use intentbook_matchmaker::workflow::executors::match_intent_executor::MatchIntentExecutor;
 use intentbook_matchmaker::workflow::executors::place_intent_executor::PlaceIntentExecutor;
+use solver_common::config::addresses::IntentbookType;
 use solver_common::config::Config;
 use solver_common::connectors::Connector;
 use solver_common::inventory::Inventory;
@@ -46,11 +47,15 @@ pub fn configure_engine(
     let new_intentbook_source = NewIntentbookIntentSource::new(
         connector.clone(),
         config.addresses.intentbook_addresses.swap_intent_intentbook,
+        IntentbookType::SwapIntentIntentBook,
     );
     let new_intent_collector = Box::new(NewIntentCollector::new(new_intentbook_source));
     let new_intent_collector = Box::new(CollectorFilterMap::new(new_intent_collector, |event| {
-        if let intentbook_matchmaker::workflow::event::Event::NewIntent(intent) = event {
-            Some(Event::NewIntent(intent))
+        if let intentbook_matchmaker::workflow::event::Event::NewIntent(Intent::SwapIntent(
+            intent,
+        )) = event
+        {
+            Some(Event::NewSwapIntent(intent))
         } else {
             None
         }

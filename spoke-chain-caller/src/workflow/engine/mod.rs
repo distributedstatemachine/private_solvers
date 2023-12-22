@@ -19,6 +19,7 @@ use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntent
 use intentbook_matchmaker::workflow::event::Event as MatchmakerEvent;
 use intentbook_matchmaker::workflow::executors::ethereum::send_transaction_match_intent_handler::SendTransactionMatchIntentHandler;
 use intentbook_matchmaker::workflow::executors::match_intent_executor::MatchIntentExecutor;
+use solver_common::config::addresses::IntentbookType;
 use solver_common::config::Config;
 use solver_common::connectors::Connector;
 use solver_common::workflow::collector_filter_map::CollectorFilterMap;
@@ -46,6 +47,7 @@ pub fn configure_engine(
             .addresses
             .intentbook_addresses
             .spoke_chain_call_intentbook,
+        IntentbookType::SpokeChainCallIntentBook,
     ));
     let new_intent_collector: Box<dyn Collector<Event>> = Box::new(CollectorFilterMap::new(
         Box::new(new_intent_collector),

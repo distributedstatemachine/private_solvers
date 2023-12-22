@@ -3,6 +3,7 @@ use std::sync::Arc;
 use artemis_core::engine::Engine;
 use artemis_core::types::CollectorMap;
 use futures::lock::Mutex;
+use solver_common::config::addresses::IntentbookType;
 
 use solver_common::config::Config;
 use solver_common::connectors::Connector;
@@ -28,27 +29,40 @@ pub fn configure_engine(
     let state_manager = Arc::new(Mutex::new(state_manager));
 
     let intentbook_addresses = vec![
-        config
-            .addresses
-            .intentbook_addresses
-            .spoke_chain_call_intentbook,
-        config.addresses.intentbook_addresses.swap_intent_intentbook,
-        config.addresses.intentbook_addresses.limit_order_intentbook,
+        (
+            IntentbookType::SpokeChainCallIntentBook,
+            config
+                .addresses
+                .intentbook_addresses
+                .spoke_chain_call_intentbook,
+        ),
+        (
+            IntentbookType::SwapIntentIntentBook,
+            config.addresses.intentbook_addresses.swap_intent_intentbook,
+        ),
+        (
+            IntentbookType::LimitOrderIntentBook,
+            config.addresses.intentbook_addresses.limit_order_intentbook,
+        ),
     ];
 
     let mut engine = Engine::<Event, Action>::default();
 
-    for intentbook_address in &intentbook_addresses {
-        let new_intentbook_source =
-            NewIntentbookIntentSource::new(connector.clone(), *intentbook_address);
+    for (intentbook_type, intentbook_address) in &intentbook_addresses {
+        let new_intentbook_source = NewIntentbookIntentSource::new(
+            connector.clone(),
+            *intentbook_address,
+            intentbook_type.clone(),
+        );
 
         let new_intent_collector = NewIntentCollector::new(new_intentbook_source);
         engine.add_collector(Box::new(new_intent_collector));
-    }
 
-    for intentbook_address in &intentbook_addresses {
-        let matched_intent_intentbook_source =
-            MatchedIntentbookIntentSource::new(connector.clone(), *intentbook_address);
+        let matched_intent_intentbook_source = MatchedIntentbookIntentSource::new(
+            connector.clone(),
+            *intentbook_address,
+            intentbook_type.clone(),
+        );
 
         let matched_intent_collector =
             MatchedIntentCollector::new(matched_intent_intentbook_source);

@@ -6,6 +6,7 @@ use async_trait::async_trait;
 use bindings_khalani::base_intent_book::{BaseIntentBook, IntentCreatedFilter};
 use ethers::contract::Event as ContractEvent;
 use ethers::types::{Address, ValueOrArray};
+use solver_common::config::addresses::IntentbookType;
 
 use crate::types::intent::Intent;
 use solver_common::config::chain::ChainId;
@@ -20,10 +21,15 @@ pub struct NewIntentbookIntentSource {
     rpc_client: Arc<RpcClient>,
     intentbook: BaseIntentBook<RpcClient>,
     intentbook_address: Address,
+    intentbook_type: IntentbookType,
 }
 
 impl NewIntentbookIntentSource {
-    pub fn new(connector: Arc<Connector>, intentbook_address: Address) -> Self {
+    pub fn new(
+        connector: Arc<Connector>,
+        intentbook_address: Address,
+        intentbook_type: IntentbookType,
+    ) -> Self {
         let rpc_client = connector.get_rpc_client(ChainId::Khalani).unwrap();
         let intentbook = BaseIntentBook::new(intentbook_address, rpc_client.clone());
 
@@ -31,6 +37,7 @@ impl NewIntentbookIntentSource {
             rpc_client,
             intentbook,
             intentbook_address,
+            intentbook_type,
         }
     }
 }
@@ -51,15 +58,23 @@ impl EventSource for NewIntentbookIntentSource {
         let with_intent_id: WithIntentId<bindings_khalani::base_intent_book::Intent> =
             (intent_id, event.intent);
 
-        if let Ok(spoke_chain_caller) = with_intent_id.clone().try_into() {
-            return Some(Ok(Intent::SpokeChainCall(spoke_chain_caller)));
+        match self.intentbook_type {
+            IntentbookType::LimitOrderIntentBook => None, // TODO: parse limit order intents.
+            IntentbookType::SpokeChainCallIntentBook => {
+                if let Ok(spoke_chain_caller) = with_intent_id.clone().try_into() {
+                    Some(Ok(Intent::SpokeChainCall(spoke_chain_caller)))
+                } else {
+                    None
+                }
+            }
+            IntentbookType::SwapIntentIntentBook => {
+                if let Ok(swap_intent) = with_intent_id.clone().try_into() {
+                    Some(Ok(Intent::SwapIntent(swap_intent)))
+                } else {
+                    None
+                }
+            }
         }
-
-        if let Ok(swap_intent) = with_intent_id.clone().try_into() {
-            return Some(Ok(Intent::SwapIntent(swap_intent)));
-        }
-
-        None
     }
 }
 

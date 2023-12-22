@@ -45,21 +45,19 @@ where
 
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
         return match event {
-            Event::NewIntent(intent) => {
-                if let Intent::SwapIntent(swap_intent) = intent {
-                    info!(?swap_intent, "Received new swap intent");
-                    self.state_manager
-                        .lock()
-                        .await
-                        .create_intent_state(swap_intent.clone());
-                    info!(?swap_intent, "Quoting the swap intent");
-                    match self.intent_quoter.quote_intent(swap_intent.clone()).await {
-                        Ok(quoted_intent) => {
-                            return self.process_event(Event::IntentQuoted(quoted_intent)).await;
-                        }
-                        Err(e) => {
-                            error!(?swap_intent, ?e, "Failed to quote the swap intent");
-                        }
+            Event::NewSwapIntent(swap_intent) => {
+                info!(?swap_intent, "Received new swap intent");
+                self.state_manager
+                    .lock()
+                    .await
+                    .create_intent_state(swap_intent.clone());
+                info!(?swap_intent, "Quoting the swap intent");
+                match self.intent_quoter.quote_intent(swap_intent.clone()).await {
+                    Ok(quoted_intent) => {
+                        return self.process_event(Event::IntentQuoted(quoted_intent)).await;
+                    }
+                    Err(e) => {
+                        error!(?swap_intent, ?e, "Failed to quote the swap intent");
                     }
                 }
                 vec![]

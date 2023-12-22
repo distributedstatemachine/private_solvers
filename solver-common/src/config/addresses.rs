@@ -36,6 +36,13 @@ pub struct IntentbookAddresses {
 }
 
 #[derive(Debug, Clone)]
+pub enum IntentbookType {
+    LimitOrderIntentBook,
+    SpokeChainCallIntentBook,
+    SwapIntentIntentBook,
+}
+
+#[derive(Debug, Clone)]
 pub struct AddressesConfig {
     pub intents_mempool_address: Address,
     pub settlement_reactor_address: Address,
