@@ -158,27 +158,6 @@ pub struct IntentBid {
     pub intent_id: [u8; 32],
     pub bid: ::ethers::core::types::Bytes,
 }
-///`SpokeCalled(address,bytes32,address,bytes,address,uint256)`
-#[derive(
-    Clone,
-    ::ethers::contract::EthAbiType,
-    ::ethers::contract::EthAbiCodec,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash
-)]
-pub struct SpokeCalled {
-    pub caller: ::ethers::core::types::Address,
-    pub spoke_chain_call_intent_id: [u8; 32],
-    pub contract_to_call: ::ethers::core::types::Address,
-    pub call_data: ::ethers::core::types::Bytes,
-    pub token: ::ethers::core::types::Address,
-    pub amount: ::ethers::core::types::U256,
-}
 ///`FuzzSelector(address,bytes4[])`
 #[derive(
     Clone,
@@ -196,58 +175,7 @@ pub struct FuzzSelector {
     pub addr: ::ethers::core::types::Address,
     pub selectors: ::std::vec::Vec<[u8; 4]>,
 }
-///`SwapIntentFilled(bytes32,address,uint256,uint256)`
-#[derive(
-    Clone,
-    ::ethers::contract::EthAbiType,
-    ::ethers::contract::EthAbiCodec,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash
-)]
-pub struct SwapIntentFilled {
-    pub intent_id: [u8; 32],
-    pub filler: ::ethers::core::types::Address,
-    pub fill_time_stamp: ::ethers::core::types::U256,
-    pub fill_amount: ::ethers::core::types::U256,
-}
-///`SwapIntentTokenBurn(bytes32)`
-#[derive(
-    Clone,
-    ::ethers::contract::EthAbiType,
-    ::ethers::contract::EthAbiCodec,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash
-)]
-pub struct SwapIntentTokenBurn {
-    pub intent_id: [u8; 32],
-}
-///`SwapIntentTokenLock(bytes32)`
-#[derive(
-    Clone,
-    ::ethers::contract::EthAbiType,
-    ::ethers::contract::EthAbiCodec,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash
-)]
-pub struct SwapIntentTokenLock {
-    pub intent_id: [u8; 32],
-}
-///`SwapIntent(address,bytes,uint32,uint32,address,address,uint256,bytes,uint256,uint256)`
+///`SwapIntent(address,uint32,uint32,address,address,uint256,bytes,uint256,uint256)`
 #[derive(
     Clone,
     ::ethers::contract::EthAbiType,
@@ -262,7 +190,6 @@ pub struct SwapIntentTokenLock {
 )]
 pub struct SwapIntent {
     pub author: ::ethers::core::types::Address,
-    pub signature: ::ethers::core::types::Bytes,
     pub source_chain_id: u32,
     pub destination_chain_id: u32,
     pub source_token: ::ethers::core::types::Address,

@@ -81,7 +81,6 @@ impl From<SwapIntent> for ContractSwapIntent {
     fn from(value: SwapIntent) -> Self {
         Self {
             author: value.author,
-            signature: value.signature,
             source_chain_id: value.source_chain_id.into(),
             destination_chain_id: value.destination_chain_id.into(),
             source_token: value.source_token,

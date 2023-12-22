@@ -10,7 +10,6 @@ pub use mock_gmp_intent_event_verifier::*;
     non_camel_case_types,
 )]
 pub mod mock_gmp_intent_event_verifier {
-    pub use super::super::shared_types::*;
     #[allow(deprecated)]
     fn __abi() -> ::ethers::core::abi::Abi {
         ::ethers::core::abi::ethabi::Contract {
@@ -480,4 +479,38 @@ pub mod mock_gmp_intent_event_verifier {
         Hash
     )]
     pub struct VerifySwapIntentTokenLockEventReturn(pub bool);
+    ///`SwapIntentFilled(bytes32,address,uint256)`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct SwapIntentFilled {
+        pub intent_id: [u8; 32],
+        pub filler: ::ethers::core::types::Address,
+        pub fill_amount: ::ethers::core::types::U256,
+    }
+    ///`SwapIntentTokenLock(bytes32)`
+    #[derive(
+        Clone,
+        ::ethers::contract::EthAbiType,
+        ::ethers::contract::EthAbiCodec,
+        serde::Serialize,
+        serde::Deserialize,
+        Default,
+        Debug,
+        PartialEq,
+        Eq,
+        Hash
+    )]
+    pub struct SwapIntentTokenLock {
+        pub intent_id: [u8; 32],
+    }
 }
