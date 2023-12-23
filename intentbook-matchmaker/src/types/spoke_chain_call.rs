@@ -141,7 +141,7 @@ impl From<SpokeChainCall> for bindings_khalani::base_intent_book::Intent {
             reward_amount: value.reward_amount,
         };
         bindings_khalani::base_intent_book::Intent {
-            intent: Bytes::from(abi_encode_with_prefix(contract_spoke_chain_call)),
+            intent: abi_encode_with_prefix(contract_spoke_chain_call),
             signature: value.signature,
         }
     }

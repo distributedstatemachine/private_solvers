@@ -2,7 +2,7 @@ use anyhow::Result;
 use bindings_khalani::shared_types::IntentBid as ContractIntent;
 use bindings_khalani::swap_intent_book::SwapIntentBid as ContractSwapIntentBid;
 use ethers::abi::{encode_packed, Token as AbiToken};
-use ethers::types::{Address, BigEndianHash, Bytes, H256, U256};
+use ethers::types::{Address, BigEndianHash, H256, U256};
 use ethers::utils::keccak256;
 
 use crate::types::intent_bid::calculate_intent_bid_id;
@@ -64,7 +64,7 @@ impl From<SwapIntentBid> for bindings_khalani::base_intent_book::IntentBid {
         let bid: ContractSwapIntentBid = value.clone().into();
         Self {
             intent_id: value.intent_id.into(),
-            bid: Bytes::from(abi_encode_with_prefix(bid)),
+            bid: abi_encode_with_prefix(bid),
         }
     }
 }

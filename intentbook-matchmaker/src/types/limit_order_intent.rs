@@ -67,7 +67,7 @@ impl From<LimitOrderIntent> for ContractIntent {
     fn from(value: LimitOrderIntent) -> Self {
         let limit_order: ContractLimitOrder = value.clone().into();
         Self {
-            intent: Bytes::from(abi_encode_with_prefix(limit_order)),
+            intent: abi_encode_with_prefix(limit_order),
             signature: value.signature.clone(),
         }
     }

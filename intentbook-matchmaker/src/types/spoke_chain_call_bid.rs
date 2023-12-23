@@ -1,7 +1,7 @@
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCallBid as ContractSpokeChainCallBid;
 use ethers::abi::{encode_packed, Token as AbiToken};
 use ethers::prelude::H256;
-use ethers::types::{Address, BigEndianHash, Bytes};
+use ethers::types::{Address, BigEndianHash};
 use ethers::utils::keccak256;
 
 use crate::types::intent_bid::calculate_intent_bid_id;
@@ -81,7 +81,7 @@ impl From<SpokeChainCallBid> for bindings_khalani::base_intent_book::IntentBid {
         };
         Self {
             intent_id: value.intent_id.into(),
-            bid: Bytes::from(abi_encode_with_prefix(bid)),
+            bid: abi_encode_with_prefix(bid),
         }
     }
 }
