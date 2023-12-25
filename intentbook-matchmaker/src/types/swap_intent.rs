@@ -104,7 +104,10 @@ impl From<SwapIntent> for bindings_khalani::base_intent_book::Intent {
     }
 }
 
-// TODO: I don't know why Solidity's abi.encode(...) adds a prefix of 0x00..20 but ethers-rs AbiEncode::encode does not.
+// TODO: apparently, ethers-rs incorrectly implements `abi.encode` for 'dynamic' types (those that contain a 'bytes' array for example).
+//  abi.encode(dynamicStruct) adds a prefix `0x0000000000000000000000000000000000000000000000000000000000000020` for such structs.
+//  But ethers-rs only encodes the main body of the struct. So we need to call two workaround functions `abi_encode_with_prefix` and `abi_decode_with_prefix`.
+//  Migration to alloy-rs (https://github.com/alloy-rs/core) should help, I tested it out and it adds the prefix properly.
 pub fn abi_encode_with_prefix<T>(t: T) -> Bytes
 where
     T: AbiEncode,
@@ -117,7 +120,6 @@ where
     Bytes::from(encoded)
 }
 
-// TODO: I can't figure out why ethers-rs ABI encoding/decoding is different from Solidity, so I use this workaround.
 pub fn abi_decode_with_prefix<T>(bytes: impl AsRef<[u8]>) -> Result<T>
 where
     T: AbiDecode,
