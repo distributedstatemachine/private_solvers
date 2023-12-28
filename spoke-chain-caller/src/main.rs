@@ -20,14 +20,17 @@ async fn main() -> Result<()> {
     configure_logs();
     info!("Starting Spoke Chain Caller");
 
-    let (config, wallet) = Args::get_config_and_wallet()?;
+    let (config, wallet_or_signer) = Args::get_config_and_wallet().await?;
 
-    let connector = Connector::new(config.clone(), wallet.clone()).await?;
+    let state_manager = InMemoryStateManager::new();
+
+    let connector = match wallet_or_signer {
+        WalletOrSigner::Wallet(wallet) => Connector::new(config.clone(), wallet).await?,
+        WalletOrSigner::Signer(signer) => Connector::new(config.clone(), signer).await?,
+    };
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config.clone(), connector.clone()).await?;
     let _inventory = Arc::new(inventory);
-
-    let state_manager = InMemoryStateManager::new();
 
     // Set up engine.
     let engine: Engine<Event, Action> = configure_engine(&config, connector.clone(), state_manager);
