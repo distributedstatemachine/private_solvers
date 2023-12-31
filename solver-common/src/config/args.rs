@@ -54,7 +54,7 @@ impl Args {
                 let chain_id = args
                     .chain_name
                     .as_deref()
-                    .map(|name| chain_name_to_id(name))
+                    .map(chain_name_to_id)
                     .transpose()?
                     .unwrap_or_default();
                 let signer = AwsSigner::new(kms, kms_id, chain_id)
