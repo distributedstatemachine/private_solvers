@@ -12,7 +12,7 @@ pub enum WalletSignerError {
     Aws(#[from] AwsSignerError),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum WalletSigner {
     Local(LocalWallet),
     Aws(AwsSigner),

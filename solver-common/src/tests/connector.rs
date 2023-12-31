@@ -3,7 +3,7 @@ use ethers::prelude::LocalWallet;
 use std::env;
 use std::path::Path;
 
-use crate::config::Config;
+use crate::config::{self, Config};
 use crate::connectors::Connector;
 
 // https://sepolia.etherscan.io/address/0x18F814fA6CB21cC51ae0C5594418766F17DFb6A9
@@ -17,11 +17,9 @@ pub async fn create_connector() -> Result<Connector> {
         .context("Failed to parse private key")?;
 
     let config: Config = create_e2e_config()?;
-    let connector = Connector::new(config, wallet).await?;
-
+    let connector = Connector::new(config, config::wallet::WalletSigner::Local(wallet)).await?;
     Ok(connector)
 }
-
 pub fn create_e2e_config() -> Result<Config> {
     let paths = [
         &env::var("CONFIG_FILE").unwrap_or_default(),

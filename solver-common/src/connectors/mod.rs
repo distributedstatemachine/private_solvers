@@ -4,14 +4,15 @@ use std::sync::Arc;
 use anyhow::{anyhow, Context, Result};
 use ethers::middleware::{MiddlewareBuilder, NonceManagerMiddleware, SignerMiddleware};
 use ethers::providers::{Http, Middleware, Provider, Ws};
-use ethers::signers::{LocalWallet, Signer};
+use ethers::signers::Signer;
 use ethers::types::Address;
 
 use crate::config::chain::{ChainConfig, ChainId};
+use crate::config::wallet::WalletSigner;
 use crate::config::Config;
 use crate::error::ChainError;
 
-pub type RpcClient = SignerMiddleware<NonceManagerMiddleware<Provider<Http>>, LocalWallet>;
+pub type RpcClient = SignerMiddleware<NonceManagerMiddleware<Provider<Http>>, WalletSigner>;
 pub type WsClient = Provider<Ws>;
 
 #[derive(Debug, Clone)]
@@ -39,11 +40,11 @@ impl Connector {
 }
 
 impl Connector {
-    pub async fn new(config: Config, wallet: LocalWallet) -> Result<Self> {
+    pub async fn new(config: Config, signer: WalletSigner) -> Result<Self> {
         let mut rpc_clients: HashMap<ChainId, Arc<RpcClient>> = HashMap::new();
         let mut ws_clients: HashMap<ChainId, Arc<WsClient>> = HashMap::new();
         for chain_config in &config.chains {
-            let rpc_client = Self::create_rpc_client(chain_config, wallet.clone()).await?;
+            let rpc_client = Self::create_rpc_client(chain_config, signer.clone()).await?;
             rpc_clients.insert(chain_config.chain_id, rpc_client);
 
             if !chain_config.ws_url.is_empty() {
@@ -54,7 +55,7 @@ impl Connector {
             }
         }
         Ok(Connector {
-            address: wallet.address(),
+            address: signer.address(),
             rpc_clients,
             ws_clients,
         })
@@ -62,7 +63,7 @@ impl Connector {
 
     async fn create_rpc_client(
         chain_config: &ChainConfig,
-        wallet: LocalWallet,
+        signer: WalletSigner,
     ) -> Result<Arc<RpcClient>> {
         let client = Provider::<Http>::try_from(chain_config.rpc_url.clone())
             .context(ChainError::FailedCreateClient(chain_config.name.clone()))?;
@@ -75,9 +76,9 @@ impl Connector {
                 chain_config.chain_id
             ));
         }
-        let wallet: LocalWallet = wallet.with_chain_id(chain_id);
-        let address = wallet.address();
-        let client: RpcClient = client.nonce_manager(address).with_signer(wallet);
+        let wallet_signer = signer.clone().with_chain_id(chain_id);
+        let address = wallet_signer.address();
+        let client: RpcClient = client.nonce_manager(address).with_signer(signer);
         Ok(Arc::new(client))
     }
 

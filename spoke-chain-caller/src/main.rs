@@ -1,6 +1,7 @@
 use anyhow::Result;
 use artemis_core::engine::Engine;
 use solver_common::config::args::Args;
+use solver_common::config::wallet::WalletSigner;
 use solver_common::connectors::Connector;
 use solver_common::diagnostics::logs::configure_logs;
 use solver_common::inventory::Inventory;
@@ -20,13 +21,17 @@ async fn main() -> Result<()> {
     configure_logs();
     info!("Starting Spoke Chain Caller");
 
-    let (config, wallet_or_signer) = Args::get_config_and_wallet().await?;
+    let (config, wallet) = Args::get_config_and_wallet().await?;
 
     let state_manager = InMemoryStateManager::new();
 
-    let connector = match wallet_or_signer {
-        WalletOrSigner::Wallet(wallet) => Connector::new(config.clone(), wallet).await?,
-        WalletOrSigner::Signer(signer) => Connector::new(config.clone(), signer).await?,
+    let connector = match wallet {
+        WalletSigner::Local(wallet) => {
+            Connector::new(config.clone(), WalletSigner::Local(wallet)).await?
+        }
+        WalletSigner::Aws(signer) => {
+            Connector::new(config.clone(), WalletSigner::Aws(signer)).await?
+        }
     };
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config.clone(), connector.clone()).await?;
