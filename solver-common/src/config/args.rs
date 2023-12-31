@@ -1,26 +1,18 @@
+use crate::config::chain::chain_name_to_id;
 use crate::config::Config;
 use anyhow::{Context, Result};
+
 use clap::Parser;
 use ethers::prelude::Signer;
 use ethers::signers::{AwsSigner, LocalWallet};
-use ethers::types::Address;
-use rusoto_core::Client;
-use rusoto_kms::{Kms, KmsClient};
+use rusoto_core::{
+    credential::ChainProvider as AwsChainProvider, region::Region as AwsRegion,
+    request::HttpClient as AwsHttpClient, Client as AwsClient,
+};
+use rusoto_kms::KmsClient;
 use tracing::info;
 
-pub enum WalletOrSigner {
-    Wallet(LocalWallet),
-    Signer(AwsSigner),
-}
-
-impl WalletOrSigner {
-    fn address(&self) -> Address {
-        match self {
-            WalletOrSigner::Wallet(wallet) => wallet.address(),
-            WalletOrSigner::Signer(signer) => signer.address(),
-        }
-    }
-}
+use super::wallet::WalletSigner;
 
 #[derive(Parser, Debug)]
 pub struct Args {
@@ -31,39 +23,51 @@ pub struct Args {
     /// KMS ID or alias
     #[arg(long)]
     pub kms_id: Option<String>,
+    /// Chain name
+    #[arg(long, requires = "kms_id")]
+    pub chain_name: Option<String>,
 
     #[arg(long)]
     pub config_file: String,
 }
 
 impl Args {
-    pub async fn get_config_and_wallet() -> Result<(Config, WalletOrSigner)> {
+    pub async fn get_config_and_wallet() -> Result<(Config, WalletSigner)> {
         let args = Args::parse();
 
         let config =
             Config::read_config(args.config_file.as_str()).context("Failed to read config file")?;
         info!(?config, "Config");
 
-        let wallet_or_signer = match (args.private_key, args.kms_id) {
+        let wallet_signer = match (args.private_key, args.kms_id) {
             (Some(private_key), None) => {
                 let wallet = private_key
                     .parse::<LocalWallet>()
                     .expect("Failed to parse private key");
-                WalletOrSigner::Wallet(wallet)
+                WalletSigner::Local(wallet)
             }
             (None, Some(kms_id)) => {
-                let kms_client = KmsClient::new(Region::UsWest1);
-                let signer = AwsSigner::new(kms_client, kms_id, chain_id)
+                let client =
+                    AwsClient::new_with(AwsChainProvider::default(), AwsHttpClient::new().unwrap());
+
+                let kms = KmsClient::new_with_client(client, AwsRegion::default());
+                let chain_id = args
+                    .chain_name
+                    .as_deref()
+                    .map(|name| chain_name_to_id(name))
+                    .transpose()?
+                    .unwrap_or_default();
+                let signer = AwsSigner::new(kms, kms_id, chain_id)
                     .await
                     .expect("Failed to create AWS signer");
-                WalletOrSigner::Signer(signer)
+                WalletSigner::Aws(signer)
             }
             _ => panic!("Either private_key or kms_id must be provided, but not both"),
         };
 
-        let address = wallet_or_signer.address();
+        let address = wallet_signer.address();
         info!(?address, "Solver address");
 
-        Ok((config, wallet_or_signer))
+        Ok((config, wallet_signer))
     }
 }
