@@ -1,8 +1,10 @@
 use alloy_primitives::private::derive_more::Display;
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
-#[derive(Display, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Display, Debug, Copy, Clone, PartialEq, Eq, Hash, EnumIter)]
 pub enum ChainId {
     Sepolia = 11155111,
     Fuji = 43113,
@@ -19,13 +21,13 @@ impl TryFrom<u32> for ChainId {
     type Error = anyhow::Error;
 
     fn try_from(value: u32) -> Result<Self, Self::Error> {
-        // TODO: 'strum' crate may reduce this boilerplate.
-        match value {
-            11155111 => Ok(ChainId::Sepolia),
-            43113 => Ok(ChainId::Fuji),
-            10012 => Ok(ChainId::Khalani),
-            _ => Err(anyhow!("Unknown chain ID {value}")),
+        for chain_id in ChainId::iter() {
+            if u32::from(chain_id) == value {
+                return Ok(chain_id);
+            }
         }
+
+        Err(anyhow!("Unknown chain ID {}", value))
     }
 }
 
