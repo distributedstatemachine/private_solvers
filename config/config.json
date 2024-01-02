@@ -9,16 +9,16 @@
       }
     },
     "escrows": {
-      "sepolia": "0x21e8BeBD9334c5e5d61d40930f302c23E2c2BEEE",
+      "sepolia": "0x2b3DD016af5C31D5bb8F3998dAD29d9F93bDe89A",
       "fuji": "0xbf30B579f4FddDE40bA8FDDC72AC0f3934B49616"
     },
     "swap_intent_fillers": {
-      "sepolia": "0xA1D71720813BC4ebe01bdef65B0DbDB564fD598d",
-      "fuji": "0x495a3bD94B35F7B0d65c1BA2C534c5CfBD64a599"
+      "sepolia": "0xC974CC8297c0E7E992078E2150501A22a5D19651",
+      "fuji": "0x75862bd9C4477f544839Ec9D542fFaC8bd0Ed403"
     },
     "spoke_chain_executors": {
-      "sepolia" : "0x5Ab12932E6a790c48A41a67C531be0C1A1C9CB7B",
-      "fuji" : "0xe3b8c8b4ff312882048a411e9d09A408E695300b"
+      "sepolia": "0x5Ab12932E6a790c48A41a67C531be0C1A1C9CB7B",
+      "fuji": "0xe3b8c8b4ff312882048a411e9d09A408E695300b"
     },
     "intentbook_addresses": {
       "limit_order_intentbook": "0x6de23d1487Dce0Ca32ade0b0Ea5ea7767Cb30b6B",
