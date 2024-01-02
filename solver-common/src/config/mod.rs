@@ -7,8 +7,6 @@ pub mod token;
 use anyhow::{Context, Result};
 use ethers::types::{Address, H256};
 
-// TODO: read config from the JSON files
-
 use crate::config::addresses::{
     AddressesConfig, AddressesConfigRaw, IntentbookAddresses, VerifierConfig,
 };

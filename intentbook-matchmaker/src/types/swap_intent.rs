@@ -88,8 +88,8 @@ impl From<SwapIntent> for ContractSwapIntent {
             destination_token: value.destination_token,
             source_amount: value.source_amount,
             source_permit_2: value.source_permit_2,
-            deadline: value.deadline,
             nonce: value.nonce,
+            deadline: value.deadline,
         }
     }
 }
