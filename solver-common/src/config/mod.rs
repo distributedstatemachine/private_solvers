@@ -3,6 +3,7 @@ pub mod args;
 pub mod balancer;
 pub mod chain;
 pub mod token;
+pub mod wallet;
 
 use anyhow::{Context, Result};
 use ethers::types::{Address, H256};

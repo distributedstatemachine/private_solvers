@@ -31,6 +31,24 @@ impl TryFrom<u32> for ChainId {
     }
 }
 
+impl TryFrom<&str> for ChainId {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "Sepolia" => Ok(ChainId::Sepolia),
+            "Fuji" => Ok(ChainId::Fuji),
+            "Khalani" => Ok(ChainId::Khalani),
+            _ => Err(anyhow!("Unknown chain name {value}")),
+        }
+    }
+}
+
+pub fn chain_name_to_id(chain_name: &str) -> Result<u64, anyhow::Error> {
+    let chain_id = ChainId::try_from(chain_name)?;
+    Ok(u64::from(chain_id as u32))
+}
+
 #[derive(Debug, Clone)]
 pub struct ChainConfig {
     pub name: String,
