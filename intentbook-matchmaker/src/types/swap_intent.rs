@@ -1,9 +1,8 @@
 use anyhow::Result;
 use bindings_khalani::shared_types::Intent as ContractIntent;
 use bindings_khalani::shared_types::SwapIntent as ContractSwapIntent;
-use ethers::abi::{encode_packed, AbiDecode, AbiEncode, Token as AbiToken};
+use ethers::abi::{encode_packed, AbiDecode, AbiEncode, AbiType, Token as AbiToken, Tokenizable};
 use ethers::types::{Address, BigEndianHash, Bytes, H256, U256};
-use ethers::utils::hex::FromHex;
 use ethers::utils::keccak256;
 
 use solver_common::config::chain::ChainId;
@@ -61,7 +60,7 @@ impl TryFrom<WithIntentId<ContractIntent>> for SwapIntent {
 
     fn try_from(value: WithIntentId<ContractIntent>) -> Result<Self, Self::Error> {
         let (intent_id, intent) = value;
-        let value: ContractSwapIntent = abi_decode_with_prefix(intent.intent)?;
+        let value: ContractSwapIntent = abi_decode_tuple(intent.intent)?;
         Ok(SwapIntent {
             intent_id,
             author: value.author,
@@ -98,51 +97,37 @@ impl From<SwapIntent> for bindings_khalani::base_intent_book::Intent {
     fn from(value: SwapIntent) -> Self {
         let contract_swap_intent: ContractSwapIntent = value.clone().into();
         bindings_khalani::base_intent_book::Intent {
-            intent: abi_encode_with_prefix(contract_swap_intent),
+            intent: abi_encode_tuple(contract_swap_intent),
             signature: value.signature,
         }
     }
 }
 
-// TODO: apparently, ethers-rs incorrectly implements `abi.encode` for 'dynamic' types (those that contain a 'bytes' array for example).
-//  abi.encode(dynamicStruct) adds a prefix `0x0000000000000000000000000000000000000000000000000000000000000020` for such structs.
-//  But ethers-rs only encodes the main body of the struct. So we need to call two workaround functions `abi_encode_with_prefix` and `abi_decode_with_prefix`.
-//  Migration to alloy-rs (https://github.com/alloy-rs/core) should help, I tested it out and it adds the prefix properly.
-pub fn abi_encode_with_prefix<T>(t: T) -> Bytes
+/// Equivalent to solidity `abi.encode(t)`.
+///
+/// Solidity `abi.encode(t)` actually encodes the tuple `(t)`, so we need to encode `(t,)` in rust.
+///
+/// Alloy-rs abi encoding may work differently. We may need to revisit this when we migrate to alloy-rs.
+pub fn abi_encode_tuple<T>(t: T) -> Bytes
 where
-    T: AbiEncode,
+    T: AbiEncode + Tokenizable,
 {
-    let mut encoded =
-        Bytes::from_hex("0x0000000000000000000000000000000000000000000000000000000000000020")
-            .unwrap()
-            .to_vec();
-    encoded.extend(AbiEncode::encode(t));
-    Bytes::from(encoded)
+    AbiEncode::encode((t,)).into()
 }
 
-pub fn abi_decode_with_prefix<T>(bytes: impl AsRef<[u8]>) -> Result<T>
+/// Equivalent to solidity `abi.decode(bytes, (T))`.
+pub fn abi_decode_tuple<T>(bytes: impl AsRef<[u8]>) -> Result<T>
 where
-    T: AbiDecode,
+    T: AbiDecode + AbiType + Tokenizable,
 {
-    let bytes_ref = bytes.as_ref();
-
-    let prefix: Vec<u8> =
-        Bytes::from_hex("0x0000000000000000000000000000000000000000000000000000000000000020")
-            .unwrap()
-            .to_vec();
-
-    // Check if the prefix matches
-    if prefix.len() <= bytes_ref.len() && &bytes_ref[..prefix.len()] == prefix.as_slice() {
-        return Ok(AbiDecode::decode(&bytes_ref[prefix.len()..])?);
-    }
-
-    Ok(AbiDecode::decode(bytes)?)
+    Ok(<(T,) as AbiDecode>::decode(bytes.as_ref())?.0)
 }
 
 #[cfg(test)]
 mod tests {
     use ethers::abi::AbiDecode;
     use ethers::types::{Address, H256};
+    use ethers::utils::hex::FromHex;
 
     use super::*;
 
@@ -173,5 +158,22 @@ mod tests {
             H256::decode_hex("0x897a3b81b3017617c14e99aba8c6373315c68ee8054aebb944c274710ad8b406")
                 .unwrap();
         assert_eq!(expected_swap_intent_id, swap_intent_id);
+    }
+
+    #[test]
+    fn test_abi_encode_decode_tuple() {
+        let intent = ContractSwapIntent {
+            author: Address::random(),
+            source_permit_2: Bytes::from_hex("0x1122334455").unwrap(),
+            deadline: U256::from(100),
+            ..Default::default()
+        };
+        let intent_bytes = abi_encode_tuple(intent.clone());
+        assert!(intent_bytes.starts_with(
+            &Bytes::from_hex("0x0000000000000000000000000000000000000000000000000000000000000020")
+                .unwrap()
+        ));
+        let intent1 = abi_decode_tuple::<ContractSwapIntent>(intent_bytes).unwrap();
+        assert_eq!(intent, intent1);
     }
 }

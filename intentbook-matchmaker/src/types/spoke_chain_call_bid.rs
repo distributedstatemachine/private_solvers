@@ -6,7 +6,7 @@ use ethers::utils::keccak256;
 
 use crate::types::intent_bid::calculate_intent_bid_id;
 use crate::types::spoke_chain_call::SpokeChainCall;
-use crate::types::swap_intent::{abi_decode_with_prefix, abi_encode_with_prefix};
+use crate::types::swap_intent::{abi_decode_tuple, abi_encode_tuple};
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 use solver_common::types::proof_id::ProofId;
 
@@ -41,7 +41,7 @@ impl TryFrom<WithIntentIdAndBidId<bindings_khalani::base_intent_book::IntentBid>
         value: WithIntentIdAndBidId<bindings_khalani::base_intent_book::IntentBid>,
     ) -> Result<Self, Self::Error> {
         let (intent_id, intent_bid_id, value) = value;
-        let value: ContractSpokeChainCallBid = abi_decode_with_prefix(value.bid)?;
+        let value: ContractSpokeChainCallBid = abi_decode_tuple(value.bid)?;
         Ok(SpokeChainCallBid {
             intent_id,
             intent_bid_id,
@@ -81,7 +81,7 @@ impl From<SpokeChainCallBid> for bindings_khalani::base_intent_book::IntentBid {
         };
         Self {
             intent_id: value.intent_id.into(),
-            bid: abi_encode_with_prefix(bid),
+            bid: abi_encode_tuple(bid),
         }
     }
 }
