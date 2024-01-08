@@ -10,11 +10,11 @@
     },
     "escrows": {
       "sepolia": "0x2b3DD016af5C31D5bb8F3998dAD29d9F93bDe89A",
-      "fuji": "0xbf30B579f4FddDE40bA8FDDC72AC0f3934B49616"
+      "fuji": "0xa4c94244Bc5D8e183b270dF5669393d1F4fB5E9F"
     },
     "swap_intent_fillers": {
       "sepolia": "0xC974CC8297c0E7E992078E2150501A22a5D19651",
-      "fuji": "0x75862bd9C4477f544839Ec9D542fFaC8bd0Ed403"
+      "fuji": "0x5bBFA02930bC8F7fFE9B34344c71610df8Eab9De"
     },
     "spoke_chain_executors": {
       "sepolia": "0x5Ab12932E6a790c48A41a67C531be0C1A1C9CB7B",
