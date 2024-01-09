@@ -52,3 +52,13 @@ RUST_LOG="debug,hyper=info" cargo run --bin swap-intent-settler -- --config-file
 ### Testing end-to-end
 
 Run this [test](https://github.com/tvl-labs/khalani-sdk/blob/main/src/e2e/intents/intents.e2e.test.ts#L9) from the Khalani SDK.
+
+### Working with Solidity Contract Bindings
+
+If you need to update bindings (`crates/bindings-khalani`) for the solidity contracts, make sure the `khalani-protocol` repository is checked out at `../khalani-protocol` (or specify the `CONTRACT_DIR` environment variable to the directory where it's checked out), and run
+
+```shell
+make generate-bindings
+```
+
+If you need to generate bindings for more contracts, edit the `Makefile` and modify `CONTRACTS`.

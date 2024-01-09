@@ -4,7 +4,7 @@ use crate::inventory::token::Token;
 use crate::inventory::Inventory;
 use anyhow::Result;
 use async_trait::async_trait;
-use bindings_khalani::erc20::ERC20;
+use bindings_khalani::ierc20_metadata::IERC20Metadata;
 use ethers::types::Address;
 use tracing::info;
 
@@ -29,7 +29,7 @@ impl TokenAllowanceSetter for Inventory {
         let spender_address = approval_request.spender_address;
         let chain_id = approval_request.token.chain_id;
         let rpc_client = self.connector.get_rpc_client(chain_id)?;
-        let erc20 = ERC20::new(token.address, rpc_client);
+        let erc20 = IERC20Metadata::new(token.address, rpc_client);
         let mut function = erc20.approve(
             spender_address,
             approval_request.allowance_amount.base_units,

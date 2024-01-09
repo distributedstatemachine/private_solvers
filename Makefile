@@ -25,3 +25,21 @@ docker_run_cross_chain_market_maker:
 .PHONY: run_swap_intent_settler
 run_swap_intent_settler: 
 	RUST_LOG=khalani_solver=debug,swap_intent_settler=debug cargo run --package swap-intent-settler -- --private-key "0x4f91dd71525e3acf4b83ffb493d16e5ed9bcdea36e8076eb3d74f361ae7dc0ff" --config-file ./config/config.json
+
+CONTRACT_DIR?=../khalani-protocol
+
+CONTRACTS=\
+	IERC20Metadata \
+	Escrow \
+	GMPEventVerifier \
+	GMPIntentEventVerifier \
+	BaseIntentBook \
+	LimitOrderIntentBook \
+	SpokeChainCallIntentBook \
+	SpokeChainExecutor \
+	SwapIntentBook \
+	SwapIntentFiller
+
+.PHONY: generate-bindings
+generate-bindings:
+	forge bind --root ${CONTRACT_DIR} -b crates/bindings-khalani/ --crate-name bindings-khalani --overwrite ${CONTRACTS:%=--select ^%$}

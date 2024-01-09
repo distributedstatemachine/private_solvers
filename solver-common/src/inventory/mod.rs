@@ -16,7 +16,7 @@ use crate::inventory::token_balance_query::TokenBalanceQuery;
 
 use anyhow::Result;
 use async_trait::async_trait;
-use bindings_khalani::erc20_mintable_burnable::ERC20MintableBurnable;
+use bindings_khalani::ierc20_metadata::IERC20Metadata;
 use ethers::types::Address;
 use std::default::Default;
 use std::sync::Arc;
@@ -53,7 +53,7 @@ impl Inventory {
     async fn request_token(&self, token_config: &TokenConfig) -> Result<Token> {
         let rpc_client = self.connector.get_rpc_client(token_config.chain_id)?;
 
-        let erc20 = ERC20MintableBurnable::new(token_config.address, rpc_client.clone());
+        let erc20 = IERC20Metadata::new(token_config.address, rpc_client.clone());
         let name = erc20.name().await?;
         let symbol = erc20.symbol().await?;
         let decimals = erc20.decimals().await?;
@@ -130,7 +130,7 @@ impl Inventory {
 impl TokenBalanceQuery for Inventory {
     async fn get_balance(&self, token: &Token, owner: Address) -> Result<Amount> {
         let rpc_client = self.connector.get_rpc_client(token.chain_id)?;
-        let erc20 = ERC20MintableBurnable::new(token.address, rpc_client);
+        let erc20 = IERC20Metadata::new(token.address, rpc_client);
         let balance = erc20.balance_of(owner).await?;
         let amount = Amount::from_token_base_units(balance, token);
         Ok(amount)
@@ -146,7 +146,7 @@ impl TokenAllowanceQuery for Inventory {
         spender: Address,
     ) -> Result<Amount> {
         let rpc_client = self.connector.get_rpc_client(token.chain_id)?;
-        let erc20 = ERC20MintableBurnable::new(token.address, rpc_client);
+        let erc20 = IERC20Metadata::new(token.address, rpc_client);
         let balance = erc20.allowance(owner, spender).await?;
         let amount = Amount::from_token_base_units(balance, token);
         Ok(amount)
