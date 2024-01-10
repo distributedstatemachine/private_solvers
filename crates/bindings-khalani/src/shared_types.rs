@@ -9,7 +9,7 @@
     Debug,
     PartialEq,
     Eq,
-    Hash
+    Hash,
 )]
 pub struct Intent {
     pub intent: ::ethers::core::types::Bytes,
@@ -26,7 +26,7 @@ pub struct Intent {
     Debug,
     PartialEq,
     Eq,
-    Hash
+    Hash,
 )]
 pub struct IntentBid {
     pub intent_id: [u8; 32],
@@ -43,7 +43,7 @@ pub struct IntentBid {
     Debug,
     PartialEq,
     Eq,
-    Hash
+    Hash,
 )]
 pub struct SwapIntent {
     pub author: ::ethers::core::types::Address,
