@@ -1,18 +1,14 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use solver_common::config::wallet::WalletSigner;
-use tracing::info;
-
+use cross_chain_market_maker::workflow::engine::configure_engine;
+use cross_chain_market_maker::workflow::state::in_memory_state_manager::InMemoryStateManager;
 use solver_common::config::args::Args;
 use solver_common::connectors::Connector;
 use solver_common::diagnostics::logs::configure_logs;
 use solver_common::inventory::Inventory;
 use solver_common::workflow::run_engine;
-use workflow::engine::configure_engine;
-use workflow::state::in_memory_state_manager::InMemoryStateManager;
-
-pub mod workflow;
+use tracing::info;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -23,14 +19,7 @@ async fn main() -> Result<()> {
 
     let state_manager = InMemoryStateManager::new();
 
-    let connector = match wallet {
-        WalletSigner::Local(wallet) => {
-            Connector::new(config.clone(), WalletSigner::Local(wallet)).await?
-        }
-        WalletSigner::Aws(signer) => {
-            Connector::new(config.clone(), WalletSigner::Aws(signer)).await?
-        }
-    };
+    let connector = Connector::new(config.clone(), wallet).await?;
     let connector = Arc::new(connector);
     let inventory = Inventory::new(config.clone(), connector.clone()).await?;
     let inventory = Arc::new(inventory);
