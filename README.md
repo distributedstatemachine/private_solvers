@@ -62,3 +62,18 @@ make generate-bindings
 ```
 
 If you need to generate bindings for more contracts, edit the `Makefile` and modify `CONTRACTS`.
+
+### Using the local dev env
+
+- Copy `config/local.toml.example` to `config/local.toml` and edit the RPC urls.
+- Start the local dev env:
+
+```shell
+cargo run --release --bin local-dev-env
+```
+
+- Now you can test the agents with the locally forked anvil nodes, just use `config/with-local.json` as the config file, e.g.
+
+```shell
+RUST_LOG="debug,hyper=info" cargo run --bin swap-intent-settler -- --config-file config/with-local.json --private-key $SETTLER_PRIVATE_KEY
+```

@@ -23,6 +23,8 @@ jobs:
           toolchain: 1.75
           profile: minimal
           components: rustfmt, clippy
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:

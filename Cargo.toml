@@ -23,7 +23,8 @@ members = [
     "spoke-chain-caller",
     "cross-chain-market-maker",
     "swap-intent-settler",
-    "intentbook-matchmaker"
+    "intentbook-matchmaker",
+    "local-dev-env",
 ]
 exclude = [
     "crates/bindings-khalani",

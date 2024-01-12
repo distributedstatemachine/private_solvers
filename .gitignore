@@ -5,3 +5,4 @@ crates/bindings-khalani/Cargo.lock
 /crates/bindings-khalani/target
 .vscode
 .env
+/config/local.toml
