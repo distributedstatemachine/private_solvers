@@ -76,8 +76,8 @@ impl Connector {
                 chain_config.chain_id
             ));
         }
-        let wallet_signer = signer.clone().with_chain_id(chain_id);
-        let address = wallet_signer.address();
+        let signer = signer.with_chain_id(chain_id);
+        let address = signer.address();
         let client: RpcClient = client.nonce_manager(address).with_signer(signer);
         Ok(Arc::new(client))
     }
