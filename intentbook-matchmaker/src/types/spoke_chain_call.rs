@@ -23,7 +23,8 @@ pub struct SpokeChainCallStub {
     pub reward_amount: U256,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type, Deserialize, Serialize)]
+#[sqlx(type_name = "spoke_chain_call", rename_all = "lowercase")]
 pub struct SpokeChainCall {
     pub intent_id: IntentId,
     pub signature: Bytes,

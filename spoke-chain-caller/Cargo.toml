@@ -17,3 +17,5 @@ async-trait.workspace = true
 async-stream.workspace = true
 futures.workspace = true
 serde.workspace = true
+tokio-postgres.workspace = ture
+sqlx.workspace = true
