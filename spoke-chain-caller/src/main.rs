@@ -10,7 +10,7 @@ use solver_common::workflow::run_engine;
 use spoke_chain_caller::workflow::action::Action;
 use spoke_chain_caller::workflow::engine::configure_engine;
 use spoke_chain_caller::workflow::event::Event;
-use spoke_chain_caller::workflow::state::in_memory_state_manager::InMemoryStateManager;
+use spoke_chain_caller::workflow::state::database_state_manager::DatabaseStateManager;
 use tracing::info;
 
 #[tokio::main]
@@ -20,7 +20,7 @@ async fn main() -> Result<()> {
 
     let (config, wallet) = Args::get_config_and_wallet().await?;
 
-    let state_manager = InMemoryStateManager::new();
+    let state_manager = DatabaseStateManager::new().await?;
 
     let connector = Connector::new(config.clone(), wallet).await?;
     let connector = Arc::new(connector);
