@@ -15,7 +15,6 @@ async-stream = "0.3.5"
 thiserror = "1.0"
 strum = "0.25.0"
 strum_macros = "0.25"
-tokio-postgres = "0.7.10"
 sqlx = { version = "0.7.3", features = ["postgres", "runtime-tokio-rustls", "macros", "migrate"] }
 
 [workspace]

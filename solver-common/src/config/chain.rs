@@ -4,7 +4,20 @@ use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-#[derive(Display, Debug, Copy, Clone, PartialEq, Eq, Hash, EnumIter)]
+#[derive(
+    Display,
+    Debug,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    EnumIter,
+    Serialize,
+    Deserialize,
+    PartialOrd,
+    Ord,
+)]
 pub enum ChainId {
     Sepolia = 11155111,
     Fuji = 43113,
@@ -28,6 +41,19 @@ impl TryFrom<u32> for ChainId {
         }
 
         Err(anyhow!("Unknown chain ID {}", value))
+    }
+}
+
+impl TryFrom<i32> for ChainId {
+    type Error = anyhow::Error;
+
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        match value {
+            11155111 => Ok(ChainId::Sepolia),
+            43113 => Ok(ChainId::Fuji),
+            10012 => Ok(ChainId::Khalani),
+            _ => Err(anyhow!("Unknown chain ID {}", value)),
+        }
     }
 }
 

@@ -2,12 +2,16 @@ use std::collections::HashMap;
 
 use crate::workflow::state::state_manager::StateManager;
 use crate::workflow::state::IntentState;
+use ethers::types::H256;
+use ethers::utils::hex;
 use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
+use serde_json::to_string;
 use solver_common::types::intent_id::IntentId;
 use sqlx::migrate::Migrator;
 use sqlx::PgPool;
 use std::env;
 
+use super::IntentStatus;
 
 pub struct DatabaseStateManager {
     intents: HashMap<IntentId, IntentState>,
@@ -52,38 +56,79 @@ impl StateManager for DatabaseStateManager {
     ) -> Result<(), sqlx::Error> {
         if let Some(pool) = &self.db_client {
             let mut connection = pool.acquire().await?;
-            sqlx::query("UPDATE IntentState SET status = $1, intent_bid_id = $2, spoke_chain_call = $3, block_number = $4 WHERE intent_id = $5")
+            let spoke_chain_call = to_string(&new_state.spoke_chain_call).unwrap();
+            sqlx::query("UPDATE IntentState SET status = $1, intent_bid_id = $2, spoke_chain_call = $3::jsonb, block_number = $4 WHERE intent_id = $5")
                 .bind(new_state.status)
                 .bind(new_state.intent_bid_id)
-                .bind(new_state.spoke_chain_call)
+                .bind(spoke_chain_call)
                 .bind(new_state.block_number)
-                .bind(intent_id)
-                .execute(&mut connection)
+                .bind(intent_id.to_string())
+                .execute(&mut *connection)
                 .await?;
         }
         Ok(())
     }
-    async fn get_state(&self, intent_id: IntentId) -> Result<IntentState, sqlx::Error> {
+
+    async fn get_state(&mut self, intent_id: IntentId) -> Option<IntentState> {
         if let Some(pool) = &self.db_client {
-            let mut connection = pool.acquire().await?;
-            let intent_state: IntentState =
-                sqlx::query_as("SELECT * FROM IntentState WHERE intent_id = $1")
-                    .bind(intent_id)
-                    .fetch_one(&mut connection)
-                    .await?;
-            Ok(intent_state)
+            match pool.acquire().await {
+                Ok(mut connection) => {
+                    let row: (String, i32, String, String, i64) = sqlx::query_as("SELECT intent_id, status, intent_bid_id, spoke_chain_call, block_number FROM IntentState WHERE intent_id = $1")
+                        .bind(intent_id.to_string())
+                        .fetch_one(&mut *connection)
+                        .await.ok()?;
+
+                    let intent_id: IntentId =
+                        IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
+                    let status: IntentStatus = serde_json::from_str(&(row.1).to_string()).ok()?;
+                    let spoke_chain_call: SpokeChainCall = serde_json::from_str(&row.3).ok()?;
+
+                    let intent_state = IntentState {
+                        intent_id,
+                        status,
+                        intent_bid_id: None,
+                        spoke_chain_call,
+                        block_number: Some(row.4),
+                    };
+
+                    self.intents.insert(intent_id, intent_state.clone());
+                    Some(intent_state)
+                }
+                Err(_) => None,
+            }
         } else {
-            Err(sqlx::Error::PoolClosed)
+            None
         }
     }
 
     async fn get_all_intents(&self) -> Result<Vec<IntentState>, sqlx::Error> {
         if let Some(pool) = &self.db_client {
             let mut connection = pool.acquire().await?;
-            let intents: Vec<IntentState> = sqlx::query_as("SELECT * FROM IntentState")
-                .fetch_all(&mut connection)
+            let rows: Vec<(String, i32, String, String, i64)> = sqlx::query_as("SELECT intent_id, status, intent_bid_id, spoke_chain_call, block_number FROM IntentState")
+                .fetch_all(&mut *connection)
                 .await?;
-            Ok(intents)
+
+            let intents: Result<Vec<IntentState>, _> = rows
+                .into_iter()
+                .map(|row| {
+                    let intent_id: IntentId =
+                        IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
+                    let status: IntentStatus =
+                        serde_json::from_str(&(row.1).to_string()).ok().unwrap();
+                    let spoke_chain_call: SpokeChainCall =
+                        serde_json::from_str(&row.3).ok().unwrap();
+
+                    Ok(IntentState {
+                        intent_id,
+                        status,
+                        intent_bid_id: None,
+                        spoke_chain_call,
+                        block_number: Some(row.4),
+                    })
+                })
+                .collect();
+
+            intents
         } else {
             Err(sqlx::Error::PoolClosed)
         }
@@ -95,49 +140,26 @@ impl StateManager for DatabaseStateManager {
     ) -> Result<IntentId, sqlx::Error> {
         if let Some(pool) = &self.db_client {
             let mut connection = pool.acquire().await?;
-            let intent_id = intent.intent_id;
-            let intent_state = IntentState::new(intent);
+            let intent_id = intent.intent_id.clone();
+            let intent_state = IntentState {
+                intent_id: intent.intent_id,
+                status: IntentStatus::New,
+                // TODO: fix this 
+                intent_bid_id: None,
+                spoke_chain_call: intent.clone(),
+                // TODO: fix this
+                block_number: None,
+            };
             let spoke_chain_call = to_string(&intent_state.spoke_chain_call).unwrap();
             sqlx::query("INSERT INTO IntentState (intent_id, status, intent_bid_id, spoke_chain_call, block_number) VALUES ($1, $2, $3, $4, $5)")
-                .bind(intent_id)
-                .bind(intent_state.status)
+                .bind(intent_id.to_string())
+                .bind(intent_state.status.to_string())
                 .bind(intent_state.intent_bid_id)
                 .bind(spoke_chain_call)
                 .bind(intent_state.block_number)
-                .execute(&mut connection)
+                .execute(&mut *connection)
                 .await?;
             Ok(intent_id)
-        } else {
-            Err(sqlx::Error::PoolClosed)
-        }
-    }
-
-    async fn update_intent_state<F>(
-        &mut self,
-        intent_id: IntentId,
-        updater: F,
-    ) -> Result<Option<IntentState>, sqlx::Error>
-    where
-        F: FnOnce(&mut IntentState),
-    {
-        if let Some(pool) = &self.db_client {
-            let mut connection = pool.acquire().await?;
-            let mut intent_state: IntentState =
-                sqlx::query_as("SELECT * FROM IntentState WHERE intent_id = $1")
-                    .bind(intent_id)
-                    .fetch_one(&mut connection)
-                    .await?;
-            updater(&mut intent_state);
-            let spoke_chain_call = to_string(&intent_state.spoke_chain_call).unwrap();
-            sqlx::query("UPDATE IntentState SET status = $1, intent_bid_id = $2, spoke_chain_call = $3, block_number = $4 WHERE intent_id = $5")
-                .bind(intent_state.status)
-                .bind(intent_state.intent_bid_id)
-                .bind(spoke_chain_call)
-                .bind(intent_state.block_number)
-                .bind(intent_id)
-                .execute(&mut connection)
-                .await?;
-            Ok(Some(intent_state))
         } else {
             Err(sqlx::Error::PoolClosed)
         }
@@ -146,11 +168,31 @@ impl StateManager for DatabaseStateManager {
     async fn get_in_progress_intents(&self) -> Result<Vec<IntentState>, sqlx::Error> {
         if let Some(pool) = &self.db_client {
             let mut connection = pool.acquire().await?;
-            let intents: Vec<IntentState> =
-                sqlx::query_as("SELECT * FROM IntentState WHERE status = 'inprogress'")
-                    .fetch_all(&mut connection)
-                    .await?;
-            Ok(intents)
+            let rows: Vec<(String, i32, Option<String>, String, i64)> = sqlx::query_as("SELECT intent_id, status, intent_bid_id, spoke_chain_call, block_number FROM IntentState WHERE status = 'inprogress'")
+                .fetch_all(&mut *connection)
+                .await?;
+    
+            let intents: Result<Vec<IntentState>, _> = rows
+                .into_iter()
+                .map(|row| {
+                    let intent_id: IntentId =
+                        IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
+                    let status: IntentStatus =
+                        serde_json::from_str(&(row.1).to_string()).ok().unwrap();
+                    let spoke_chain_call: SpokeChainCall =
+                        serde_json::from_str(&row.3).ok().unwrap();
+    
+                    Ok(IntentState {
+                        intent_id,
+                        status,
+                        intent_bid_id: row.2,
+                        spoke_chain_call,
+                        block_number: Some(row.4),
+                    })
+                })
+                .collect();
+    
+            intents
         } else {
             Err(sqlx::Error::PoolClosed)
         }
@@ -161,7 +203,12 @@ impl StateManager for DatabaseStateManager {
 mod tests {
     use super::*;
     use sqlx::postgres::PgPoolOptions;
-    use std::{env, panic::{AssertUnwindSafe, self}, time::Duration, sync::Arc};
+    use std::{
+        env,
+        panic::{self, AssertUnwindSafe},
+        sync::Arc,
+        time::Duration,
+    };
 
     fn is_postgres_running() -> bool {
         let result = panic::catch_unwind(AssertUnwindSafe(|| {

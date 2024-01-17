@@ -85,6 +85,6 @@ mod tests {
             H256::decode_hex("0x98fce71edb803e8602d178e017d0f843fa93cda2223449f4d6c1e2d8b81fd428")
                 .unwrap(),
         );
-        assert_eq!(expected_intent_bid_id, intent_bid_id);
+        assert_eq!(expected_intent_bid_id, intent_bid_id.into());
     }
 }

@@ -3,21 +3,18 @@ use std::sync::Arc;
 use anyhow::Result;
 use bindings_khalani::spoke_chain_call_intent_book::SpokeChainCall as ContractSpokeChainCall;
 use ethers::contract::{Eip712, EthAbiType};
-use ethers::types::{Address as EthAddress, Bytes as EthBytes, U256 as EthU256};
+use ethers::types::{Address, Bytes, U256};
 
 use ethers::utils::hex;
-use solver_common::config::chain::ChainId as EthChainId;
+use solver_common::config::chain::ChainId;
 use solver_common::connectors::Connector;
-use solver_common::types::intent_id::{IntentId as SolverIntentId, WithIntentId};
-use sqlx::postgres::{PgRow, PgTypeInfo, PgValue};
-use sqlx::prelude::{FromRow, Type};
-use sqlx::{Postgres, Row};
+use solver_common::types::intent_id::{IntentId, WithIntentId};
 
 use crate::types::intent::calculate_intent_id;
 use crate::types::swap_intent::{abi_decode_tuple, abi_encode_tuple};
-use ethers::abi::{InvalidOutputType, Token, Tokenizable};
 use serde::{Deserialize, Serialize};
-// use ethers::types::Token;
+use std::convert::TryFrom;
+use std::fmt;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SpokeChainCallStub {
@@ -30,8 +27,8 @@ pub struct SpokeChainCallStub {
     pub reward_amount: U256,
 }
 
-#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type, Deserialize, Serialize)]
-#[sqlx(type_name = "spoke_chain_call")]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord)]
+// #[sqlx(type_name = "spoke_chain_call")]
 pub struct SpokeChainCall {
     pub intent_id: IntentId,
     pub signature: Bytes,
@@ -45,120 +42,22 @@ pub struct SpokeChainCall {
     pub reward_amount: U256,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, EthAbiType, Serialize)]
-pub struct U256(EthU256);
-
-impl<'r> FromRow<'r, PgRow> for U256 {
-    fn from_row(row: &'r PgRow) -> Result<Self, sqlx::Error> {
-        let value: String = row.try_get(0)?;
-        let value = EthU256::from_dec_str(&value).unwrap();
-        Ok(U256(value))
-    }
-}
-
-impl Type<Postgres> for U256 {
-    fn type_info() -> PgTypeInfo {
-        <String as Type<Postgres>>::type_info()
-    }
-
-    fn compatible(ty: &PgTypeInfo) -> bool {
-        <String as Type<Postgres>>::compatible(ty)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ChainId(EthChainId);
-
-impl<'r> FromRow<'r, PgRow> for ChainId {
-    fn from_row(row: &'r PgRow) -> Result<Self, sqlx::Error> {
-        let value: i32 = row.try_get(0)?;
-        Ok(ChainId(value.into()))
-    }
-}
-
-impl Type<Postgres> for ChainId {
-    fn type_info() -> PgTypeInfo {
-        <i32 as Type<Postgres>>::type_info()
-    }
-
-    fn compatible(ty: &PgTypeInfo) -> bool {
-        <i32 as Type<Postgres>>::compatible(ty)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, EthAbiType)]
-pub struct Address(EthAddress);
-
-impl<'r> FromRow<'r, PgRow> for Address {
-    fn from_row(row: &'r PgRow) -> Result<Self, sqlx::Error> {
-        let value: String = row.try_get(0)?;
-        let value = EthAddress::from_slice(&hex::decode(&value)?);
-        Ok(Address(value))
-    }
-}
-
-impl Type<Postgres> for Address {
-    fn type_info() -> PgTypeInfo {
-        <String as Type<Postgres>>::type_info()
-    }
-
-    fn compatible(ty: &PgTypeInfo) -> bool {
-        <String as Type<Postgres>>::compatible(ty)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Bytes(EthBytes);
-
-impl<'r> FromRow<'r, PgRow> for Bytes {
-    fn from_row(row: &'r PgRow) -> Result<Self, sqlx::Error> {
-        let value: Vec<u8> = row.try_get(0)?;
-        Ok(Bytes(EthBytes::from(value)))
-    }
-}
-
-impl Type<Postgres> for Bytes {
-    fn type_info() -> PgTypeInfo {
-        <Vec<u8> as Type<Postgres>>::type_info()
-    }
-
-    fn compatible(ty: &PgTypeInfo) -> bool {
-        <Vec<u8> as Type<Postgres>>::compatible(ty)
-    }
-}
-
-impl Tokenizable for Bytes {
-    fn from_token(token: Token) -> Result<Self, InvalidOutputType> {
-        match token {
-            Token::Bytes(bytes) => Ok(Bytes(EthBytes::from(bytes))),
-            // TODO: Handle error properly
-            _ => Err(InvalidOutputType("Bytes".to_string())),
-        }
-    }
-
-    fn into_token(self) -> Token {
-        Token::Bytes(self.0.into())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct IntentId(SolverIntentId);
-
-impl<'r> FromRow<'r, PgRow> for IntentId {
-    fn from_row(row: &'r PgRow) -> Result<Self, sqlx::Error> {
-        let value: String = row.try_get(0)?;
-        let value = SolverIntentId::from_slice(&hex::decode(value)?);
-        Ok(IntentId(value))
-    }
-}
-
-impl Type<Postgres> for IntentId {
-    fn type_info() -> PgTypeInfo {
-        <String as Type<Postgres>>::type_info()
-    }
-
-    fn compatible(ty: &PgTypeInfo) -> bool {
-        <String as Type<Postgres>>::compatible(ty)
+impl fmt::Display for SpokeChainCall {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "SpokeChainCall {{ intent_id: {}, signature: {}, author: {}, chain_id: {}, contract_to_call: {}, call_data: {}, token: {}, amount: {}, reward_token: {}, reward_amount: {} }}",
+            self.intent_id,
+            hex::encode(&self.signature.0),
+            self.author,
+            self.chain_id,
+            self.contract_to_call,
+            hex::encode(&self.call_data.0),
+            self.token,
+            self.amount,
+            self.reward_token,
+            self.reward_amount
+        )
     }
 }
 

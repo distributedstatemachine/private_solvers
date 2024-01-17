@@ -11,14 +11,12 @@ pub trait StateManager {
         new_state: IntentState,
     ) -> Result<(), sqlx::Error>;
 
-    fn get_state(&self, intent_id: IntentId) -> Option<&IntentState>;
-    fn get_all_intents(&self) -> Vec<IntentState>;
+    async fn get_state(&mut self, intent_id: IntentId) -> Option<IntentState>;
+    async fn get_all_intents(&self) -> Result<Vec<IntentState>, sqlx::Error>;
 
-    fn create_intent_state(&mut self, intent: SpokeChainCall) -> IntentId;
+    async fn create_intent_state(&mut self, intent: SpokeChainCall) ->  Result<IntentId, sqlx::Error>;
 
-    fn update_intent_state<F>(&mut self, intent_id: IntentId, updater: F) -> Option<IntentState>
-    where
-        F: FnOnce(&mut IntentState);
 
-    fn get_in_progress_intents(&self) -> Vec<IntentState>;
+
+    async fn get_in_progress_intents(&self) -> Result<Vec<IntentState>, sqlx::Error> ;
 }

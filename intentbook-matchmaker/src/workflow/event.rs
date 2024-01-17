@@ -6,7 +6,7 @@ use crate::types::intent_bid::IntentBid;
 use crate::workflow::executors::settle_intent_executor::SettleIntentHandlerResult;
 
 /// Core Event enum.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq,)]
 pub enum Event {
     NewIntent(Intent),
     NewMatchedIntent(IntentBid),

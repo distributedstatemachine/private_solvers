@@ -126,7 +126,7 @@ mod tests {
             H256::decode_hex("0xd1a8d584d0ae1ac3c487eca8a960349363db0e3253a584faf153dd8fdab6524c")
                 .unwrap(),
         );
-        assert_eq!(expected_proof_id, proof_id);
+        assert_eq!(expected_proof_id, proof_id.into());
     }
 
     #[test]
@@ -147,6 +147,6 @@ mod tests {
             H256::decode_hex("0x4dfd3858737268a0f558625b161b74539cb6d484c870fc14bb30a4b73d00686a")
                 .unwrap(),
         );
-        assert_eq!(expected_proof_id, proof_id);
+        assert_eq!(expected_proof_id, proof_id.into());
     }
 }
