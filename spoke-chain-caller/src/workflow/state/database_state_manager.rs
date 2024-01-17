@@ -6,12 +6,8 @@ use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::types::intent_id::IntentId;
 use sqlx::migrate::Migrator;
 use sqlx::PgPool;
-use sqlx::{Encode, Type};
 use std::env;
-use std::io;
-use tokio_postgres::{Client, Error, NoTls};
 
-use super::IntentStatus;
 
 pub struct DatabaseStateManager {
     intents: HashMap<IntentId, IntentState>,
@@ -165,7 +161,7 @@ impl StateManager for DatabaseStateManager {
 mod tests {
     use super::*;
     use sqlx::postgres::PgPoolOptions;
-    use std::env;
+    use std::{env, panic::{AssertUnwindSafe, self}, time::Duration, sync::Arc};
 
     fn is_postgres_running() -> bool {
         let result = panic::catch_unwind(AssertUnwindSafe(|| {

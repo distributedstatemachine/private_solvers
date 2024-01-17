@@ -15,7 +15,8 @@ pub enum IntentStatus {
     Cancelled,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type, Deserialize, Serialize)]
+#[sqlx(type_name = "intent_state", rename_all = "lowercase")]
 pub struct IntentState {
     pub intent_id: IntentId,
     pub status: IntentStatus,

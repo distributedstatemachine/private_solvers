@@ -6,7 +6,7 @@ use crate::workflow::strategies::intents_strategy::IntentsStrategy;
 
 use crate::workflow::executors::call_spoke_executor::CallSpokeExecutor;
 use crate::workflow::executors::ethereum::send_transaction_call_spoke_handler::SendTransactionCallSpokeHandler;
-use crate::workflow::state::in_memory_state_manager::InMemoryStateManager;
+use crate::workflow::state::database_state_manager::DatabaseStateManager;
 use artemis_core::engine::Engine;
 use artemis_core::types::{Collector, CollectorMap, ExecutorMap};
 
@@ -27,7 +27,7 @@ use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 pub fn configure_engine(
     config: &Config,
     connector: Arc<Connector>,
-    state_manager: InMemoryStateManager,
+    state_manager: DatabaseStateManager,
 ) -> Engine<Event, Action> {
     // Set up SpokeChainCall specific intent source.
     let state_manager = Arc::new(Mutex::new(state_manager));

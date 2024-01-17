@@ -2215,8 +2215,11 @@ dependencies = [
  "bindings-khalani",
  "ethers",
  "futures",
+ "serde",
  "solver-common",
+ "sqlx",
  "tokio",
+ "tokio-postgres",
  "tracing",
 ]
 

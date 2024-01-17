@@ -36,10 +36,10 @@ impl<S> Strategy<Event, Action> for IntentsStrategy<S>
 where
     S: StateManager + Sync + Send,
 {
-            async fn sync_state(&mut self) -> Result<()> {
-                info!("Syncing state");
-                Ok(())
-            }
+    async fn sync_state(&mut self) -> Result<()> {
+        info!("Syncing state");
+        Ok(())
+    }
 
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
         return match event {
