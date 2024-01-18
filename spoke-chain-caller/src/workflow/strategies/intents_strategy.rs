@@ -49,7 +49,8 @@ where
                     .state_manager
                     .lock()
                     .await
-                    .create_intent_state(spoke_chain_call.clone());
+                    .create_intent_state(spoke_chain_call.clone())
+                    .await;
 
                 let spoke_chain_call_bid = SpokeChainCallBid::new(
                     spoke_chain_call.intent_id,

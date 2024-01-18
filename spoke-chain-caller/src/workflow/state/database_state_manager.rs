@@ -14,6 +14,7 @@ use std::env;
 
 use super::IntentStatus;
 
+#[derive(Default)]
 pub struct DatabaseStateManager {
     intents: HashMap<IntentId, IntentState>,
     db_client: Option<PgPool>,
@@ -37,15 +38,6 @@ impl DatabaseStateManager {
             migrator.run(&mut connection).await?;
         }
         Ok(())
-    }
-}
-
-impl Default for DatabaseStateManager {
-    fn default() -> Self {
-        Self {
-            intents: HashMap::new(),
-            db_client: None,
-        }
     }
 }
 
@@ -142,7 +134,7 @@ impl StateManager for DatabaseStateManager {
     ) -> Result<IntentId, sqlx::Error> {
         if let Some(pool) = &self.db_client {
             let mut connection = pool.acquire().await?;
-            let intent_id = intent.intent_id.clone();
+            let intent_id = intent.intent_id;
             let intent_state = IntentState {
                 intent_id: intent.intent_id,
                 status: IntentStatus::New,
@@ -253,7 +245,7 @@ impl StateManager for DatabaseStateManager {
 
 //         //   TODO: Run migrations
 
-//         println!("output: {:?}", cmd);
+//         // println!("output: {:?}", cmd);
 
 //         std::thread::sleep(Duration::from_secs(5));
 
