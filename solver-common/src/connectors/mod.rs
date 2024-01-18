@@ -13,6 +13,7 @@ use crate::config::Config;
 use crate::error::ChainError;
 
 pub type RpcClient = SignerMiddleware<NonceManagerMiddleware<Provider<Http>>, WalletSigner>;
+
 pub type WsClient = Provider<Ws>;
 
 #[derive(Debug, Clone)]
@@ -50,7 +51,8 @@ impl Connector {
             if !chain_config.ws_url.is_empty() {
                 let ws_client = Self::create_ws_client(chain_config)
                     .await
-                    .context(ChainError::FailedCreateWebsocket(chain_config.name.clone()))?;
+                    .context(ChainError::FailedCreateWebsocket(chain_config.name.clone()))
+                    .unwrap();
                 ws_clients.insert(chain_config.chain_id, ws_client);
             }
         }
@@ -60,6 +62,7 @@ impl Connector {
             ws_clients,
         })
     }
+
 
     async fn create_rpc_client(
         chain_config: &ChainConfig,

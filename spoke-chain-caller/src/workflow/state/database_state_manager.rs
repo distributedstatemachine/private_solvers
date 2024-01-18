@@ -1,10 +1,15 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
+use crate::workflow::collectors::ethereum::spoke_chain_call_intents_book_source::SpokeChainCallIntentbookSource;
+use crate::workflow::collectors::spoke_chain_call_intent_collector::SpokeChainCallIntentSource;
 use crate::workflow::state::state_manager::StateManager;
 use crate::workflow::state::IntentState;
 use async_trait::async_trait;
 use ethers::types::H256;
 use ethers::utils::hex;
+use ethers_middleware::Middleware;
+use futures::StreamExt;
 use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use serde_json::to_string;
 use solver_common::types::intent_id::IntentId;
@@ -14,7 +19,6 @@ use std::env;
 
 use super::IntentStatus;
 
-#[derive(Default)]
 pub struct DatabaseStateManager {
     intents: HashMap<IntentId, IntentState>,
     db_client: Option<PgPool>,
@@ -190,6 +194,49 @@ impl StateManager for DatabaseStateManager {
         } else {
             Err(sqlx::Error::PoolClosed)
         }
+    }
+
+    /// Fetches the state from the database and compares it with the last known block from the rpc
+    /// client. If the block number is greater than the last known block, it fetches the new intents
+    /// from using get_new_spoke_chain_call_intents_stream and updates the state in the database.
+    async fn fetch_state(
+        &mut self,
+        spoke_chain_call_intentbook_source: &SpokeChainCallIntentbookSource,
+    ) -> Result<Vec<IntentState>, sqlx::Error> {
+        let mut new_intents = vec![];
+        let in_progress_intents = self.get_in_progress_intents().await?;
+        for intent in in_progress_intents {
+            let block_number = intent.block_number.unwrap();
+
+            let rpc_client = Arc::clone(&spoke_chain_call_intentbook_source.rpc_client);
+            let latest_block_number_result = rpc_client.get_block_number().await;
+            if let Ok(latest_block_number) = latest_block_number_result {
+                if block_number < latest_block_number.as_u64() as i64 {
+                    let new_spoke_chain_call_intents_stream_result =
+                        spoke_chain_call_intentbook_source
+                            .get_new_spoke_chain_call_intents_stream()
+                            .await;
+                    let mut new_spoke_chain_call_intents_stream =
+                        match new_spoke_chain_call_intents_stream_result {
+                            Ok(stream) => stream,
+                            Err(e) => return Err(sqlx::Error::Protocol(e.to_string().into())),
+                        };
+                    while let Some(new_intent) = new_spoke_chain_call_intents_stream.next().await {
+                        let intent_id = new_intent.intent_id;
+                        let intent_state = IntentState {
+                            intent_id,
+                            status: IntentStatus::InProgress,
+                            intent_bid_id: None,
+                            spoke_chain_call: new_intent,
+                            block_number: Some(latest_block_number.as_u64() as i64),
+                        };
+                        self.update_state(intent_id, intent_state.clone()).await?;
+                        new_intents.push(intent_state);
+                    }
+                }
+            }
+        }
+        Ok(new_intents)
     }
 }
 

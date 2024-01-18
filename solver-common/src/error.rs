@@ -25,6 +25,8 @@ pub enum ChainError {
     ClientNotFound(u32),
     #[error("Can not find chain for spoke chain id {0}")]
     ChainNotFound(u32),
+    #[error("Failed to get block number for chain {0}")]
+    FailedGetBlockNumber(u32),
 }
 
 #[derive(Debug, Error)]
