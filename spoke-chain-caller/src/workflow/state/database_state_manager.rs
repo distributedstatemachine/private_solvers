@@ -219,7 +219,7 @@ impl StateManager for DatabaseStateManager {
                     let mut new_spoke_chain_call_intents_stream =
                         match new_spoke_chain_call_intents_stream_result {
                             Ok(stream) => stream,
-                            Err(e) => return Err(sqlx::Error::Protocol(e.to_string().into())),
+                            Err(e) => return Err(sqlx::Error::Protocol(e.to_string())),
                         };
                     while let Some(new_intent) = new_spoke_chain_call_intents_stream.next().await {
                         let intent_id = new_intent.intent_id;

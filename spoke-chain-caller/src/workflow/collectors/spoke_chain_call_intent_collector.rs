@@ -22,7 +22,9 @@ impl<S: SpokeChainCallIntentSource> SpokeChainCallIntentCollector<S> {
 }
 
 #[async_trait]
-impl<S: SpokeChainCallIntentSource + Sync + Send> Collector<Event> for SpokeChainCallIntentCollector<S> {
+impl<S: SpokeChainCallIntentSource + Sync + Send> Collector<Event>
+    for SpokeChainCallIntentCollector<S>
+{
     // TODO: Add additional streams for other events
     async fn get_event_stream(&self) -> Result<CollectorStream<'_, Event>> {
         let intents_stream = self.0.get_new_spoke_chain_call_intents_stream().await?;

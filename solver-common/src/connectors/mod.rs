@@ -63,7 +63,6 @@ impl Connector {
         })
     }
 
-
     async fn create_rpc_client(
         chain_config: &ChainConfig,
         signer: WalletSigner,
