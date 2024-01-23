@@ -17,7 +17,7 @@ use solver_common::inventory::Inventory;
 use solver_common::types::intent_id::{IntentId, WithIntentId};
 
 use crate::workflow::collectors::spoke_chain_call_intent_collector::SpokeChainCallIntentSource;
-use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
+use solver_common::types::spoke_chain_call::SpokeChainCall;
 
 #[derive(Debug, Clone)]
 pub struct SpokeChainCallIntentbookSource {

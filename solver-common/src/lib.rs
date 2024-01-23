@@ -1,3 +1,4 @@
+pub mod collectors;
 pub mod config;
 pub mod connectors;
 pub mod diagnostics;

@@ -1,30 +1,29 @@
 use std::sync::Arc;
 
+use crate::config::addresses::IntentbookType;
 use anyhow::Result;
 use artemis_core::types::CollectorStream;
 use async_trait::async_trait;
-use bindings_khalani::base_intent_book::{BaseIntentBook, IntentCreatedFilter};
+use bindings_khalani::base_intent_book::BaseIntentBook;
+use bindings_khalani::base_intent_book::IntentMatchFilter;
 use ethers::contract::Event as ContractEvent;
 use ethers::types::{Address, ValueOrArray};
-use solver_common::config::addresses::IntentbookType;
 
-use solver_common::config::chain::ChainId;
-use solver_common::connectors::{Connector, RpcClient};
-use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
-use solver_common::types::intent::Intent;
-
-use crate::workflow::collectors::new_intent_collector::NewIntentSource;
-use solver_common::types::intent_id::{IntentId, WithIntentId};
+use crate::collectors::matched_intent_collector::MatchedIntentsSource;
+use crate::config::chain::ChainId;
+use crate::connectors::{Connector, RpcClient};
+use crate::ethereum::event_indexer::{EventFetcher, EventSource};
+use crate::types::intent_bid::IntentBid;
+use crate::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 
 #[derive(Debug, Clone)]
-pub struct NewIntentbookIntentSource {
+pub struct MatchedIntentbookIntentSource {
     rpc_client: Arc<RpcClient>,
     intentbook: BaseIntentBook<RpcClient>,
-    intentbook_address: Address,
     intentbook_type: IntentbookType,
 }
 
-impl NewIntentbookIntentSource {
+impl MatchedIntentbookIntentSource {
     pub fn new(
         connector: Arc<Connector>,
         intentbook_address: Address,
@@ -36,40 +35,40 @@ impl NewIntentbookIntentSource {
         Self {
             rpc_client,
             intentbook,
-            intentbook_address,
             intentbook_type,
         }
     }
 }
 
 #[async_trait]
-impl EventSource for NewIntentbookIntentSource {
-    type EventFilter = IntentCreatedFilter;
-    type EventResult = Intent;
+impl EventSource for MatchedIntentbookIntentSource {
+    type EventFilter = IntentMatchFilter;
+    type EventResult = IntentBid;
 
     fn create_event_filter(&self) -> ContractEvent<Arc<RpcClient>, RpcClient, Self::EventFilter> {
         self.intentbook
-            .intent_created_filter()
-            .address(ValueOrArray::Value(self.intentbook_address))
+            .intent_match_filter()
+            .address(ValueOrArray::Value(self.intentbook.address()))
     }
 
     fn parse_event(&self, event: Self::EventFilter) -> Option<Result<Self::EventResult>> {
         let intent_id: IntentId = event.intent_id.into();
-        let with_intent_id: WithIntentId<bindings_khalani::base_intent_book::Intent> =
-            (intent_id, event.intent);
+        let intent_bid_id: IntentBidId = event.intent_bid_id.into();
+        let with_intent_id: WithIntentIdAndBidId<bindings_khalani::base_intent_book::IntentBid> =
+            (intent_id, intent_bid_id, event.intent_bid);
 
         match self.intentbook_type {
             IntentbookType::LimitOrderIntentBook => None, // TODO: parse limit order intents.
             IntentbookType::SpokeChainCallIntentBook => {
-                if let Ok(spoke_chain_caller) = with_intent_id.clone().try_into() {
-                    Some(Ok(Intent::SpokeChainCall(spoke_chain_caller)))
+                if let Ok(spoke_chain_call_bid) = with_intent_id.clone().try_into() {
+                    Some(Ok(IntentBid::SpokeChainCallBid(spoke_chain_call_bid)))
                 } else {
                     None
                 }
             }
             IntentbookType::SwapIntentIntentBook => {
-                if let Ok(swap_intent) = with_intent_id.clone().try_into() {
-                    Some(Ok(Intent::SwapIntent(swap_intent)))
+                if let Ok(swap_intent_bid) = with_intent_id.clone().try_into() {
+                    Some(Ok(IntentBid::SwapIntentBid(swap_intent_bid)))
                 } else {
                     None
                 }
@@ -79,10 +78,10 @@ impl EventSource for NewIntentbookIntentSource {
 }
 
 #[async_trait]
-impl NewIntentSource for NewIntentbookIntentSource {
-    async fn get_new_intent_source(&self) -> Result<CollectorStream<'_, Intent>> {
+impl MatchedIntentsSource for MatchedIntentbookIntentSource {
+    async fn get_matched_intents_source(&self) -> Result<CollectorStream<'_, IntentBid>> {
         let event_fetcher = EventFetcher::new(
-            format!("Intentbook (New) {}", self.intentbook_address),
+            format!("Intentbook (Matched) {}", self.intentbook.address()),
             self.rpc_client.clone(),
             self.clone(),
         );

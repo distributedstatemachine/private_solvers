@@ -5,8 +5,8 @@ use ethers::prelude::TxHash;
 use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 
-use crate::types::intent::Intent;
 use crate::workflow::action::Action;
+use solver_common::types::intent::Intent;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SettleIntentHandlerResult {

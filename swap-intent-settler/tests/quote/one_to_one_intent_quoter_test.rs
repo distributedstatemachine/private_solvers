@@ -3,11 +3,11 @@ use std::sync::Arc;
 use anyhow::Result;
 use ethers::types::U256;
 
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::config::chain::ChainId;
 use solver_common::inventory::amount::Amount;
 use solver_common::inventory::Inventory;
 use solver_common::tests::connector::{create_connector, create_e2e_config};
+use solver_common::types::swap_intent::SwapIntent;
 use swap_intent_settler::quote::intent_quoter::IntentQuoter;
 use swap_intent_settler::quote::one_to_one_intent_quoter::OneToOneIntentQuoter;
 

@@ -1,6 +1,6 @@
-use intentbook_matchmaker::types::intent::Intent;
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
-use intentbook_matchmaker::types::swap_intent_bid::SwapIntentBid;
+use solver_common::types::intent::Intent;
+use solver_common::types::swap_intent::SwapIntent;
+use solver_common::types::swap_intent_bid::SwapIntentBid;
 
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 

@@ -9,6 +9,7 @@ use tracing::{info, warn};
 use crate::workflow::action::Action;
 use crate::workflow::event::Event;
 use crate::workflow::state::state_manager::StateManager;
+pub use solver_common::workflow::event::Event as Common;
 
 pub struct IntentsStrategy<S: StateManager> {
     state_manager: Arc<Mutex<S>>,
@@ -35,7 +36,7 @@ where
 
     async fn process_event(&mut self, event: Event) -> Vec<Action> {
         return match event {
-            Event::NewIntent(intent) => {
+            Event::NewIntent(_common, intent) => {
                 info!(?intent, "New intent");
                 self.state_manager
                     .lock()
@@ -43,7 +44,7 @@ where
                     .create_intent_state(intent.clone());
                 Vec::default()
             }
-            Event::NewMatchedIntent(intent_bid) => {
+            Event::NewMatchedIntent(_common, intent_bid) => {
                 let intent_id = intent_bid.intent_id();
                 info!(?intent_id, "Intent matched");
                 let intent = self

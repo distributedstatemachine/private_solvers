@@ -1,5 +1,5 @@
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::types::intent_id::IntentId;
+use solver_common::types::swap_intent::SwapIntent;
 
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 

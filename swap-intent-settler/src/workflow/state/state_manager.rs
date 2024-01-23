@@ -1,6 +1,6 @@
 use crate::workflow::state::IntentState;
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::types::intent_id::IntentId;
+use solver_common::types::swap_intent::SwapIntent;
 
 pub trait StateManager {
     fn update_state(&mut self, intent_id: IntentId, new_state: IntentState);

@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use futures::lock::Mutex;
 use tracing::{error, info};
 
-use intentbook_matchmaker::types::intent::Intent;
+use solver_common::types::intent::Intent;
 
 use crate::quote::intent_quoter::IntentQuoter;
 use crate::workflow::action::Action;

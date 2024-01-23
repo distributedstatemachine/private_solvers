@@ -12,7 +12,6 @@ use solver_common::types::proof_id::ProofId;
 
 use crate::workflow::event::Event;
 use crate::workflow::state::state_manager::StateManager;
-
 #[async_trait]
 pub trait ProofSource {
     async fn get_proof_ids_stream(&self) -> Result<CollectorStream<'_, ProofId>>;

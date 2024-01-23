@@ -5,9 +5,9 @@ use anyhow::Result;
 use artemis_core::types::Strategy;
 use async_trait::async_trait;
 use futures::lock::Mutex;
-use intentbook_matchmaker::types::intent::Intent;
-use intentbook_matchmaker::types::spoke_chain_call_bid::SpokeChainCallBid;
 use solver_common::connectors::Connector;
+use solver_common::types::intent::Intent;
+use solver_common::types::spoke_chain_call_bid::SpokeChainCallBid;
 use tracing::info;
 
 use crate::workflow::action::Action;

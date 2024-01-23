@@ -3,8 +3,8 @@ use std::sync::Arc;
 use anyhow::Result;
 use async_trait::async_trait;
 
-use intentbook_matchmaker::types::swap_intent_bid::SwapIntentBid;
 use solver_common::connectors::Connector;
+use solver_common::types::swap_intent_bid::SwapIntentBid;
 
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use crate::workflow::executors::matched_swap_intent_bid_creator_executor::{

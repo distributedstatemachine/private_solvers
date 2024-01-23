@@ -1,20 +1,20 @@
 use std::sync::Arc;
 
+use crate::config::addresses::IntentbookType;
 use anyhow::Result;
 use artemis_core::types::CollectorStream;
 use async_trait::async_trait;
 use bindings_khalani::base_intent_book::{BaseIntentBook, IntentCreatedFilter};
 use ethers::contract::Event as ContractEvent;
 use ethers::types::{Address, ValueOrArray};
-use solver_common::config::addresses::IntentbookType;
 
-use solver_common::config::chain::ChainId;
-use solver_common::connectors::{Connector, RpcClient};
-use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
-use solver_common::types::intent::Intent;
+use crate::config::chain::ChainId;
+use crate::connectors::{Connector, RpcClient};
+use crate::ethereum::event_indexer::{EventFetcher, EventSource};
+use crate::types::intent::Intent;
 
-use crate::workflow::collectors::new_intent_collector::NewIntentSource;
-use solver_common::types::intent_id::{IntentId, WithIntentId};
+use crate::collectors::new_intent_collector::NewIntentSource;
+use crate::types::intent_id::{IntentId, WithIntentId};
 
 #[derive(Debug, Clone)]
 pub struct NewIntentbookIntentSource {

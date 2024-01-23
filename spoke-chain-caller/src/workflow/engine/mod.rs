@@ -11,8 +11,6 @@ use artemis_core::engine::Engine;
 use artemis_core::types::{Collector, CollectorMap, ExecutorMap};
 
 use futures::lock::Mutex;
-use intentbook_matchmaker::types::intent::Intent;
-use intentbook_matchmaker::types::intent_bid::IntentBid;
 use intentbook_matchmaker::workflow::action::Action as MatchmakerAction;
 use intentbook_matchmaker::workflow::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
 use intentbook_matchmaker::workflow::collectors::new_intent_collector::NewIntentCollector;
@@ -22,6 +20,8 @@ use intentbook_matchmaker::workflow::executors::match_intent_executor::MatchInte
 use solver_common::config::addresses::IntentbookType;
 use solver_common::config::Config;
 use solver_common::connectors::Connector;
+use solver_common::types::intent::Intent;
+use solver_common::types::intent_bid::IntentBid;
 use solver_common::workflow::collector_filter_map::CollectorFilterMap;
 
 pub fn configure_engine(
@@ -52,7 +52,7 @@ pub fn configure_engine(
     let new_intent_collector: Box<dyn Collector<Event>> = Box::new(CollectorFilterMap::new(
         Box::new(new_intent_collector),
         |event| match event {
-            MatchmakerEvent::NewIntent(intent) => match &intent {
+            MatchmakerEvent::NewIntent(_common, intent) => match &intent {
                 Intent::SpokeChainCall(spoke_chain_call) => {
                     Some(Event::NewSpokeChainCall(spoke_chain_call.clone()))
                 }

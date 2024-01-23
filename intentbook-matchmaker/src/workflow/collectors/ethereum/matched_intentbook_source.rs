@@ -9,11 +9,11 @@ use ethers::contract::Event as ContractEvent;
 use ethers::types::{Address, ValueOrArray};
 use solver_common::config::addresses::IntentbookType;
 
-use crate::types::intent_bid::IntentBid;
 use crate::workflow::collectors::matched_intent_collector::MatchedIntentsSource;
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::event_indexer::{EventFetcher, EventSource};
+use solver_common::types::intent_bid::IntentBid;
 use solver_common::types::intent_id::{IntentBidId, IntentId, WithIntentIdAndBidId};
 
 #[derive(Debug, Clone)]

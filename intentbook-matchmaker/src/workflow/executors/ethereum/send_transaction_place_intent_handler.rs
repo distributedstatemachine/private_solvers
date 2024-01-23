@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use crate::types::intent::Intent;
 use crate::workflow::executors::place_intent_executor::{
     PlaceIntentHandler, PlaceIntentHandlerResult,
 };
@@ -12,6 +11,7 @@ use solver_common::config::addresses::IntentbookAddresses;
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::transaction::submit_transaction;
+use solver_common::types::intent::Intent;
 use tracing::info;
 
 pub struct SendTransactionPlaceIntentHandler {

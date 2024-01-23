@@ -1,10 +1,10 @@
-use crate::types::intent::Intent;
-use crate::types::intent_bid::IntentBid;
 use crate::workflow::action::Action;
 use anyhow::Result;
 use artemis_core::types::{Collector, Executor};
 use async_trait::async_trait;
 use ethers::types::TxHash;
+use solver_common::types::intent::Intent;
+use solver_common::types::intent_bid::IntentBid;
 use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Sender};
 

@@ -11,11 +11,11 @@ use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::ethereum::transaction::submit_transaction;
 
-use crate::types::intent::Intent;
-use crate::types::intent_bid::IntentBid;
 use crate::workflow::executors::match_intent_executor::{
     MatchIntentHandler, MatchIntentHandlerResult,
 };
+use solver_common::types::intent::Intent;
+use solver_common::types::intent_bid::IntentBid;
 
 pub struct SendTransactionMatchIntentHandler {
     connector: Arc<Connector>,

@@ -3,8 +3,8 @@ use std::sync::Arc;
 use artemis_core::engine::Engine;
 use artemis_core::types::{CollectorMap, ExecutorMap};
 use futures::lock::Mutex;
-use intentbook_matchmaker::types::intent::Intent;
-use intentbook_matchmaker::types::intent_bid::IntentBid;
+use solver_common::types::intent::Intent;
+use solver_common::types::intent_bid::IntentBid;
 
 use crate::quote::one_to_one_intent_quoter::OneToOneIntentQuoter;
 use crate::workflow::action::Action;
@@ -51,9 +51,10 @@ pub fn configure_engine(
     );
     let new_intent_collector = Box::new(NewIntentCollector::new(new_intentbook_source));
     let new_intent_collector = Box::new(CollectorFilterMap::new(new_intent_collector, |event| {
-        if let intentbook_matchmaker::workflow::event::Event::NewIntent(Intent::SwapIntent(
-            intent,
-        )) = event
+        if let intentbook_matchmaker::workflow::event::Event::NewIntent(
+            _common,
+            Intent::SwapIntent(intent),
+        ) = event
         {
             Some(Event::NewSwapIntent(intent))
         } else {

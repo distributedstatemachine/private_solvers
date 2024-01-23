@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use crate::types::intent::Intent;
 use crate::workflow::state::state_manager::StateManager;
 use crate::workflow::state::IntentState;
+use solver_common::types::intent::Intent;
 use solver_common::types::intent_id::IntentId;
 
 pub struct InMemoryStateManager {

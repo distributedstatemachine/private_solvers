@@ -4,9 +4,9 @@ use anyhow::Result;
 use async_trait::async_trait;
 use tracing::info;
 
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::inventory::amount::Amount;
 use solver_common::inventory::Inventory;
+use solver_common::types::swap_intent::SwapIntent;
 
 use crate::quote::intent_quoter::IntentQuoter;
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;

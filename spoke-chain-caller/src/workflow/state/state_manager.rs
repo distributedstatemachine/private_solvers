@@ -3,8 +3,8 @@ use crate::workflow::{
     state::IntentState,
 };
 use async_trait::async_trait;
-use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::types::intent_id::IntentId;
+use solver_common::types::spoke_chain_call::SpokeChainCall;
 
 // TODO: Move sync states here
 #[async_trait]

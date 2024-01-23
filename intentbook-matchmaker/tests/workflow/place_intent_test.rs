@@ -2,11 +2,11 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use ethers::types::{Address, Bytes, U256};
-use intentbook_matchmaker::types::intent::Intent;
-use intentbook_matchmaker::types::spoke_chain_call::{SpokeChainCall, SpokeChainCallStub};
 use intentbook_matchmaker::workflow::executors::ethereum::send_transaction_place_intent_handler::SendTransactionPlaceIntentHandler;
 use intentbook_matchmaker::workflow::executors::place_intent_executor::PlaceIntentHandler;
 use solver_common::config::chain::ChainId;
+use solver_common::types::intent::Intent;
+use solver_common::types::spoke_chain_call::{SpokeChainCall, SpokeChainCallStub};
 
 use solver_common::inventory::Inventory;
 use solver_common::tests::connector::{create_connector, create_e2e_config};

@@ -7,7 +7,6 @@ use ethers::types::{Address, U256};
 use futures::StreamExt;
 use tracing::info;
 
-use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
 use solver_common::config::chain::ChainId;
 use solver_common::diagnostics::logs::configure_logs;
 use solver_common::inventory::amount::Amount;
@@ -15,6 +14,7 @@ use solver_common::inventory::token_allowance_query::TokenAllowanceQuery;
 use solver_common::inventory::token_allowance_setter::{AllowanceRequest, TokenAllowanceSetter};
 use solver_common::inventory::Inventory;
 use solver_common::tests::connector::{create_connector, create_e2e_config};
+use solver_common::types::spoke_chain_call::SpokeChainCall;
 use spoke_chain_caller::workflow::action::Action;
 use spoke_chain_caller::workflow::executors::call_spoke_executor::CallSpokeExecutor;
 use spoke_chain_caller::workflow::executors::ethereum::send_transaction_call_spoke_handler::SendTransactionCallSpokeHandler;

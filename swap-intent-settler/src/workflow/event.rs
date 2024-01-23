@@ -1,6 +1,6 @@
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use intentbook_matchmaker::workflow::executors::match_intent_executor::MatchIntentHandlerResult;
 use intentbook_matchmaker::workflow::executors::place_intent_executor::PlaceIntentHandlerResult;
+use solver_common::types::swap_intent::SwapIntent;
 
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use crate::workflow::executors::fill_spoke_chain_call_intent_creator_executor::FillSpokeChainCallIntentCreatorHandlerResult;

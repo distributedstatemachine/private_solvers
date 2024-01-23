@@ -8,11 +8,11 @@ use ethers::contract::ContractCall;
 use solver_common::config::addresses::IntentbookAddresses;
 use tracing::info;
 
-use crate::types::intent::Intent;
 use solver_common::config::chain::ChainId;
 use solver_common::connectors::{Connector, RpcClient};
 use solver_common::error::ChainError;
 use solver_common::ethereum::transaction::submit_transaction;
+use solver_common::types::intent::Intent;
 
 use crate::workflow::executors::settle_intent_executor::SettleIntentHandler;
 

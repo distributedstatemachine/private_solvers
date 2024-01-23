@@ -1,5 +1,5 @@
-use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
-use intentbook_matchmaker::types::spoke_chain_call_bid::SpokeChainCallBid;
+use solver_common::types::spoke_chain_call::SpokeChainCall;
+use solver_common::types::spoke_chain_call_bid::SpokeChainCallBid;
 
 /// Core Action enum.
 #[derive(Debug, Clone)]

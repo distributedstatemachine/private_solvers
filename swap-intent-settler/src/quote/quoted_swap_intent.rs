@@ -1,5 +1,5 @@
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::inventory::amount::Amount;
+use solver_common::types::swap_intent::SwapIntent;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct QuotedSwapIntent {

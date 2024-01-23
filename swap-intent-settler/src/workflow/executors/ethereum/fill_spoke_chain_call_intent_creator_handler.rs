@@ -4,11 +4,11 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bindings_khalani::swap_intent_filler::SwapIntentFiller;
 
-use intentbook_matchmaker::types::spoke_chain_call::{SpokeChainCall, SpokeChainCallStub};
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::connectors::Connector;
 use solver_common::error::ConfigError;
 use solver_common::inventory::Inventory;
+use solver_common::types::spoke_chain_call::{SpokeChainCall, SpokeChainCallStub};
 
 use crate::quote::quoted_swap_intent::QuotedSwapIntent;
 use crate::workflow::executors::fill_spoke_chain_call_intent_creator_executor::{

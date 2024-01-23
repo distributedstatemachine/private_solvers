@@ -8,13 +8,13 @@ use ethers::types::Address;
 use tracing::info;
 
 use bindings_khalani::shared_types::SwapIntent as ContractSwapIntent;
-use intentbook_matchmaker::types::spoke_chain_call::{SpokeChainCall, SpokeChainCallStub};
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
 use solver_common::config::addresses::AddressesConfig;
 use solver_common::connectors::Connector;
 use solver_common::error::ConfigError;
 use solver_common::inventory::amount::Amount;
 use solver_common::inventory::Inventory;
+use solver_common::types::spoke_chain_call::{SpokeChainCall, SpokeChainCallStub};
+use solver_common::types::swap_intent::SwapIntent;
 
 use crate::workflow::executors::lock_tokens_spoke_chain_call_intent_creator_executor::{
     LockTokensSpokeChainCallIntentCreatorHandler,

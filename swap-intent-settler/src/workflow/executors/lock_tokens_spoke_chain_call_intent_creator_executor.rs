@@ -3,8 +3,8 @@ use crate::workflow::event::Event;
 use anyhow::Result;
 use artemis_core::types::{Collector, CollectorMap, Executor};
 use async_trait::async_trait;
-use intentbook_matchmaker::types::spoke_chain_call::SpokeChainCall;
-use intentbook_matchmaker::types::swap_intent::SwapIntent;
+use solver_common::types::spoke_chain_call::SpokeChainCall;
+use solver_common::types::swap_intent::SwapIntent;
 use solver_common::workflow::action_confirmation_collector::ActionConfirmationCollector;
 use tokio::sync::mpsc::{channel, Sender};
 
