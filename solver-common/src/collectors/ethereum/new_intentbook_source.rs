@@ -18,10 +18,10 @@ use crate::types::intent_id::{IntentId, WithIntentId};
 
 #[derive(Debug, Clone)]
 pub struct NewIntentbookIntentSource {
-    rpc_client: Arc<RpcClient>,
-    intentbook: BaseIntentBook<RpcClient>,
-    intentbook_address: Address,
-    intentbook_type: IntentbookType,
+    pub rpc_client: Arc<RpcClient>,
+    pub intentbook: BaseIntentBook<RpcClient>,
+    pub intentbook_address: Address,
+    pub intentbook_type: IntentbookType,
 }
 
 impl NewIntentbookIntentSource {

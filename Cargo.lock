@@ -4311,6 +4311,7 @@ dependencies = [
  "bindings-khalani",
  "clap",
  "ethers",
+ "ethers-middleware",
  "futures",
  "rusoto_core",
  "rusoto_kms",

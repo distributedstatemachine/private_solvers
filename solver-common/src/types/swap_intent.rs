@@ -4,11 +4,13 @@ use bindings_khalani::shared_types::SwapIntent as ContractSwapIntent;
 use ethers::abi::{encode_packed, AbiDecode, AbiEncode, AbiType, Token as AbiToken, Tokenizable};
 use ethers::types::{Address, BigEndianHash, Bytes, H256, U256};
 use ethers::utils::keccak256;
+use serde::{Deserialize, Serialize};
 
 use crate::config::chain::ChainId;
 use crate::types::intent_id::{IntentId, WithIntentId};
+use std::fmt;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct SwapIntent {
     pub intent_id: IntentId,
     pub author: Address,
@@ -100,6 +102,16 @@ impl From<SwapIntent> for bindings_khalani::base_intent_book::Intent {
             intent: abi_encode_tuple(contract_swap_intent),
             signature: value.signature,
         }
+    }
+}
+
+impl fmt::Display for SwapIntent {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "SwapIntent {{ intent_id: {}, author: {}, signature: {}, source_chain_id: {}, destination_chain_id: {}, source_token: {}, destination_token: {}, source_amount: {}, source_permit_2: {}, deadline: {}, nonce: {} }}",
+            self.intent_id, self.author, self.signature, self.source_chain_id, self.destination_chain_id, self.source_token, self.destination_token, self.source_amount, self.source_permit_2, self.deadline, self.nonce
+        )
     }
 }
 

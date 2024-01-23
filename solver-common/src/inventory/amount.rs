@@ -1,11 +1,12 @@
 use ethers::types::U256;
 use ethers::utils::format_units;
+use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Formatter};
 use std::ops::{Add, Div, Mul};
 
 pub type Decimals = u8;
 
-#[derive(Debug, Clone, Eq, PartialOrd, PartialEq, Ord, Default)]
+#[derive(Debug, Clone, Eq, PartialOrd, PartialEq, Ord, Default, Serialize, Deserialize)]
 pub struct Amount {
     pub base_units: U256,
     pub decimals: Decimals,

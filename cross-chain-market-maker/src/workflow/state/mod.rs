@@ -1,5 +1,5 @@
-use intentbook_matchmaker::types::limit_order_intent::LimitOrderIntent;
 use solver_common::types::intent_id::IntentId;
+use solver_common::types::limit_order_intent::LimitOrderIntent;
 
 pub mod in_memory_state_manager;
 pub mod state_manager;

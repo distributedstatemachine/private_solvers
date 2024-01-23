@@ -14,7 +14,7 @@ use solver_common::ethereum::transaction::submit_transaction;
 use crate::workflow::executors::post_limit_order_executor::{
     PostLimitOrderHandler, PostLimitOrderHandlerResult,
 };
-use intentbook_matchmaker::types::limit_order_intent::LimitOrderIntent;
+use solver_common::types::limit_order_intent::LimitOrderIntent;
 
 pub struct SendTransactionPostLimitOrderHandler {
     connector: Arc<Connector>,

@@ -9,8 +9,10 @@ use std::sync::Arc;
 use crate::inventory::{amount::Amount, token::Token, Inventory};
 use crate::types::intent_id::{IntentId, WithIntentId};
 use crate::types::swap_intent::{abi_decode_tuple, abi_encode_tuple};
+use serde::{Deserialize, Serialize};
+use std::fmt;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct LimitOrderIntent {
     pub intent_id: IntentId,
     pub author: Address,
@@ -70,5 +72,15 @@ impl From<LimitOrderIntent> for ContractIntent {
             intent: abi_encode_tuple(limit_order),
             signature: value.signature.clone(),
         }
+    }
+}
+
+impl fmt::Display for LimitOrderIntent {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "LimitOrderIntent {{ intent_id: {}, author: {}, signature: {}, volume: {}, token: {}, out_token: {}, price: {} }}",
+            self.intent_id, self.author, self.signature, self.volume, self.token, self.out_token, self.price
+        )
     }
 }

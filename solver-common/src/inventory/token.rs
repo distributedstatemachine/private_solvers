@@ -1,9 +1,11 @@
 use crate::config::chain::ChainId;
 use crate::inventory::amount::Amount;
 use ethers::types::{Address, U256};
+use serde::{Deserialize, Serialize};
+use std::fmt;
 use std::ops::Mul;
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Token {
     pub chain_id: ChainId,
     pub address: Address,
@@ -27,5 +29,15 @@ impl Amount {
             decimals: token.decimals,
             base_units,
         }
+    }
+}
+
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "Token {{ chain_id: {}, address: {}, name: {}, symbol: {}, decimals: {} }}",
+            self.chain_id, self.address, self.name, self.symbol, self.decimals
+        )
     }
 }

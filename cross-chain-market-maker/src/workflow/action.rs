@@ -1,4 +1,4 @@
-use intentbook_matchmaker::types::limit_order_intent::LimitOrderIntent;
+use solver_common::types::limit_order_intent::LimitOrderIntent;
 
 /// Core Action enum.
 #[derive(Debug, Clone)]

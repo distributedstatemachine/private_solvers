@@ -7,7 +7,10 @@ use crate::types::limit_order_intent::LimitOrderIntent;
 use crate::types::spoke_chain_call::SpokeChainCall;
 use crate::types::swap_intent::SwapIntent;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+use serde::{Deserialize, Serialize};
+use std::fmt;
+
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum Intent {
     SpokeChainCall(SpokeChainCall),
     LimitOrder(LimitOrderIntent),
@@ -30,6 +33,20 @@ impl From<Intent> for bindings_khalani::base_intent_book::Intent {
             Intent::SpokeChainCall(spoke_chain_call) => spoke_chain_call.into(),
             Intent::LimitOrder(limit_order_intent) => limit_order_intent.into(),
             Intent::SwapIntent(swap_intent) => swap_intent.into(),
+        }
+    }
+}
+
+impl fmt::Display for Intent {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Intent::SpokeChainCall(spoke_chain_call) => {
+                write!(f, "SpokeChainCall: {}", spoke_chain_call)
+            }
+            Intent::LimitOrder(limit_order_intent) => {
+                write!(f, "LimitOrder: {}", limit_order_intent)
+            }
+            Intent::SwapIntent(swap_intent) => write!(f, "SwapIntent: {}", swap_intent),
         }
     }
 }
