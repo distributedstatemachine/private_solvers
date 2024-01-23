@@ -54,7 +54,7 @@ impl StateManager for DatabaseStateManager {
         &mut self,
         intent_id: IntentId,
         new_state: IntentState,
-        intentbook: &IntentbookType,
+        _intentbook: &IntentbookType,
     ) -> Result<(), sqlx::Error> {
         if let Some(pool) = &self.db_client {
             let mut connection = pool.acquire().await?;
