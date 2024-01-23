@@ -150,7 +150,7 @@ impl StateManager for DatabaseStateManager {
                 // TODO: fix this
                 intent_bid_id: intent_bid
                     .map(|bid| calculate_intent_bid_id(bid.into()).to_string()),
-                intent: intent,
+                intent,
                 // TODO: fix this
                 block_number: None,
             };
