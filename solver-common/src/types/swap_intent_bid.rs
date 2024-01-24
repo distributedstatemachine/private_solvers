@@ -35,6 +35,17 @@ impl SwapIntentBid {
     }
 }
 
+impl Default for SwapIntentBid {
+    fn default() -> Self {
+        Self {
+            intent_bid_id: IntentBidId::default(),
+            intent_id: IntentId::default(),
+            filler: Address::default(),
+            fill_amount: U256::default(),
+        }
+    }
+}
+
 impl TryFrom<WithIntentIdAndBidId<ContractIntent>> for SwapIntentBid {
     type Error = anyhow::Error;
 

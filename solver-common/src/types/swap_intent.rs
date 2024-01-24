@@ -57,6 +57,24 @@ impl SwapIntent {
     }
 }
 
+impl Default for SwapIntent {
+    fn default() -> Self {
+        Self {
+            intent_id: IntentId::default(),
+            author: Address::default(),
+            signature: Bytes::default(),
+            source_chain_id: ChainId::Fuji,
+            destination_chain_id: ChainId::Khalani,
+            source_token: Address::default(),
+            destination_token: Address::default(),
+            source_amount: U256::default(),
+            source_permit_2: Bytes::default(),
+            deadline: U256::default(),
+            nonce: U256::default(),
+        }
+    }
+}
+
 impl TryFrom<WithIntentId<ContractIntent>> for SwapIntent {
     type Error = anyhow::Error;
 

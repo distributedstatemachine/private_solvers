@@ -4,8 +4,10 @@ use serde::{Deserialize, Serialize};
 
 pub mod database_state_manager;
 pub mod state_manager;
+pub mod database_client;
 use std::fmt;
 
+// TODO: Move this to solver_common/types
 #[derive(Clone, Debug, PartialEq, PartialOrd, sqlx::Type, Deserialize, Serialize)]
 #[sqlx(type_name = "intent_status", rename_all = "lowercase")]
 pub enum IntentStatus {
@@ -36,6 +38,17 @@ pub struct IntentState {
     pub intent_bid_id: Option<String>,
     pub intent: Intent,
     pub block_number: Option<i64>,
+}
+impl Default for IntentState {
+    fn default() -> Self {
+        Self {
+            intent_id: IntentId::default(),
+            status: IntentStatus::New, 
+            intent_bid_id: None,
+            intent: Intent::default(), // assuming Intent also implements Default
+            block_number: None,
+        }
+    }
 }
 
 impl fmt::Display for IntentState {

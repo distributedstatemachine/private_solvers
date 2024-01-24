@@ -28,3 +28,4 @@ rusoto_kms = { version = "0.48", default-features = false }
 strum.workspace = true
 strum_macros.workspace = true
 sqlx.workspace = true
+mockall = "0.12.1"

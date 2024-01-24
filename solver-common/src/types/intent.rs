@@ -27,6 +27,12 @@ impl Intent {
     }
 }
 
+impl Default for Intent {
+    fn default() -> Self {
+        Self::SwapIntent(SwapIntent::default()) 
+    }
+}
+
 impl From<Intent> for bindings_khalani::base_intent_book::Intent {
     fn from(value: Intent) -> Self {
         match value {
@@ -48,6 +54,34 @@ impl fmt::Display for Intent {
             }
             Intent::SwapIntent(swap_intent) => write!(f, "SwapIntent: {}", swap_intent),
         }
+    }
+}
+
+impl Intent {
+    pub fn new(
+        variant: &str,
+        spoke_chain_call: SpokeChainCall,
+        limit_order_intent: LimitOrderIntent,
+        swap_intent: SwapIntent,
+    ) -> Self {
+        match variant {
+            "SpokeChainCall" => Intent::SpokeChainCall(spoke_chain_call),
+            "LimitOrder" => Intent::LimitOrder(limit_order_intent),
+            "SwapIntent" => Intent::SwapIntent(swap_intent),
+            _ => panic!("Invalid variant"),
+        }
+    }
+
+    pub fn new_spoke_chain_call(spoke_chain_call: SpokeChainCall) -> Self {
+        Intent::SpokeChainCall(spoke_chain_call)
+    }
+
+    pub fn new_limit_order(limit_order_intent: LimitOrderIntent) -> Self {
+        Intent::LimitOrder(limit_order_intent)
+    }
+
+    pub fn new_swap_intent(swap_intent: SwapIntent) -> Self {
+        Intent::SwapIntent(swap_intent)
     }
 }
 

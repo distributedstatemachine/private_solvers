@@ -1,3 +1,5 @@
+use std::pin::Pin;
+
 use crate::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSource;
 use crate::config::addresses::IntentbookType;
 use crate::state::IntentState;
@@ -6,19 +8,23 @@ use crate::types::intent_bid::IntentBid;
 use crate::types::intent_id::IntentId;
 
 use async_trait::async_trait;
+use futures::Future;
 
 // TODO: Move sync states here
 #[async_trait]
 pub trait StateManager {
     // TODO: Make error generic
-    async fn update_state(
+    async fn update_intent_state(
         &mut self,
         intent_id: IntentId,
         new_state: IntentState,
         intentbook: &IntentbookType,
     ) -> Result<(), sqlx::Error>;
 
-    async fn get_state(&mut self, intent_id: IntentId) -> Option<IntentState>;
+    async fn get_intent_state(
+        &self,
+        intent_id: IntentId,
+    ) -> Pin<Box<dyn Future<Output = Option<IntentState>> + Send>>;
     async fn get_all_intents(&self) -> Result<Vec<IntentState>, sqlx::Error>;
 
     async fn create_intent_state(
