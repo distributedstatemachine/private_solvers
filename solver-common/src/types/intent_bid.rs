@@ -34,7 +34,7 @@ impl IntentBid {
 
 impl Default for IntentBid {
     fn default() -> Self {
-        Self::SwapIntentBid(SwapIntentBid::default()) 
+        Self::SwapIntentBid(SwapIntentBid::default())
     }
 }
 impl From<IntentBid> for bindings_khalani::base_intent_book::IntentBid {

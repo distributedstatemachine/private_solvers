@@ -29,7 +29,7 @@ impl Intent {
 
 impl Default for Intent {
     fn default() -> Self {
-        Self::SwapIntent(SwapIntent::default()) 
+        Self::SwapIntent(SwapIntent::default())
     }
 }
 

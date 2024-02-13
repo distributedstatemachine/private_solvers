@@ -36,7 +36,11 @@ impl DatabaseClient for PgPool {
         Ok(())
     }
 
-    async fn update_intent_state(&self, intent_id: IntentId, new_state: IntentState) -> Result<(), sqlx::Error> {
+    async fn update_intent_state(
+        &self,
+        intent_id: IntentId,
+        new_state: IntentState,
+    ) -> Result<(), sqlx::Error> {
         let intent = to_string(&new_state.intent).unwrap(); // Serialize the intent
         sqlx::query("UPDATE IntentState SET status = $1, intent_bid_id = $2, spoke_chain_call = $3::jsonb, block_number = $4 WHERE intent_id = $5")
             .bind(new_state.status)
@@ -59,13 +63,13 @@ impl DatabaseClient for PgPool {
             .await?
             .map(|row| {
                 let intent_id = IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
-                let status: IntentStatus = serde_json::from_str(&(row.1).to_string()).unwrap(); 
+                let status: IntentStatus = serde_json::from_str(&(row.1).to_string()).unwrap();
                 let intent: Intent = serde_json::from_str(&row.3).unwrap();
 
                 IntentState {
                     intent_id,
                     status,
-                    intent_bid_id: None, 
+                    intent_bid_id: None,
                     intent,
                     block_number: Some(row.4),
                 }
@@ -80,24 +84,31 @@ impl DatabaseClient for PgPool {
             .fetch_all(self)
             .await?;
 
-        let intents = rows.into_iter().map(|row| {
-            let intent_id = IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
-            let status: IntentStatus = serde_json::from_str(&row.1.to_string()).unwrap();
-            let intent: Intent = serde_json::from_str(&row.3).unwrap();
+        let intents = rows
+            .into_iter()
+            .map(|row| {
+                let intent_id = IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
+                let status: IntentStatus = serde_json::from_str(&row.1.to_string()).unwrap();
+                let intent: Intent = serde_json::from_str(&row.3).unwrap();
 
-            IntentState {
-                intent_id,
-                status,
-                intent_bid_id: row.2,
-                intent,
-                block_number: Some(row.4),
-            }
-        }).collect();
+                IntentState {
+                    intent_id,
+                    status,
+                    intent_bid_id: row.2,
+                    intent,
+                    block_number: Some(row.4),
+                }
+            })
+            .collect();
 
         Ok(intents)
     }
 
-    async fn create_intent_state(&self, intent: Intent, intent_bid: Option<IntentBid>) -> Result<IntentId, sqlx::Error> {
+    async fn create_intent_state(
+        &self,
+        intent: Intent,
+        intent_bid: Option<IntentBid>,
+    ) -> Result<IntentId, sqlx::Error> {
         let intent_clone = intent.clone();
         let intent_id = calculate_intent_id(intent_clone.into());
         let intent_state = IntentState {
@@ -125,19 +136,22 @@ impl DatabaseClient for PgPool {
             .fetch_all(self)
             .await?;
 
-        let intents = rows.into_iter().map(|row| {
-            let intent_id = IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
-            let status: IntentStatus = serde_json::from_str(&row.1.to_string()).unwrap();
-            let intent: Intent = serde_json::from_str(&row.3).unwrap();
+        let intents = rows
+            .into_iter()
+            .map(|row| {
+                let intent_id = IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
+                let status: IntentStatus = serde_json::from_str(&row.1.to_string()).unwrap();
+                let intent: Intent = serde_json::from_str(&row.3).unwrap();
 
-            IntentState {
-                intent_id,
-                status,
-                intent_bid_id: row.2,
-                intent,
-                block_number: Some(row.4),
-            }
-        }).collect();
+                IntentState {
+                    intent_id,
+                    status,
+                    intent_bid_id: row.2,
+                    intent,
+                    block_number: Some(row.4),
+                }
+            })
+            .collect();
 
         Ok(intents)
     }
@@ -165,7 +179,9 @@ impl StateManager for DatabaseStateManager {
         new_state: IntentState,
         _intentbook: &IntentbookType,
     ) -> Result<(), sqlx::Error> {
-        self.db_client.update_intent_state(intent_id, new_state).await
+        self.db_client
+            .update_intent_state(intent_id, new_state)
+            .await
     }
 
     async fn get_intent_state(
@@ -180,7 +196,6 @@ impl StateManager for DatabaseStateManager {
             }
         })
     }
-    
 
     async fn get_all_intents(&self) -> Result<Vec<IntentState>, sqlx::Error> {
         self.db_client.get_all_intents().await
@@ -210,7 +225,7 @@ impl StateManager for DatabaseStateManager {
         let in_progress_intents = self.db_client.get_in_progress_intents().await?;
         for intent in in_progress_intents {
             let block_number = intent.block_number.unwrap();
-    
+
             let rpc_client = Arc::clone(&intentbook_source.rpc_client);
             let latest_block_number_result = rpc_client.get_block_number().await;
             if let Ok(latest_block_number) = latest_block_number_result {
@@ -232,7 +247,9 @@ impl StateManager for DatabaseStateManager {
                             intent: new_intent,
                             block_number: Some(latest_block_number.as_u64() as i64),
                         };
-                        self.db_client.update_intent_state(intent_id, intent_state.clone()).await?;
+                        self.db_client
+                            .update_intent_state(intent_id, intent_state.clone())
+                            .await?;
                         new_intents.push(intent_state);
                     }
                 }
@@ -242,16 +259,15 @@ impl StateManager for DatabaseStateManager {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use mockall::predicate::*;
     use crate::state::database_client::MockDatabaseClient;
+    use mockall::predicate::*;
 
     // TODO: Make this test more robust by creating actual states and not default.
     // it might also make sense to combine this with create_intent_state
-     #[tokio::test]
+    #[tokio::test]
     async fn test_update_intent_state() {
         let mut mock_db_client = MockDatabaseClient::new();
 
@@ -259,7 +275,8 @@ mod tests {
         let expected_intent_id = IntentId::default();
         let expected_new_state = IntentState::default();
         let expected_new_state_clone = expected_new_state.clone(); // Clone before moving
-        mock_db_client.expect_update_intent_state()
+        mock_db_client
+            .expect_update_intent_state()
             .with(eq(expected_intent_id), eq(expected_new_state_clone))
             .return_once(|_, _| Ok(()));
 
@@ -267,7 +284,13 @@ mod tests {
         let mut state_manager = DatabaseStateManager::new(Arc::new(mock_db_client)).await;
 
         // Call update_intent_state and check the result
-        let result = state_manager.update_intent_state(expected_intent_id, expected_new_state, &IntentbookType::SwapIntentIntentBook).await;
+        let result = state_manager
+            .update_intent_state(
+                expected_intent_id,
+                expected_new_state,
+                &IntentbookType::SwapIntentIntentBook,
+            )
+            .await;
         assert!(result.is_ok());
     }
 
@@ -279,7 +302,8 @@ mod tests {
         let expected_intent_id = IntentId::default();
         let expected_intent_state = Some(IntentState::default());
         let expected_intent_state_clone = expected_intent_state.clone(); // Clone before moving
-        mock_db_client.expect_get_intent_state()
+        mock_db_client
+            .expect_get_intent_state()
             .with(eq(expected_intent_id))
             .return_once(move |_| Ok(expected_intent_state_clone));
 
@@ -287,7 +311,10 @@ mod tests {
         let state_manager = DatabaseStateManager::new(Arc::new(mock_db_client)).await;
 
         // Call get_intent_state and check the result
-        let result = state_manager.get_intent_state(expected_intent_id).await.await;
+        let result = state_manager
+            .get_intent_state(expected_intent_id)
+            .await
+            .await;
         assert_eq!(result, expected_intent_state);
     }
 
@@ -298,7 +325,8 @@ mod tests {
         // Set up the mock to return a specific value when get_all_intents is called
         let expected_intents = vec![IntentState::default()];
         let expected_intents_clone = expected_intents.clone(); // Clone for the assertion later
-        mock_db_client.expect_get_all_intents()
+        mock_db_client
+            .expect_get_all_intents()
             .return_once(move || Ok(expected_intents_clone));
 
         // Create a DatabaseStateManager with the mock client
@@ -317,7 +345,8 @@ mod tests {
         let expected_intent = Intent::default();
         let expected_intent_bid = Some(IntentBid::default());
         let expected_intent_id = IntentId::default();
-        mock_db_client.expect_create_intent_state()
+        mock_db_client
+            .expect_create_intent_state()
             .with(eq(expected_intent.clone()), eq(expected_intent_bid.clone()))
             .return_once(move |_, _| Ok(expected_intent_id));
 
@@ -325,7 +354,9 @@ mod tests {
         let mut state_manager = DatabaseStateManager::new(Arc::new(mock_db_client)).await;
 
         // Call create_intent_state and check the result
-        let result = state_manager.create_intent_state(expected_intent, expected_intent_bid).await;
+        let result = state_manager
+            .create_intent_state(expected_intent, expected_intent_bid)
+            .await;
         assert_eq!(result.unwrap(), expected_intent_id);
     }
 }

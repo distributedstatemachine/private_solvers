@@ -2,9 +2,9 @@ use crate::types::intent::Intent;
 use crate::types::intent_id::IntentId;
 use serde::{Deserialize, Serialize};
 
+pub mod database_client;
 pub mod database_state_manager;
 pub mod state_manager;
-pub mod database_client;
 use std::fmt;
 
 // TODO: Move this to solver_common/types
@@ -43,7 +43,7 @@ impl Default for IntentState {
     fn default() -> Self {
         Self {
             intent_id: IntentId::default(),
-            status: IntentStatus::New, 
+            status: IntentStatus::New,
             intent_bid_id: None,
             intent: Intent::default(), // assuming Intent also implements Default
             block_number: None,

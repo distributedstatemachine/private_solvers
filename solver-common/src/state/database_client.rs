@@ -1,9 +1,9 @@
-use mockall::automock;
 use crate::state::IntentState;
 use crate::types::intent::Intent;
 use crate::types::intent_bid::IntentBid;
 use crate::types::intent_id::IntentId;
 use async_trait::async_trait;
+use mockall::automock;
 
 #[automock]
 #[async_trait]
