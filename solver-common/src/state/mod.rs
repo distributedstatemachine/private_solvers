@@ -18,6 +18,19 @@ pub enum IntentStatus {
     Cancelled,
 }
 
+// TODO: This conversion is only needed for the test. Should consider removing it
+impl IntentStatus {
+    fn from_i32(value: i32) -> Option<Self> {
+        match value {
+            0 => Some(IntentStatus::NotExists),
+            1 => Some(IntentStatus::New),
+            2 => Some(IntentStatus::InProgress),
+            3 => Some(IntentStatus::Settled),
+            4 => Some(IntentStatus::Cancelled),
+            _ => None,
+        }
+    }
+}
 impl fmt::Display for IntentStatus {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let status_str = match self {
@@ -45,7 +58,7 @@ impl Default for IntentState {
             intent_id: IntentId::default(),
             status: IntentStatus::New,
             intent_bid_id: None,
-            intent: Intent::default(), // assuming Intent also implements Default
+            intent: Intent::default(),
             block_number: None,
         }
     }

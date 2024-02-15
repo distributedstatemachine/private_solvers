@@ -29,3 +29,9 @@ strum.workspace = true
 strum_macros.workspace = true
 sqlx.workspace = true
 mockall = "0.12.1"
+dotenv = "0.15.0"
+
+
+[dev-dependencies]
+testcontainers = "0.15.0"
+testcontainers-modules = { version = "0.3.2", features = ["postgres"] }

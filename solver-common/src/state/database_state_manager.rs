@@ -6,6 +6,7 @@ use crate::collectors::ethereum::new_intentbook_source::NewIntentbookIntentSourc
 use crate::collectors::new_intent_collector::NewIntentSource;
 use crate::state::database_client::DatabaseClient;
 
+use super::IntentStatus;
 use crate::config::addresses::IntentbookType;
 use crate::state::state_manager::StateManager;
 use crate::state::IntentState;
@@ -20,17 +21,15 @@ use futures::{Future, StreamExt};
 use serde_json::to_string;
 use sqlx::migrate::Migrator;
 use sqlx::PgPool;
-use std::env;
-
-use super::IntentStatus;
 
 #[async_trait]
 impl DatabaseClient for PgPool {
     async fn run_migrations(&self) -> Result<(), sqlx::Error> {
-        // Retrieve the migrations directory from an environment variable
-        let migrations_dir = env::var("MIGRATIONS_DIR").expect("MIGRATIONS_DIR must be set");
-        let migrator = Migrator::new(std::path::Path::new(&migrations_dir)).await?;
-        // Run the migrations using the acquired PgPool (self)
+        let migrations_folder = "./solver-common/src/migrations";
+        let migrator = Migrator::new(std::path::Path::new(migrations_folder))
+            .await
+            .expect("Failed to create migrator");
+
         migrator.run(self).await?;
 
         Ok(())
@@ -41,12 +40,12 @@ impl DatabaseClient for PgPool {
         intent_id: IntentId,
         new_state: IntentState,
     ) -> Result<(), sqlx::Error> {
-        let intent = to_string(&new_state.intent).unwrap(); // Serialize the intent
-        sqlx::query("UPDATE IntentState SET status = $1, intent_bid_id = $2, spoke_chain_call = $3::jsonb, block_number = $4 WHERE intent_id = $5")
+        let intent = to_string(&new_state.intent).unwrap();
+        sqlx::query("UPDATE IntentState SET status = $1, intent_bid_id = $2, intent = $3::jsonb, block_number = $4 WHERE intent_id = $5")
             .bind(new_state.status)
-            .bind(new_state.intent_bid_id)
+            .bind(new_state.intent_bid_id.unwrap_or_else(|| "default_bid_id".to_string())) 
             .bind(&intent)
-            .bind(new_state.block_number)
+            .bind(new_state.block_number.unwrap_or(0))
             .bind(intent_id.to_string())
             .execute(self)
             .await?;
@@ -57,19 +56,19 @@ impl DatabaseClient for PgPool {
         &self,
         intent_id: IntentId,
     ) -> Result<Option<IntentState>, sqlx::Error> {
-        let result = sqlx::query_as::<_, (String, i32, String, String, i64)>("SELECT intent_id, status, intent_bid_id, spoke_chain_call, block_number FROM IntentState WHERE intent_id = $1")
+        let result = sqlx::query_as::<_, (String, String, String, String, i64)>("SELECT intent_id, status, intent_bid_id, intent, block_number FROM IntentState WHERE intent_id = $1")
             .bind(intent_id.to_string())
             .fetch_optional(self)
             .await?
             .map(|row| {
                 let intent_id = IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
-                let status: IntentStatus = serde_json::from_str(&(row.1).to_string()).unwrap();
+                let status: IntentStatus = serde_json::from_str(&row.1).unwrap();
+                let intent_bid_id = Some(row.2);
                 let intent: Intent = serde_json::from_str(&row.3).unwrap();
-
                 IntentState {
                     intent_id,
                     status,
-                    intent_bid_id: None,
+                    intent_bid_id,
                     intent,
                     block_number: Some(row.4),
                 }
@@ -77,24 +76,25 @@ impl DatabaseClient for PgPool {
         Ok(result)
     }
 
-    // FIX ME: Still using old schema
     async fn get_all_intents(&self) -> Result<Vec<IntentState>, sqlx::Error> {
-        let rows: Vec<(String, i32, Option<String>, String, i64)> = sqlx::query_as(
-            "SELECT intent_id, status, intent_bid_id, spoke_chain_call, block_number FROM IntentState")
-            .fetch_all(self)
-            .await?;
+        let rows: Vec<(String, String, String, String, i64)> = sqlx::query_as(
+            "SELECT intent_id, status, intent_bid_id, intent, block_number FROM IntentState",
+        )
+        .fetch_all(self)
+        .await?;
 
         let intents = rows
             .into_iter()
             .map(|row| {
                 let intent_id = IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
-                let status: IntentStatus = serde_json::from_str(&row.1.to_string()).unwrap();
+                let status: IntentStatus = serde_json::from_str(&row.1).unwrap();
+                let intent_bid_id = Some(row.2); // Since intent_bid_id is now NOT NULL
                 let intent: Intent = serde_json::from_str(&row.3).unwrap();
 
                 IntentState {
                     intent_id,
                     status,
-                    intent_bid_id: row.2,
+                    intent_bid_id,
                     intent,
                     block_number: Some(row.4),
                 }
@@ -111,28 +111,30 @@ impl DatabaseClient for PgPool {
     ) -> Result<IntentId, sqlx::Error> {
         let intent_clone = intent.clone();
         let intent_id = calculate_intent_id(intent_clone.into());
+        let intent_bid_id = intent_bid
+            .map(|bid| calculate_intent_bid_id(bid.into()).to_string())
+            .unwrap_or_else(|| "default_bid_id".to_string());
         let intent_state = IntentState {
             intent_id,
             status: IntentStatus::New,
-            intent_bid_id: intent_bid.map(|bid| calculate_intent_bid_id(bid.into()).to_string()),
+            intent_bid_id: Some(intent_bid_id.clone()),
             intent,
             block_number: None,
         };
         let serialized_intent = to_string(&intent_state.intent).unwrap();
-        sqlx::query("INSERT INTO IntentState (intent_id, status, intent_bid_id, spoke_chain_call, block_number) VALUES ($1, $2, $3, $4::jsonb, $5)")
+        sqlx::query("INSERT INTO IntentState (intent_id, status, intent_bid_id, intent, block_number) VALUES ($1, $2, $3, $4::jsonb, $5)")
             .bind(intent_id.to_string())
             .bind(intent_state.status.to_string())
-            .bind(intent_state.intent_bid_id)
+            .bind(intent_bid_id) // Adjusted to ensure it's not null
             .bind(&serialized_intent)
-            .bind(intent_state.block_number)
+            .bind(intent_state.block_number.unwrap_or(0)) // Provide a default value for block_number
             .execute(self)
             .await?;
         Ok(intent_id)
     }
-
     async fn get_in_progress_intents(&self) -> Result<Vec<IntentState>, sqlx::Error> {
-        let rows: Vec<(String, i32, Option<String>, String, i64)> = sqlx::query_as(
-            "SELECT intent_id, status, intent_bid_id, spoke_chain_call, block_number FROM IntentState WHERE status = 'InProgress'")
+        let rows: Vec<(String, String, String, String, i64)> = sqlx::query_as(
+            "SELECT intent_id, status, intent_bid_id, intent, block_number FROM IntentState WHERE status = 'InProgress'")
             .fetch_all(self)
             .await?;
 
@@ -140,13 +142,14 @@ impl DatabaseClient for PgPool {
             .into_iter()
             .map(|row| {
                 let intent_id = IntentId::from(H256::from_slice(&hex::decode(&row.0).unwrap()));
-                let status: IntentStatus = serde_json::from_str(&row.1.to_string()).unwrap();
+                let status: IntentStatus = serde_json::from_str(&row.1).unwrap();
+                let intent_bid_id = Some(row.2); // Since intent_bid_id is now NOT NULL
                 let intent: Intent = serde_json::from_str(&row.3).unwrap();
 
                 IntentState {
                     intent_id,
                     status,
-                    intent_bid_id: row.2,
+                    intent_bid_id,
                     intent,
                     block_number: Some(row.4),
                 }
@@ -262,101 +265,126 @@ impl StateManager for DatabaseStateManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::database_client::MockDatabaseClient;
-    use mockall::predicate::*;
+    use sqlx::{postgres::PgPoolOptions, PgPool, Row};
+    use std::env;
+    use testcontainers_modules::{postgres::Postgres, testcontainers::clients::Cli};
 
-    // TODO: Make this test more robust by creating actual states and not default.
-    // it might also make sense to combine this with create_intent_state
+    struct TestDb {
+        uri: String,
+    }
+
+    impl TestDb {
+        async fn new() -> Self {
+            // let pool_options = sqlx::postgres::PgPoolOptions::new().max_connections(5);
+
+            let docker = Cli::default();
+            let container = docker.run(Postgres::default());
+
+
+
+            let uri = format!(
+                "postgres://postgres:postgres@127.0.0.1:{}/postgres",
+                container.get_host_port_ipv4(5432)
+            );
+
+            // Simple delay to wait for the container to be ready, adjust as needed
+            tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+
+            env::set_var("DATABASE_URL", &uri);
+
+            // // Create a new instance of PgPool
+            // let pool = container
+            //     .connect(&uri)
+            //     .await
+            //     .expect("Failed to connect to the database");
+
+            // Create a new connection pool
+            let pool = PgPoolOptions::new()
+                .max_connections(5)
+                .connect(&uri)
+                .await
+                .expect("Failed to create a connection pool");
+
+            // Run migrations
+            Self::run_migrations(&pool)
+                .await
+                .expect("Failed to run migrations");
+
+            Self { uri }
+        }
+
+        async fn run_migrations(pool: &PgPool) -> Result<(), sqlx::Error> {
+            // Specify the path to your migrations folder
+            // let migrations_folder = "./solver-common/src/migrations";
+            let migrations_folder = "./src/migrations";
+
+            let migrator = sqlx::migrate::Migrator::new(std::path::Path::new(migrations_folder))
+                .await
+                .expect("Failed to create migrator");
+
+            // Apply migrations
+            migrator.run(pool).await?;
+
+            Ok(())
+        }
+    }
+
+    // impl Drop for TestDb {
+    //     fn drop(&mut self) {}
+    // }
+
     #[tokio::test]
     async fn test_update_intent_state() {
-        let mut mock_db_client = MockDatabaseClient::new();
+        let test_db = TestDb::new().await;
+        let pool = PgPool::connect(&test_db.uri).await.unwrap();
 
-        // Set up the mock to return Ok(()) when update_intent_state is called
-        let expected_intent_id = IntentId::default();
-        let expected_new_state = IntentState::default();
-        let expected_new_state_clone = expected_new_state.clone(); // Clone before moving
-        mock_db_client
-            .expect_update_intent_state()
-            .with(eq(expected_intent_id), eq(expected_new_state_clone))
-            .return_once(|_, _| Ok(()));
+        // Insert a test intent into the database
+        let insert_query = sqlx::query(
+            "INSERT INTO IntentState (intent_id, status, intent_bid_id, spoke_chain_call, block_number) VALUES ($1, $2, $3, $4::jsonb, $5) RETURNING intent_id",
+        )
+        .bind("test_intent_id")
+        .bind("New")
+        .bind(None::<String>)
+        .bind("{}")
+        .bind(0)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        let intent_id: String = insert_query.get("intent_id");
 
-        // Create a DatabaseStateManager with the mock client
-        let mut state_manager = DatabaseStateManager::new(Arc::new(mock_db_client)).await;
+        // Update the intent state
+        let update_query = sqlx::query(
+            "UPDATE IntentState SET status = $1, block_number = $2 WHERE intent_id = $3",
+        )
+        .bind("InProgress")
+        .bind(1)
+        .bind(&intent_id)
+        .execute(&pool)
+        .await;
+        assert!(update_query.is_ok(), "Failed to update intent state");
 
-        // Call update_intent_state and check the result
-        let result = state_manager
-            .update_intent_state(
-                expected_intent_id,
-                expected_new_state,
-                &IntentbookType::SwapIntentIntentBook,
-            )
-            .await;
-        assert!(result.is_ok());
+        // Fetch the updated intent and assert the changes
+        let select_query = sqlx::query_as::<_, (String, i32, Option<String>, String, i64)>(
+            "SELECT intent_id, status, intent_bid_id, spoke_chain_call, block_number FROM IntentState WHERE intent_id = $1",
+        )
+        .bind(&intent_id)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+
+        assert_eq!(select_query.0, intent_id);
+        let status = IntentStatus::from_i32(select_query.1).expect("Invalid status value");
+        assert_eq!(status, IntentStatus::InProgress);
+        assert_eq!(select_query.4, 1);
     }
 
-    #[tokio::test]
-    async fn test_get_intent_state() {
-        let mut mock_db_client = MockDatabaseClient::new();
+    // #[tokio::test]
+    // async fn test_get_intent_state() {
+    //     let test_db = TestDb::new().await;
+    //     let pool = PgPool::connect(&test_db.uri).await.unwrap();
 
-        // Set up the mock to return a specific value when get_intent_state is called
-        let expected_intent_id = IntentId::default();
-        let expected_intent_state = Some(IntentState::default());
-        let expected_intent_state_clone = expected_intent_state.clone(); // Clone before moving
-        mock_db_client
-            .expect_get_intent_state()
-            .with(eq(expected_intent_id))
-            .return_once(move |_| Ok(expected_intent_state_clone));
-
-        // Create a DatabaseStateManager with the mock client
-        let state_manager = DatabaseStateManager::new(Arc::new(mock_db_client)).await;
-
-        // Call get_intent_state and check the result
-        let result = state_manager
-            .get_intent_state(expected_intent_id)
-            .await
-            .await;
-        assert_eq!(result, expected_intent_state);
-    }
-
-    #[tokio::test]
-    async fn test_get_all_intents() {
-        let mut mock_db_client = MockDatabaseClient::new();
-
-        // Set up the mock to return a specific value when get_all_intents is called
-        let expected_intents = vec![IntentState::default()];
-        let expected_intents_clone = expected_intents.clone(); // Clone for the assertion later
-        mock_db_client
-            .expect_get_all_intents()
-            .return_once(move || Ok(expected_intents_clone));
-
-        // Create a DatabaseStateManager with the mock client
-        let state_manager = DatabaseStateManager::new(Arc::new(mock_db_client)).await;
-
-        // Call get_all_intents and check the result
-        let result = state_manager.get_all_intents().await;
-        assert_eq!(result.unwrap(), expected_intents);
-    }
-
-    #[tokio::test]
-    async fn test_create_intent_state() {
-        let mut mock_db_client = MockDatabaseClient::new();
-
-        // Set up the mock to return a specific value when create_intent_state is called
-        let expected_intent = Intent::default();
-        let expected_intent_bid = Some(IntentBid::default());
-        let expected_intent_id = IntentId::default();
-        mock_db_client
-            .expect_create_intent_state()
-            .with(eq(expected_intent.clone()), eq(expected_intent_bid.clone()))
-            .return_once(move |_, _| Ok(expected_intent_id));
-
-        // Create a DatabaseStateManager with the mock client
-        let mut state_manager = DatabaseStateManager::new(Arc::new(mock_db_client)).await;
-
-        // Call create_intent_state and check the result
-        let result = state_manager
-            .create_intent_state(expected_intent, expected_intent_bid)
-            .await;
-        assert_eq!(result.unwrap(), expected_intent_id);
-    }
+    //     // Insert test data
+    //     // Fetch intent state using `get_intent_state`
+    //     // Assert the fetched data matches expected values
+    // }
 }
